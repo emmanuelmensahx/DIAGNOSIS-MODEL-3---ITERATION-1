@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  afridiag:
+    build: .
+    container_name: afridiag-app
+    ports:
+      - "8080:8080"
+    volumes:
+      # Persistent data storage
+      - afridiag_data:/app/data
+      # Configuration files (optional override)
+      - ./config:/app/config:ro
+    environment:
+      - DATABASE_URL=sqlite:///app/data/afridiag.db
+      - ENVIRONMENT=production
+      - OFFLINE_MODE=true
+      - TZ=UTC
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  afridiag_data:
+    driver: local
