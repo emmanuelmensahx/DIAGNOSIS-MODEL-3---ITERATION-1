@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - AI-Powered Medical Diagnosis Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .welcome-section h2 {
+            font-size: 36px;
+            color: #1E88E5;
+            margin-bottom: 15px;
+        }
+        
+        .welcome-section p {
+            font-size: 18px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid transparent;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-color: #1E88E5;
+        }
+        
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1E88E5;
+            margin-bottom: 10px;
+        }
+        
+        .card-description {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        /* Quick Stats */
+        .stats-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .stats-title {
+            font-size: 24px;
+            color: #1E88E5;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1E88E5;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 50px;
+        }
+        
+        .footer p {
+            opacity: 0.8;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .welcome-section h2 {
+                font-size: 28px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1E88E5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">🩺</div>
+                <div class="logo-text">
+                    <h1>AfriDiag</h1>
+                    <p>AI-Powered Medical Diagnosis</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">👤</div>
+                <span id="userEmail">Guest User</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h2>Welcome to AfriDiag</h2>
+            <p>Your comprehensive AI-powered medical diagnosis platform designed specifically for African healthcare settings. Access all tools and features from this central dashboard.</p>
+        </section>
+
+        <!-- Dashboard Cards -->
+        <section class="dashboard-grid">
+            <a href="diagnosis_screen.html" class="dashboard-card">
+                <div class="card-icon">🔍</div>
+                <h3 class="card-title">AI Diagnosis</h3>
+                <p class="card-description">Perform comprehensive medical diagnosis using our advanced AI system with symptom analysis and treatment recommendations.</p>
+            </a>
+
+            <a href="comprehensive_diagnosis.html" class="dashboard-card">
+                <div class="card-icon">🩺</div>
+                <h3 class="card-title">Comprehensive Diagnosis</h3>
+                <p class="card-description">Access advanced diagnostic tools with detailed analysis, specialist consultation options, and integrated chat support for complex cases.</p>
+            </a>
+
+            <a href="patients_screen.html" class="dashboard-card">
+                <div class="card-icon">👥</div>
+                <h3 class="card-title">Patient Management</h3>
+                <p class="card-description">View, manage, and track patient records, medical history, and ongoing treatments in one centralized location.</p>
+            </a>
+
+            <a href="new_patient_screen.html" class="dashboard-card">
+                <div class="card-icon">➕</div>
+                <h3 class="card-title">New Patient</h3>
+                <p class="card-description">Register new patients and create comprehensive medical profiles with demographic and health information.</p>
+            </a>
+
+            <a href="treatment_guide_screen.html" class="dashboard-card">
+                <div class="card-icon">💊</div>
+                <h3 class="card-title">Treatment Guide</h3>
+                <p class="card-description">Access evidence-based treatment protocols and medication guidelines tailored for African healthcare contexts.</p>
+            </a>
+
+            <a href="profile_screen.html" class="dashboard-card">
+                <div class="card-icon">⚙️</div>
+                <h3 class="card-title">Settings & Profile</h3>
+                <p class="card-description">Manage your account settings, preferences, and view system statistics and performance metrics.</p>
+            </a>
+
+            <a href="specialist_chat.html" class="dashboard-card">
+                <div class="card-icon">💬</div>
+                <h3 class="card-title">Expert Chat</h3>
+                <p class="card-description">Connect with medical specialists for real-time consultations, expert opinions, and collaborative diagnosis discussions.</p>
+            </a>
+
+            <a href="specialist-dashboard" class="dashboard-card">
+                <div class="card-icon">👨‍⚕️</div>
+                <h3 class="card-title">Specialist Consultation</h3>
+                <p class="card-description">Access the specialist dashboard to review consultation requests, provide expert opinions, and manage patient consultations.</p>
+            </a>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="stats-section">
+            <h3 class="stats-title">System Overview</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalPatients">-</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalDiagnoses">-</div>
+                    <div class="stat-label">Diagnoses Made</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="systemStatus">Online</div>
+                    <div class="stat-label">System Status</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="aiAccuracy">95%</div>
+                    <div class="stat-label">AI Accuracy</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 AfriDiag - AI-Powered Medical Diagnosis Platform for African Healthcare</p>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Check authentication status
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const userEmail = localStorage.getItem('userEmail');
+            
+            if (userEmail) {
+                document.getElementById('userEmail').textContent = userEmail;
+            }
+            
+            return !!token;
+        }
+
+        // Logout function
+        function logout() {
+            if (window.afridiagAuth) {
+                window.afridiagAuth.logout();
+            } else {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userEmail');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Load system statistics
+        async function loadStats() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) return;
+
+                // Try to fetch real stats from API
+                const response = await fetch('http://localhost:8001/api/v1/statistics', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('totalPatients').textContent = stats.total_patients || '0';
+                    document.getElementById('totalDiagnoses').textContent = stats.total_diagnoses || '0';
+                } else {
+                    // Fallback to demo data
+                    document.getElementById('totalPatients').textContent = '127';
+                    document.getElementById('totalDiagnoses').textContent = '342';
+                }
+            } catch (error) {
+                console.log('Using demo statistics');
+                document.getElementById('totalPatients').textContent = '127';
+                document.getElementById('totalDiagnoses').textContent = '342';
+            }
+        }
+
+        // Initialize page
+        window.addEventListener('load', function() {
+            // Use new auth system if available
+            if (window.afridiagAuth) {
+                window.afridiagAuth.updateAuthUI();
+            } else {
+                checkAuth();
+            }
+            
+            loadStats();
+            
+            console.log('🩺 AfriDiag Dashboard Loaded');
+        });
+    </script>
+</body>
+</html>

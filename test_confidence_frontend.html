@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Confidence Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            background-color: #ffe8e8;
+            border-left: 4px solid #f44336;
+        }
+        .confidence-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+            margin: 10px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .debug-info {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 AfriDiag Confidence Testing</h1>
+            <p>Testing confidence values from different sources</p>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 1: Direct Backend Function Call</h3>
+            <button onclick="testDirectBackend()">Test Direct Backend</button>
+            <div id="directResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 2: Mock Frontend Display</h3>
+            <button onclick="testMockFrontend()">Test Mock Frontend</button>
+            <div id="mockResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 3: Confidence Calculation Debug</h3>
+            <button onclick="debugConfidenceCalculation()">Debug Calculation</button>
+            <div id="debugResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 4: Frontend Display Logic</h3>
+            <button onclick="testFrontendLogic()">Test Display Logic</button>
+            <div id="frontendResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Mock data for testing
+        const mockPredictionData = {
+            diagnosis: "Malaria",
+            confidence: 0.4946,  // 49.46% as decimal
+            severity: "moderate",
+            enhanced_ai: true,
+            model_agreement: 1.0,
+            differential_diagnosis: [
+                { diagnosis: "Typhoid", confidence: 0.32 },
+                { diagnosis: "Dengue", confidence: 0.18 }
+            ]
+        };
+
+        function testDirectBackend() {
+            const resultDiv = document.getElementById('directResult');
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <h4>✅ Direct Backend Test Results</h4>
+                    <div class="confidence-display">Confidence: ${(mockPredictionData.confidence * 100).toFixed(1)}%</div>
+                    <div class="debug-info">
+                        Raw confidence value: ${mockPredictionData.confidence}<br>
+                        Type: ${typeof mockPredictionData.confidence}<br>
+                        Enhanced AI: ${mockPredictionData.enhanced_ai}<br>
+                        Model Agreement: ${(mockPredictionData.model_agreement * 100).toFixed(1)}%
+                    </div>
+                </div>
+            `;
+        }
+
+        function testMockFrontend() {
+            const resultDiv = document.getElementById('mockResult');
+            
+            // Simulate the frontend confidence display logic
+            let displayConfidence = mockPredictionData.confidence;
+            
+            // Check if confidence is already a percentage (> 1)
+            if (displayConfidence > 1) {
+                displayConfidence = displayConfidence / 100;
+            }
+            
+            // Convert to percentage for display
+            const percentageDisplay = (displayConfidence * 100).toFixed(1);
+            
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <h4>🎯 Mock Frontend Display</h4>
+                    <div class="confidence-display">Displayed Confidence: ${percentageDisplay}%</div>
+                    <div class="debug-info">
+                        Original value: ${mockPredictionData.confidence}<br>
+                        After processing: ${displayConfidence}<br>
+                        Final display: ${percentageDisplay}%<br>
+                        Logic: ${displayConfidence > 1 ? 'Divided by 100' : 'Multiplied by 100'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function debugConfidenceCalculation() {
+            const resultDiv = document.getElementById('debugResult');
+            
+            // Test different confidence value scenarios
+            const testValues = [0.4946, 49.46, 0.94, 94, 0.32, 32];
+            let debugOutput = '<div class="result"><h4>🔧 Confidence Calculation Debug</h4>';
+            
+            testValues.forEach(value => {
+                let processed = value;
+                let logic = 'No change';
+                
+                if (value > 1) {
+                    processed = value / 100;
+                    logic = 'Divided by 100 (was percentage)';
+                }
+                
+                const display = (processed * 100).toFixed(1);
+                
+                debugOutput += `
+                    <div class="debug-info">
+                        Input: ${value} → Processed: ${processed} → Display: ${display}%<br>
+                        Logic: ${logic}
+                    </div>
+                `;
+            });
+            
+            debugOutput += '</div>';
+            resultDiv.innerHTML = debugOutput;
+        }
+
+        function testFrontendLogic() {
+            const resultDiv = document.getElementById('frontendResult');
+            
+            // Simulate the actual frontend logic from diagnosis_screen.html
+            function displayEnhancedDiagnosisResults(prediction) {
+                let confidence = prediction.confidence || 0;
+                
+                // This might be where the issue is - check for different confidence formats
+                if (typeof confidence === 'string') {
+                    confidence = parseFloat(confidence);
+                }
+                
+                // If confidence is already a percentage (> 1), convert to decimal
+                if (confidence > 1) {
+                    confidence = confidence / 100;
+                }
+                
+                // Determine confidence level
+                let confidenceLevel = 'Low';
+                let confidenceColor = '#ff6b6b';
+                
+                if (confidence >= 0.8) {
+                    confidenceLevel = 'Very High';
+                    confidenceColor = '#51cf66';
+                } else if (confidence >= 0.6) {
+                    confidenceLevel = 'High';
+                    confidenceColor = '#69db7c';
+                } else if (confidence >= 0.4) {
+                    confidenceLevel = 'Moderate';
+                    confidenceColor = '#ffd43b';
+                } else if (confidence >= 0.2) {
+                    confidenceLevel = 'Low';
+                    confidenceColor = '#ff8787';
+                }
+                
+                return {
+                    confidence: confidence,
+                    confidencePercentage: (confidence * 100).toFixed(1),
+                    confidenceLevel: confidenceLevel,
+                    confidenceColor: confidenceColor
+                };
+            }
+            
+            // Test with different scenarios
+            const testScenarios = [
+                { name: "Normal decimal (0.4946)", data: { ...mockPredictionData, confidence: 0.4946 } },
+                { name: "Percentage format (49.46)", data: { ...mockPredictionData, confidence: 49.46 } },
+                { name: "High confidence (0.94)", data: { ...mockPredictionData, confidence: 0.94 } },
+                { name: "High percentage (94)", data: { ...mockPredictionData, confidence: 94 } }
+            ];
+            
+            let output = '<div class="result"><h4>🎨 Frontend Display Logic Test</h4>';
+            
+            testScenarios.forEach(scenario => {
+                const result = displayEnhancedDiagnosisResults(scenario.data);
+                output += `
+                    <div class="debug-info">
+                        <strong>${scenario.name}</strong><br>
+                        Input: ${scenario.data.confidence}<br>
+                        Processed: ${result.confidence}<br>
+                        Display: <span style="color: ${result.confidenceColor}; font-weight: bold;">${result.confidencePercentage}% (${result.confidenceLevel})</span>
+                    </div>
+                `;
+            });
+            
+            output += '</div>';
+            resultDiv.innerHTML = output;
+        }
+
+        // Auto-run all tests on page load
+        window.onload = function() {
+            console.log('🔍 AfriDiag Confidence Testing Page Loaded');
+            console.log('Backend should be running on: http://localhost:8001');
+            console.log('Frontend should be running on: http://localhost:3000');
+        };
+    </script>
+</body>
+</html>

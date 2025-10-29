@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Debug Test</title>
+</head>
+<body>
+    <h1>URL Debug Test</h1>
+    <button onclick="testFetch()">Test Fetch</button>
+    <div id="output"></div>
+
+    <script>
+        async function testFetch() {
+            const output = document.getElementById('output');
+            const baseUrl = 'http://localhost:8001/api/v1';
+            const endpoint = '/predict/enhanced';
+            const fullUrl = `${baseUrl}${endpoint}`;
+            
+            output.innerHTML = `<p>Base URL: ${baseUrl}</p>
+                               <p>Endpoint: ${endpoint}</p>
+                               <p>Full URL: ${fullUrl}</p>`;
+            
+            console.log('About to fetch:', fullUrl);
+            
+            try {
+                const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        symptoms: ['fever', 'cough'],
+                        patient_data: {}
+                    })
+                });
+                
+                output.innerHTML += `<p>Response status: ${response.status}</p>`;
+                output.innerHTML += `<p>Response URL: ${response.url}</p>`;
+                
+                const text = await response.text();
+                output.innerHTML += `<p>Response: ${text}</p>`;
+                
+            } catch (error) {
+                output.innerHTML += `<p>Error: ${error.message}</p>`;
+                console.error('Fetch error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

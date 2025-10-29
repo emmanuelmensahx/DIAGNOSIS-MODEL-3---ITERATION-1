@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Emergency Diagnosis Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .success {
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .error {
+            background-color: #dc3545;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .result {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Direct Emergency Diagnosis Test</h1>
+        <p>This page directly tests the emergency diagnosis endpoint without any caching.</p>
+        
+        <div class="form-group">
+            <label for="symptoms">Symptoms (comma-separated):</label>
+            <textarea id="symptoms" placeholder="fever, headache, body aches">fever, headache, body aches</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="patientName">Patient Name:</label>
+            <input type="text" id="patientName" value="Test Patient" placeholder="Patient Name">
+        </div>
+        
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" value="30" placeholder="Age">
+        </div>
+        
+        <div class="form-group">
+            <label for="gender">Gender:</label>
+            <select id="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <button class="button" onclick="testEmergencyDiagnosis()">🚨 Test Emergency Diagnosis</button>
+        <button class="button" onclick="manualLogin()">🔐 Manual Login</button>
+        <button class="button" onclick="checkAuthStatus()">👤 Check Auth Status</button>
+        <button class="button" onclick="clearResults()">🧹 Clear Results</button>
+        <button class="button" onclick="checkBackendHealth()">❤️ Check Backend Health</button>
+        
+        <div id="status"></div>
+        <div id="results" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = type;
+            statusDiv.innerHTML = message;
+            statusDiv.style.display = 'block';
+        }
+        
+        function showResults(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.textContent = JSON.stringify(data, null, 2);
+            resultsDiv.style.display = 'block';
+        }
+        
+        function clearResults() {
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('status').style.display = 'none';
+        }
+        
+        async function checkBackendHealth() {
+            showStatus('🔍 Checking backend health...', 'info');
+            
+            try {
+                const response = await fetch('/api/v1/health');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showStatus('✅ Backend is healthy!', 'success');
+                    showResults(data);
+                } else {
+                    showStatus('❌ Backend health check failed', 'error');
+                    showResults(data);
+                }
+            } catch (error) {
+                showStatus(`❌ Error checking backend: ${error.message}`, 'error');
+                showResults({ error: error.message });
+            }
+        }
+        
+        async function getAuthToken() {
+            // Try to get token from localStorage first
+            let token = localStorage.getItem('access_token');
+            
+            if (token) {
+                console.log('Found existing token in localStorage');
+                return token;
+            }
+            
+            // If no token, try to login with demo credentials
+            showStatus('🔐 No auth token found, attempting login...', 'info');
+            
+            try {
+                const loginResponse = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'username=worker@afridiag.com&password=demo123'
+                });
+                
+                if (loginResponse.ok) {
+                    const loginData = await loginResponse.json();
+                    token = loginData.access_token;
+                    localStorage.setItem('access_token', token);
+                    console.log('Successfully logged in and got token');
+                    return token;
+                } else {
+                    const errorData = await loginResponse.json();
+                    throw new Error(`Login failed: ${errorData.detail || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                throw error;
+            }
+        }
+
+        async function testEmergencyDiagnosis() {
+            showStatus('🚨 Testing emergency diagnosis...', 'info');
+            
+            try {
+                // First, ensure we have an auth token
+                const token = await getAuthToken();
+                
+                if (!token) {
+                    throw new Error('Could not obtain authentication token');
+                }
+                
+                showStatus('🔐 Authentication successful, making diagnosis request...', 'info');
+                
+                // Get form data
+                const symptoms = document.getElementById('symptoms').value.split(',').map(s => s.trim()).filter(s => s);
+                const patientName = document.getElementById('patientName').value;
+                const age = parseInt(document.getElementById('age').value);
+                const gender = document.getElementById('gender').value;
+                
+                const requestData = {
+                    patient_name: patientName,
+                    age: age,
+                    gender: gender,
+                    symptoms: symptoms,
+                    medical_history: "No significant medical history",
+                    additional_notes: "Direct test from test page"
+                };
+                
+                console.log('Sending request:', requestData);
+                console.log('Using token:', token.substring(0, 20) + '...');
+                
+                const response = await fetch('/api/v1/emergency-diagnosis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const data = await response.json();
+                
+                console.log('Response:', data);
+                
+                if (response.ok) {
+                    showStatus(`✅ Emergency diagnosis successful! Disease: ${data.disease_type || data.disease_code || 'Unknown'}`, 'success');
+                    showResults(data);
+                    
+                    // Also log key information
+                    console.log('Disease Type:', data.disease_type);
+                    console.log('Disease Code:', data.disease_code);
+                    console.log('Confidence:', data.confidence);
+                    console.log('Grok Engine Used:', data.grok_engine_used);
+                    console.log('Emergency Diagnosis Used:', data.emergency_diagnosis_used);
+                } else {
+                    if (response.status === 401) {
+                        // Token might be expired, clear it and try again
+                        localStorage.removeItem('access_token');
+                        showStatus('🔐 Token expired, please try again...', 'error');
+                    }
+                    showStatus(`❌ Emergency diagnosis failed: ${data.detail || data.message || 'Unknown error'}`, 'error');
+                    showResults(data);
+                }
+            } catch (error) {
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                showResults({ error: error.message, stack: error.stack });
+            }
+        }
+        
+        async function manualLogin() {
+            showStatus('🔐 Attempting manual login...', 'info');
+            
+            try {
+                // Clear any existing token first
+                localStorage.removeItem('access_token');
+                
+                const token = await getAuthToken();
+                if (token) {
+                    showStatus('✅ Login successful!', 'success');
+                    showResults({ 
+                        message: 'Successfully logged in',
+                        token_preview: token.substring(0, 20) + '...',
+                        token_length: token.length
+                    });
+                } else {
+                    showStatus('❌ Login failed', 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Login error: ${error.message}`, 'error');
+                showResults({ error: error.message });
+            }
+        }
+        
+        function checkAuthStatus() {
+            const token = localStorage.getItem('access_token');
+            
+            if (token) {
+                showStatus('✅ Authentication token found', 'success');
+                showResults({
+                    status: 'Authenticated',
+                    token_preview: token.substring(0, 20) + '...',
+                    token_length: token.length,
+                    stored_in: 'localStorage'
+                });
+            } else {
+                showStatus('❌ No authentication token found', 'error');
+                showResults({
+                    status: 'Not authenticated',
+                    message: 'No token found in localStorage'
+                });
+            }
+        }
+
+        // Auto-run health check on page load
+        window.onload = function() {
+            console.log('🧪 Direct Emergency Diagnosis Test - Page loaded');
+            checkBackendHealth();
+            checkAuthStatus();
+        };
+    </script>
+</body>
+</html>

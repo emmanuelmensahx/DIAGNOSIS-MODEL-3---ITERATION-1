@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test Page - AfriDiag</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-content {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .nav-link {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 AfriDiag - Simple Test Page</h1>
+        
+        <div class="test-content">
+            <h2>✅ This page is working!</h2>
+            <p>If you can see this content, the web server is working correctly.</p>
+            <p>Current time: <span id="current-time"></span></p>
+        </div>
+
+        <div class="test-content">
+            <h3>🔗 Navigation Test</h3>
+            <p>Try clicking these links to test if other pages load:</p>
+            <div class="nav-links">
+                <a href="patients_screen.html" class="nav-link">👥 Patients</a>
+                <a href="new_patient_screen.html" class="nav-link">➕ New Patient</a>
+                <a href="diagnosis_screen.html" class="nav-link">🔍 Diagnosis</a>
+                <a href="treatment_guide_screen.html" class="nav-link">💊 Treatment</a>
+                <a href="index.html" class="nav-link">🏠 Home</a>
+            </div>
+        </div>
+
+        <div class="test-content">
+            <h3>🧪 Browser Information</h3>
+            <p>User Agent: <span id="user-agent"></span></p>
+            <p>Screen Resolution: <span id="screen-resolution"></span></p>
+            <p>Window Size: <span id="window-size"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Simple JavaScript to test if JS is working
+        document.getElementById('current-time').textContent = new Date().toLocaleString();
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('screen-resolution').textContent = screen.width + 'x' + screen.height;
+        document.getElementById('window-size').textContent = window.innerWidth + 'x' + window.innerHeight;
+        
+        console.log('Simple test page loaded successfully');
+    </script>
+</body>
+</html>

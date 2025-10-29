@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear AfriDiag Cache</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .danger {
+            background-color: #dc3545;
+        }
+        .danger:hover {
+            background-color: #c82333;
+        }
+        .success {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        .info {
+            background-color: #17a2b8;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 AfriDiag Cache Cleaner</h1>
+        <p>This tool helps clear cached diagnosis data that might be causing the frontend to show old results.</p>
+        
+        <div class="info">
+            <strong>Current localStorage data:</strong>
+            <div id="currentData"></div>
+        </div>
+        
+        <button class="button" onclick="showCurrentData()">📊 Show Current Cache</button>
+        <button class="button danger" onclick="clearDiagnosisCache()">🗑️ Clear Diagnosis Cache</button>
+        <button class="button danger" onclick="clearAllCache()">💥 Clear All Cache</button>
+        <button class="button" onclick="goToDiagnosis()">🏥 Go to Diagnosis</button>
+        
+        <div id="successMessage" class="success"></div>
+    </div>
+
+    <script>
+        function showCurrentData() {
+            const currentDataDiv = document.getElementById('currentData');
+            const data = {
+                diagnosisResult: localStorage.getItem('diagnosisResult'),
+                patientData: localStorage.getItem('patientData'),
+                token: localStorage.getItem('token'),
+                authToken: localStorage.getItem('authToken'),
+                userEmail: localStorage.getItem('userEmail')
+            };
+            
+            let html = '<ul>';
+            for (const [key, value] of Object.entries(data)) {
+                if (value) {
+                    const truncated = value.length > 100 ? value.substring(0, 100) + '...' : value;
+                    html += `<li><strong>${key}:</strong> ${truncated}</li>`;
+                } else {
+                    html += `<li><strong>${key}:</strong> <em>Not set</em></li>`;
+                }
+            }
+            html += '</ul>';
+            currentDataDiv.innerHTML = html;
+        }
+        
+        function clearDiagnosisCache() {
+            localStorage.removeItem('diagnosisResult');
+            localStorage.removeItem('patientData');
+            localStorage.removeItem('current_diagnosis');
+            
+            showSuccess('✅ Diagnosis cache cleared! Old COVID-19 results should be gone.');
+            showCurrentData();
+        }
+        
+        function clearAllCache() {
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            showSuccess('✅ All cache cleared! You may need to log in again.');
+            showCurrentData();
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function goToDiagnosis() {
+            window.location.href = '/diagnosis_screen.html';
+        }
+        
+        // Show current data on page load
+        window.onload = function() {
+            showCurrentData();
+        };
+    </script>
+</body>
+</html>

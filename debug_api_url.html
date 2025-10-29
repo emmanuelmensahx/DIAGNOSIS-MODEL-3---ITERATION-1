@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug API URL</title>
+</head>
+<body>
+    <h1>Debug API URL</h1>
+    <button onclick="testApiCall()">Test API Call</button>
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api/v1';
+        
+        async function testApiCall() {
+            const endpoint = '/predict/enhanced';
+            const fullUrl = `${API_BASE}${endpoint}`;
+            
+            console.log('API_BASE:', API_BASE);
+            console.log('endpoint:', endpoint);
+            console.log('Full URL:', fullUrl);
+            
+            document.getElementById('result').innerHTML = `
+                <p><strong>API_BASE:</strong> ${API_BASE}</p>
+                <p><strong>endpoint:</strong> ${endpoint}</p>
+                <p><strong>Full URL:</strong> ${fullUrl}</p>
+            `;
+            
+            try {
+                const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test'
+                    },
+                    body: JSON.stringify({
+                        symptoms: ['fever', 'cough'],
+                        patient_data: {
+                            age: 25,
+                            gender: 'male'
+                        }
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response URL:', response.url);
+                
+                document.getElementById('result').innerHTML += `
+                    <p><strong>Response status:</strong> ${response.status}</p>
+                    <p><strong>Response URL:</strong> ${response.url}</p>
+                `;
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML += `
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

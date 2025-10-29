@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearest Specialist Location Finder Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .test-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .search-btn:hover {
+            background: #2980b9;
+        }
+        
+        .results-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .specialist-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #fafafa;
+            transition: transform 0.2s;
+        }
+        
+        .specialist-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .specialist-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .specialist-info {
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .distance-info {
+            background: #e8f5e8;
+            color: #27ae60;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .availability-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        .available { background: #d4edda; color: #155724; }
+        .busy { background: #f8d7da; color: #721c24; }
+        .partially-available { background: #fff3cd; color: #856404; }
+        
+        .no-results {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 40px;
+        }
+        
+        .location-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .location-item {
+            background: #ecf0f1;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗺️ Nearest Specialist Location Finder</h1>
+        <p>Find specialists closest to your location</p>
+    </div>
+
+    <div class="test-controls">
+        <h3>Search Parameters</h3>
+        <div class="form-group">
+            <label for="userLocation">Your Location:</label>
+            <select id="userLocation">
+                <option value="">Select your location...</option>
+                <option value="Nairobi, Kenya">Nairobi, Kenya</option>
+                <option value="London, UK">London, UK</option>
+                <option value="Cairo, Egypt">Cairo, Egypt</option>
+                <option value="Lagos, Nigeria">Lagos, Nigeria</option>
+                <option value="Cape Town, South Africa">Cape Town, South Africa</option>
+                <option value="Accra, Ghana">Accra, Ghana</option>
+                <option value="Addis Ababa, Ethiopia">Addis Ababa, Ethiopia</option>
+                <option value="Kampala, Uganda">Kampala, Uganda</option>
+                <option value="Dar es Salaam, Tanzania">Dar es Salaam, Tanzania</option>
+                <option value="Kigali, Rwanda">Kigali, Rwanda</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="specialization">Specialization (Optional):</label>
+            <select id="specialization">
+                <option value="">All Specializations</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Internal Medicine">Internal Medicine</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Surgery">Surgery</option>
+                <option value="Emergency Medicine">Emergency Medicine</option>
+                <option value="Obstetrics & Gynecology">Obstetrics & Gynecology</option>
+                <option value="Pulmonology">Pulmonology</option>
+                <option value="Gastroenterology">Gastroenterology</option>
+                <option value="Infectious Diseases">Infectious Diseases</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="maxResults">Maximum Results:</label>
+            <select id="maxResults">
+                <option value="5">5 specialists</option>
+                <option value="10" selected>10 specialists</option>
+                <option value="15">15 specialists</option>
+                <option value="20">20 specialists</option>
+            </select>
+        </div>
+        
+        <button class="search-btn" onclick="findNearestSpecialists()">🔍 Find Nearest Specialists</button>
+    </div>
+
+    <div class="results-section">
+        <h3>Search Results</h3>
+        <div id="searchResults">
+            <div class="no-results">
+                Select your location and click "Find Nearest Specialists" to see results
+            </div>
+        </div>
+    </div>
+
+    <div class="results-section">
+        <h3>Available Locations</h3>
+        <p>Specialists are available in the following locations:</p>
+        <div id="availableLocations" class="location-list"></div>
+    </div>
+
+    <script src="/frontend/specialist_database.js"></script>
+    <script>
+        let specialistDb;
+
+        function initializeApp() {
+            try {
+                specialistDb = new SpecialistDatabase();
+                loadAvailableLocations();
+                console.log('Location finder initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize location finder:', error);
+                document.getElementById('searchResults').innerHTML = 
+                    `<div style="color: red;">Error: ${error.message}</div>`;
+            }
+        }
+
+        function loadAvailableLocations() {
+            const locations = specialistDb.getAvailableLocations();
+            const container = document.getElementById('availableLocations');
+            
+            container.innerHTML = locations.map(location => 
+                `<div class="location-item">${location}</div>`
+            ).join('');
+        }
+
+        function findNearestSpecialists() {
+            const userLocation = document.getElementById('userLocation').value;
+            const specialization = document.getElementById('specialization').value || null;
+            const maxResults = parseInt(document.getElementById('maxResults').value);
+            
+            if (!userLocation) {
+                alert('Please select your location first');
+                return;
+            }
+
+            try {
+                const nearestSpecialists = specialistDb.findNearestSpecialists(
+                    userLocation, 
+                    specialization, 
+                    maxResults
+                );
+                
+                displayResults(nearestSpecialists, userLocation, specialization);
+            } catch (error) {
+                console.error('Error finding nearest specialists:', error);
+                document.getElementById('searchResults').innerHTML = 
+                    `<div style="color: red;">Error: ${error.message}</div>`;
+            }
+        }
+
+        function displayResults(specialists, userLocation, specialization) {
+            const container = document.getElementById('searchResults');
+            
+            if (!specialists || specialists.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        No specialists found for the selected criteria.<br>
+                        Location: ${userLocation}<br>
+                        ${specialization ? `Specialization: ${specialization}` : 'All specializations'}
+                    </div>
+                `;
+                return;
+            }
+
+            const resultsHtml = `
+                <div style="margin-bottom: 15px; color: #2c3e50;">
+                    <strong>Found ${specialists.length} specialist(s) near ${userLocation}</strong>
+                    ${specialization ? ` in ${specialization}` : ''}
+                </div>
+                ${specialists.map((specialist, index) => `
+                    <div class="specialist-card">
+                        <div class="specialist-name">
+                            ${index + 1}. ${specialist.avatar} ${specialist.name}
+                        </div>
+                        <div class="specialist-info">
+                            <strong>${specialist.specialization}</strong> • ${specialist.location}
+                        </div>
+                        <div class="specialist-info">
+                            ${specialist.experience} years experience • ⭐ ${specialist.rating}/5.0
+                        </div>
+                        <div class="specialist-info">
+                            💰 ${specialist.consultationFee} ${specialist.currency} • 🗣️ ${specialist.languages.join(', ')}
+                        </div>
+                        <div class="distance-info">
+                            📍 ${specialist.distanceText}
+                        </div>
+                        <div class="emergency-contact-section">
+                            <div style="font-weight: bold; color: #e74c3c; margin: 8px 0 4px 0;">🚨 Emergency Contact:</div>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <a href="tel:${specialist.phone}" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #27ae60; color: white; text-decoration: none; border-radius: 4px; font-size: 12px;">
+                                    📞 ${specialist.phone}
+                                </a>
+                                <a href="mailto:${specialist.email}" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #3498db; color: white; text-decoration: none; border-radius: 4px; font-size: 12px;">
+                                    ✉️ ${specialist.email}
+                                </a>
+                            </div>
+                        </div>
+                        <span class="availability-status ${specialist.availability?.status || 'unknown'}">
+                            ${getAvailabilityText(specialist.availability?.status)}
+                        </span>
+                    </div>
+                `).join('')}
+            `;
+            
+            container.innerHTML = resultsHtml;
+        }
+
+        function getAvailabilityText(status) {
+            switch(status) {
+                case 'available': return '✅ Available';
+                case 'busy': return '🔴 Busy';
+                case 'partially-available': return '🟡 Partially Available';
+                default: return '❓ Status Unknown';
+            }
+        }
+
+        // Quick test functions
+        function testNairobiCardiology() {
+            document.getElementById('userLocation').value = 'Nairobi, Kenya';
+            document.getElementById('specialization').value = 'Cardiology';
+            findNearestSpecialists();
+        }
+
+        function testLondonPediatrics() {
+            document.getElementById('userLocation').value = 'London, UK';
+            document.getElementById('specialization').value = 'Pediatrics';
+            findNearestSpecialists();
+        }
+
+        function testCairoAllSpecialists() {
+            document.getElementById('userLocation').value = 'Cairo, Egypt';
+            document.getElementById('specialization').value = '';
+            findNearestSpecialists();
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

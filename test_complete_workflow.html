@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Workflow Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .success { border-color: #4CAF50; background-color: #f8fff8; }
+        .error { border-color: #f44336; background-color: #fff8f8; }
+        .pending { border-color: #ff9800; background-color: #fff8f0; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .status.success { background-color: #d4edda; color: #155724; }
+        .status.error { background-color: #f8d7da; color: #721c24; }
+        .status.pending { background-color: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Complete Workflow Test</h1>
+        <p>This test verifies the complete authentication and diagnosis workflow after fixing the URL routing issues.</p>
+        
+        <div class="test-section pending" id="auth-section">
+            <h3>1. Authentication Test</h3>
+            <button onclick="testAuthentication()">Test Login</button>
+            <div id="auth-status" class="status pending">Pending</div>
+            <div id="auth-log" class="log"></div>
+        </div>
+
+        <div class="test-section pending" id="diagnosis-section">
+            <h3>2. Enhanced Diagnosis Test</h3>
+            <button onclick="testDiagnosis()" disabled id="diagnosis-btn">Test Enhanced Diagnosis</button>
+            <div id="diagnosis-status" class="status pending">Pending</div>
+            <div id="diagnosis-log" class="log"></div>
+        </div>
+
+        <div class="test-section pending" id="patients-section">
+            <h3>3. Patients List Test</h3>
+            <button onclick="testPatients()" disabled id="patients-btn">Test Patients List</button>
+            <div id="patients-status" class="status pending">Pending</div>
+            <div id="patients-log" class="log"></div>
+        </div>
+
+        <div class="test-section pending" id="summary-section">
+            <h3>Test Summary</h3>
+            <div id="summary-content">
+                <p>Run all tests to see the summary.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+        const baseUrl = 'http://localhost:8001/api/v1';
+        
+        function log(sectionId, message) {
+            const logElement = document.getElementById(sectionId + '-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function setStatus(sectionId, status, message) {
+            const statusElement = document.getElementById(sectionId + '-status');
+            const sectionElement = document.getElementById(sectionId + '-section');
+            
+            statusElement.className = `status ${status}`;
+            statusElement.textContent = message;
+            
+            sectionElement.className = `test-section ${status}`;
+        }
+
+        async function testAuthentication() {
+            log('auth', 'Starting authentication test...');
+            setStatus('auth', 'Testing...');
+
+            try {
+                // Backend expects form data for OAuth2PasswordRequestForm
+                const formData = new URLSearchParams();
+                formData.append('username', 'admin@afridiag.org');
+                formData.append('password', 'admin123');
+
+                const response = await fetch(`${baseUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+
+                log('auth', `Login response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    log('auth', 'Login successful! Token received.');
+                    setStatus('auth', 'success', 'Authentication successful');
+                    
+                    // Enable other test buttons
+                    document.getElementById('diagnosis-btn').disabled = false;
+                    document.getElementById('patients-btn').disabled = false;
+                } else {
+                    const errorData = await response.json();
+                    log('auth', `Login failed: ${JSON.stringify(errorData)}`);
+                    setStatus('auth', 'error', 'Authentication failed');
+                }
+            } catch (error) {
+                log('auth', `Error: ${error.message}`);
+                setStatus('auth', 'error', 'Network error');
+            }
+        }
+
+        async function testDiagnosis() {
+            if (!authToken) {
+                log('diagnosis', 'No auth token available. Please login first.');
+                return;
+            }
+
+            log('diagnosis', 'Starting enhanced diagnosis test...');
+            setStatus('diagnosis', 'pending', 'Testing...');
+
+            const testData = {
+                symptoms: "fever, cough, difficulty breathing",
+                medical_history: "No significant medical history",
+                age: 35,
+                gender: "male"
+            };
+
+            try {
+                const response = await fetch(`${baseUrl}/predict/enhanced?medical_history=${encodeURIComponent(testData.medical_history)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                log('diagnosis', `Diagnosis response status: ${response.status}`);
+                log('diagnosis', `URL used: ${baseUrl}/predict/enhanced`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log('diagnosis', `Diagnosis successful! Response: ${JSON.stringify(data, null, 2)}`);
+                    setStatus('diagnosis', 'success', 'Enhanced diagnosis successful');
+                } else {
+                    const errorData = await response.text();
+                    log('diagnosis', `Diagnosis failed: ${errorData}`);
+                    setStatus('diagnosis', 'error', `Diagnosis failed (${response.status})`);
+                }
+            } catch (error) {
+                log('diagnosis', `Error: ${error.message}`);
+                setStatus('diagnosis', 'error', 'Network error');
+            }
+        }
+
+        async function testPatients() {
+            if (!authToken) {
+                log('patients', 'No auth token available. Please login first.');
+                return;
+            }
+
+            log('patients', 'Starting patients list test...');
+            setStatus('patients', 'pending', 'Testing...');
+
+            try {
+                const response = await fetch(`${baseUrl}/patients/?page=1&size=5`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                log('patients', `Patients response status: ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log('patients', `Patients list retrieved! Count: ${data.items ? data.items.length : 'unknown'}`);
+                    setStatus('patients', 'success', 'Patients list successful');
+                } else {
+                    const errorData = await response.text();
+                    log('patients', `Patients request failed: ${errorData}`);
+                    setStatus('patients', 'error', `Patients request failed (${response.status})`);
+                }
+            } catch (error) {
+                log('patients', `Error: ${error.message}`);
+                setStatus('patients', 'error', 'Network error');
+            }
+
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const authStatus = document.getElementById('auth-status').className.includes('success');
+            const diagnosisStatus = document.getElementById('diagnosis-status').className.includes('success');
+            const patientsStatus = document.getElementById('patients-status').className.includes('success');
+
+            let summary = '<h4>Test Results:</h4><ul>';
+            summary += `<li>Authentication: ${authStatus ? '✅ PASS' : '❌ FAIL'}</li>`;
+            summary += `<li>Enhanced Diagnosis: ${diagnosisStatus ? '✅ PASS' : '❌ FAIL'}</li>`;
+            summary += `<li>Patients List: ${patientsStatus ? '✅ PASS' : '❌ FAIL'}</li>`;
+            summary += '</ul>';
+
+            if (authStatus && diagnosisStatus && patientsStatus) {
+                summary += '<p><strong>🎉 All tests passed! The URL routing issues have been successfully resolved.</strong></p>';
+                setStatus('summary', 'success', 'All tests passed');
+            } else {
+                summary += '<p><strong>⚠️ Some tests failed. Please check the logs above for details.</strong></p>';
+                setStatus('summary', 'error', 'Some tests failed');
+            }
+
+            document.getElementById('summary-content').innerHTML = summary;
+        }
+
+        // Auto-run authentication test on page load
+        window.onload = function() {
+            log('auth', 'Page loaded. Ready to test authentication.');
+        };
+    </script>
+</body>
+</html>

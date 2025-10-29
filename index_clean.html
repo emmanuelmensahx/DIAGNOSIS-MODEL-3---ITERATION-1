@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - AI-Powered Medical Diagnosis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+        
+        .app-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .app-subtitle {
+            font-size: 20px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 40px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .feature-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .feature-description {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator">
+        🟢 System Online
+    </div>
+
+    <div class="container">
+        <div class="logo-section">
+            <div class="logo">🩺</div>
+            <h1 class="app-title">AfriDiag</h1>
+            <p class="app-subtitle">AI-Powered Medical Diagnosis for African Healthcare</p>
+        </div>
+
+        <div class="features-grid">
+            <a href="patients_screen.html" class="feature-card">
+                <div class="feature-icon">👥</div>
+                <div class="feature-title">Patient Management</div>
+                <div class="feature-description">
+                    Comprehensive patient records, search functionality, and medical history tracking for efficient healthcare management.
+                </div>
+            </a>
+
+            <a href="new_patient_screen.html" class="feature-card">
+                <div class="feature-icon">➕</div>
+                <div class="feature-title">New Patient Registration</div>
+                <div class="feature-description">
+                    Streamlined patient registration with comprehensive forms, medical history, and emergency contact information.
+                </div>
+            </a>
+
+            <a href="diagnosis_screen.html" class="feature-card">
+                <div class="feature-icon">🩺</div>
+                <div class="feature-title">AI Diagnosis</div>
+                <div class="feature-description">
+                    Advanced AI-powered diagnostic tools with symptom analysis, medical imaging, and evidence-based recommendations.
+                </div>
+            </a>
+
+            <a href="treatment_guide_screen.html" class="feature-card">
+                <div class="feature-icon">📖</div>
+                <div class="feature-title">Treatment Guide</div>
+                <div class="feature-description">
+                    Evidence-based treatment protocols, medication guidelines, and clinical recommendations for various conditions.
+                </div>
+            </a>
+        </div>
+
+        <div style="color: rgba(255,255,255,0.8); font-size: 14px; margin-top: 40px;">
+            <p>&copy; 2024 AfriDiag. Empowering African Healthcare with AI.</p>
+        </div>
+    </div>
+
+    <script>
+        console.log('🩺 AfriDiag Application Loaded Successfully');
+        console.log('✅ All systems operational');
+        
+        // Simple click tracking
+        document.querySelectorAll('.feature-card').forEach(element => {
+            element.addEventListener('click', function(e) {
+                const destination = this.getAttribute('href');
+                console.log('📊 Navigation to:', destination);
+            });
+        });
+    </script>
+</body>
+</html>

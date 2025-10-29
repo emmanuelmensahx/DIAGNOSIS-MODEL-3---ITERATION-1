@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Second Opinion Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .log { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 3px; 
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Second Opinion Fix Test</h1>
+        <p>This test verifies that the second opinion functionality works correctly after fixing the localStorage data retrieval issue.</p>
+
+        <div class="test-section info">
+            <h3>📋 Test Setup</h3>
+            <button onclick="setupTestData()">Setup Test Data</button>
+            <button onclick="clearTestData()">Clear Test Data</button>
+            <button onclick="showStoredData()">Show Stored Data</button>
+            <div id="setupLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔬 Test Second Opinion Request</h3>
+            <button onclick="testSecondOpinion()">Test Second Opinion</button>
+            <div id="testLog" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Authentication Test</h3>
+            <button onclick="testAuthentication()">Test Auth Token</button>
+            <div id="authLog" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            element.innerHTML += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+
+        function setupTestData() {
+            log('setupLog', '🔧 Setting up test data...');
+            
+            // Create test patient data
+            const testPatient = {
+                patientId: 'P' + Date.now(),
+                name: 'Test Patient',
+                age: 35,
+                gender: 'Male',
+                medicalHistory: 'No significant medical history'
+            };
+
+            // Create test diagnosis data
+            const testDiagnosis = {
+                timestamp: Date.now(),
+                symptoms: ['fever', 'cough', 'fatigue'],
+                diagnosis: 'Upper respiratory infection',
+                treatment: 'Rest and fluids',
+                followUp: 'Follow up in 3-5 days',
+                specialist: 'General practitioner consultation recommended',
+                critical: false,
+                medicalHistory: 'No significant medical history'
+            };
+
+            // Store test data in localStorage (using the correct structure)
+            const currentDiagnosis = {
+                patient: testPatient,
+                diagnosis: testDiagnosis
+            };
+
+            localStorage.setItem('current_diagnosis', JSON.stringify(currentDiagnosis));
+            
+            // Also set up a test auth token
+            localStorage.setItem('access_token', 'test_token_123');
+            
+            log('setupLog', '✅ Test data setup complete');
+            log('setupLog', `Patient ID: ${testPatient.patientId}`);
+            log('setupLog', `Diagnosis timestamp: ${testDiagnosis.timestamp}`);
+        }
+
+        function clearTestData() {
+            localStorage.removeItem('current_diagnosis');
+            localStorage.removeItem('access_token');
+            log('setupLog', '🗑️ Test data cleared');
+        }
+
+        function showStoredData() {
+            log('setupLog', '📊 Current localStorage data:');
+            
+            const currentDiagnosis = localStorage.getItem('current_diagnosis');
+            const accessToken = localStorage.getItem('access_token');
+            
+            log('setupLog', `current_diagnosis: ${currentDiagnosis ? 'EXISTS' : 'NOT FOUND'}`);
+            log('setupLog', `access_token: ${accessToken ? 'EXISTS' : 'NOT FOUND'}`);
+            
+            if (currentDiagnosis) {
+                try {
+                    const data = JSON.parse(currentDiagnosis);
+                    log('setupLog', `Patient ID: ${data.patient?.patientId || 'NOT FOUND'}`);
+                    log('setupLog', `Diagnosis timestamp: ${data.diagnosis?.timestamp || 'NOT FOUND'}`);
+                } catch (e) {
+                    log('setupLog', `❌ Error parsing current_diagnosis: ${e.message}`);
+                }
+            }
+        }
+
+        async function testSecondOpinion() {
+            log('testLog', '🧪 Testing second opinion request...');
+            
+            try {
+                // Get data from localStorage (using the corrected approach)
+                const currentDiagnosisData = localStorage.getItem('current_diagnosis');
+                
+                if (!currentDiagnosisData) {
+                    log('testLog', '❌ No current_diagnosis found in localStorage');
+                    return;
+                }
+
+                const diagnosisInfo = JSON.parse(currentDiagnosisData);
+                const currentPatient = diagnosisInfo.patient;
+                const currentDiagnosis = diagnosisInfo.diagnosis;
+
+                if (!currentPatient || !currentDiagnosis) {
+                    log('testLog', '❌ Patient or diagnosis information not found in current_diagnosis');
+                    return;
+                }
+
+                log('testLog', `✅ Found patient: ${currentPatient.patientId}`);
+                log('testLog', `✅ Found diagnosis: ${currentDiagnosis.timestamp}`);
+
+                // Determine specialization
+                const diagnosisData = currentDiagnosis;
+                let specialization = 'general_medicine';
+                
+                if (diagnosisData.symptoms && diagnosisData.symptoms.some(s => 
+                    s.toLowerCase().includes('chest') || s.toLowerCase().includes('heart'))) {
+                    specialization = 'cardiology';
+                } else if (diagnosisData.symptoms && diagnosisData.symptoms.some(s => 
+                    s.toLowerCase().includes('lung') || s.toLowerCase().includes('breath'))) {
+                    specialization = 'pulmonology';
+                }
+
+                // Create consultation request
+                const consultationRequest = {
+                    patient_id: currentPatient.patientId,
+                    diagnosis_id: currentDiagnosis.timestamp || Date.now(),
+                    priority: diagnosisData.critical ? 'high' : 'medium',
+                    specialization_required: specialization,
+                    description: `Second opinion request for patient diagnosis.
+
+**Patient Information:**
+- Symptoms: ${diagnosisData.symptoms}
+- Medical History: ${diagnosisData.medicalHistory}
+
+**Current Diagnosis:**
+${diagnosisData.diagnosis}
+
+**Recommended Treatment:**
+${diagnosisData.treatment}
+
+**Follow-up Care:**
+${diagnosisData.followUp}
+
+**Specialist Referral:**
+${diagnosisData.specialist}
+
+Please review this diagnosis and provide your expert opinion.`,
+                    estimated_duration: 30
+                };
+
+                log('testLog', '📤 Sending consultation request...');
+                log('testLog', `Request data: ${JSON.stringify(consultationRequest, null, 2)}`);
+
+                // Send consultation request to API
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/v1/consultations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(consultationRequest)
+                });
+
+                log('testLog', `📊 Response status: ${response.status}`);
+
+                if (response.ok) {
+                    const consultation = await response.json();
+                    log('testLog', '✅ Second opinion request submitted successfully!');
+                    log('testLog', `Consultation ID: ${consultation.id}`);
+                } else {
+                    const errorText = await response.text();
+                    log('testLog', `❌ Request failed: ${response.status} - ${errorText}`);
+                }
+
+            } catch (error) {
+                log('testLog', `❌ Error: ${error.message}`);
+            }
+        }
+
+        async function testAuthentication() {
+            log('authLog', '🔐 Testing authentication...');
+            
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                log('authLog', '❌ No access token found');
+                return;
+            }
+
+            log('authLog', `✅ Token found: ${token.substring(0, 20)}...`);
+
+            try {
+                const response = await fetch('/api/v1/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                log('authLog', `📊 Auth check status: ${response.status}`);
+
+                if (response.ok) {
+                    const user = await response.json();
+                    log('authLog', `✅ Authenticated as: ${user.email || user.username}`);
+                } else {
+                    log('authLog', `❌ Authentication failed: ${response.status}`);
+                }
+            } catch (error) {
+                log('authLog', `❌ Auth error: ${error.message}`);
+            }
+        }
+
+        // Auto-show stored data on page load
+        window.onload = function() {
+            showStoredData();
+        };
+    </script>
+</body>
+</html>

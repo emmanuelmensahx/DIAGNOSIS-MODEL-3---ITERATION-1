@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag Test App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .patient-list {
+            margin-top: 20px;
+        }
+        .patient-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AfriDiag Test Application</h1>
+        
+        <div id="status" class="status info">
+            Ready to test...
+        </div>
+
+        <div>
+            <h3>Authentication Test</h3>
+            <button onclick="testLogin()">Test Login (worker@afridiag.com)</button>
+            <button onclick="testLoginSpecialist()">Test Login (specialist@afridiag.com)</button>
+            <button onclick="testLogout()">Logout</button>
+        </div>
+
+        <div>
+            <h3>Patient Management Test</h3>
+            <button onclick="loadPatients()">Load Patients</button>
+            <button onclick="testCreatePatient()">Create Test Patient</button>
+        </div>
+
+        <div id="patients" class="patient-list"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8001/api/v1';
+        let authToken = null;
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        async function testLogin() {
+            try {
+                updateStatus('Testing login...', 'info');
+                
+                const params = new URLSearchParams();
+                params.append('username', 'worker@afridiag.com');
+                params.append('password', 'demo123');
+
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString()
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    updateStatus(`Login successful! Token: ${authToken.substring(0, 20)}...`, 'success');
+                } else {
+                    const error = await response.text();
+                    updateStatus(`Login failed: ${error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus(`Login error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLoginSpecialist() {
+            try {
+                updateStatus('Testing specialist login...', 'info');
+                
+                const params = new URLSearchParams();
+                params.append('username', 'specialist@afridiag.com');
+                params.append('password', 'demo123');
+
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString()
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    updateStatus(`Specialist login successful! Token: ${authToken.substring(0, 20)}...`, 'success');
+                } else {
+                    const error = await response.text();
+                    updateStatus(`Specialist login failed: ${error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus(`Specialist login error: ${error.message}`, 'error');
+            }
+        }
+
+        function testLogout() {
+            authToken = null;
+            updateStatus('Logged out', 'info');
+            document.getElementById('patients').innerHTML = '';
+        }
+
+        async function loadPatients() {
+            if (!authToken) {
+                updateStatus('Please login first', 'error');
+                return;
+            }
+
+            try {
+                updateStatus('Loading patients...', 'info');
+                
+                const response = await fetch(`${API_BASE}/patients/?page=1&size=20`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus(`Loaded ${data.items.length} patients`, 'success');
+                    displayPatients(data.items);
+                } else {
+                    const error = await response.text();
+                    updateStatus(`Failed to load patients: ${error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus(`Error loading patients: ${error.message}`, 'error');
+            }
+        }
+
+        function displayPatients(patients) {
+            const patientsDiv = document.getElementById('patients');
+            patientsDiv.innerHTML = '<h3>Patients:</h3>';
+            
+            patients.forEach(patient => {
+                const patientDiv = document.createElement('div');
+                patientDiv.className = 'patient-item';
+                patientDiv.innerHTML = `
+                    <strong>${patient.first_name} ${patient.last_name}</strong><br>
+                    ID: ${patient.unique_id}<br>
+                    DOB: ${patient.date_of_birth}<br>
+                    Gender: ${patient.gender}<br>
+                    Phone: ${patient.phone_number}
+                `;
+                patientsDiv.appendChild(patientDiv);
+            });
+        }
+
+        async function testCreatePatient() {
+            if (!authToken) {
+                updateStatus('Please login first', 'error');
+                return;
+            }
+
+            try {
+                updateStatus('Creating test patient...', 'info');
+                
+                const patientData = {
+                    first_name: 'Test',
+                    last_name: 'Patient',
+                    date_of_birth: '1990-01-01',
+                    gender: 'male',
+                    phone_number: '+1234567890',
+                    address: 'Test Address'
+                };
+
+                const response = await fetch(`${API_BASE}/patients/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(patientData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStatus(`Patient created successfully! ID: ${data.unique_id}`, 'success');
+                    loadPatients(); // Refresh the list
+                } else {
+                    const error = await response.text();
+                    updateStatus(`Failed to create patient: ${error}`, 'error');
+                }
+            } catch (error) {
+                updateStatus(`Error creating patient: ${error.message}`, 'error');
+            }
+        }
+
+        // Test backend connectivity on page load
+        window.onload = async function() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    updateStatus('Backend connection successful!', 'success');
+                } else {
+                    updateStatus('Backend connection failed', 'error');
+                }
+            } catch (error) {
+                updateStatus(`Backend connection error: ${error.message}`, 'error');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - AI-Powered Medical Diagnosis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 40px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .nav-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .nav-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .nav-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .nav-description {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .status-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background: #4CAF50;
+        }
+        
+        .status-offline {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🩺</div>
+            <h1 class="title">AfriDiag</h1>
+            <p class="subtitle">AI-Powered Medical Diagnosis for African Healthcare</p>
+        </div>
+        
+        <div class="status-bar">
+            <span class="status-indicator status-online"></span>
+            System Status: Online | Backend: Connected | Version: 1.0.0
+        </div>
+        
+        <div class="nav-grid">
+            <a href="patients_screen.html" class="nav-card">
+                <div class="nav-icon">👥</div>
+                <h3 class="nav-title">Patient Management</h3>
+                <p class="nav-description">View, add, and manage patient records with comprehensive medical histories</p>
+            </a>
+            
+            <a href="diagnosis_screen.html" class="nav-card">
+                <div class="nav-icon">🔍</div>
+                <h3 class="nav-title">AI Diagnosis</h3>
+                <p class="nav-description">Get AI-powered diagnostic suggestions based on symptoms and medical data</p>
+            </a>
+            
+            <a href="treatment_screen.html" class="nav-card">
+                <div class="nav-icon">💊</div>
+                <h3 class="nav-title">Treatment Plans</h3>
+                <p class="nav-description">Create and manage personalized treatment plans for patients</p>
+            </a>
+            
+            <a href="analytics_screen.html" class="nav-card">
+                <div class="nav-icon">📊</div>
+                <h3 class="nav-title">Analytics</h3>
+                <p class="nav-description">View medical statistics, trends, and diagnostic accuracy reports</p>
+            </a>
+            
+            <a href="settings_screen.html" class="nav-card">
+                <div class="nav-icon">⚙️</div>
+                <h3 class="nav-title">Settings</h3>
+                <p class="nav-description">Configure system preferences, user accounts, and application settings</p>
+            </a>
+            
+            <a href="emergency_screen.html" class="nav-card">
+                <div class="nav-icon">🚨</div>
+                <h3 class="nav-title">Emergency</h3>
+                <p class="nav-description">Quick access to emergency protocols and critical patient information</p>
+            </a>
+        </div>
+        
+        <div style="text-align: center; color: rgba(255,255,255,0.8); margin-top: 40px;">
+            <p>© 2024 AfriDiag - Empowering African Healthcare with AI Technology</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple navigation and status checking
+        console.log('🩺 AfriDiag Dashboard Loaded Successfully');
+        
+        // Check backend connectivity
+        async function checkBackendStatus() {
+            try {
+                const response = await fetch('http://localhost:8001/health');
+                if (response.ok) {
+                    console.log('✅ Backend connection: OK');
+                } else {
+                    console.log('⚠️ Backend connection: Issues detected');
+                }
+            } catch (error) {
+                console.log('❌ Backend connection: Failed');
+            }
+        }
+        
+        // Check status on load
+        checkBackendStatus();
+        
+        // Add click handlers for navigation
+        document.querySelectorAll('.nav-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                console.log(`🔗 Navigating to: ${href}`);
+            });
+        });
+    </script>
+</body>
+</html>

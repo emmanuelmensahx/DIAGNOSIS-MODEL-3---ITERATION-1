@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toggle Test</title>
+    <style>
+        .ai-features {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e8f5e8;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .ai-features.active {
+            display: block;
+        }
+        
+        .ai-toggle {
+            margin: 20px;
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        
+        .ai-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0 10px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Toggle Test Page</h1>
+    
+    <div class="ai-toggle">
+        <label>
+            <input type="checkbox" id="aiToggle" onchange="toggleAIFeatures()">
+            <span>🚀 Grok AI Diagnosis</span>
+        </label>
+        <div class="ai-features" id="aiFeatures">
+            <h3>AI Features Section</h3>
+            <p>This section should appear when the toggle is checked!</p>
+            <textarea placeholder="Medical History" rows="4" style="width: 100%;"></textarea>
+        </div>
+    </div>
+
+    <script>
+        function toggleAIFeatures() {
+            alert('Toggle function called!');
+            console.log('toggleAIFeatures called');
+            
+            const aiToggle = document.getElementById('aiToggle');
+            const aiFeatures = document.getElementById('aiFeatures');
+            
+            console.log('aiToggle:', aiToggle);
+            console.log('aiFeatures:', aiFeatures);
+            console.log('aiToggle.checked:', aiToggle ? aiToggle.checked : 'aiToggle is null');
+            
+            if (aiToggle && aiFeatures) {
+                if (aiToggle.checked) {
+                    console.log('Adding active class');
+                    aiFeatures.classList.add('active');
+                } else {
+                    console.log('Removing active class');
+                    aiFeatures.classList.remove('active');
+                }
+                console.log('aiFeatures classes:', aiFeatures.className);
+            } else {
+                console.error('Required elements not found:', {
+                    aiToggle: !!aiToggle,
+                    aiFeatures: !!aiFeatures
+                });
+            }
+        }
+    </script>
+</body>
+</html>

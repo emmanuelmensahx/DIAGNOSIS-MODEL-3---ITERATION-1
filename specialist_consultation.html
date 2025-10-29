@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specialist Consultation - AfriDiag</title>
+    <link rel="stylesheet" href="css/navigation.css">
+    <script src="/frontend/specialist_database.js"></script>
+    <script src="/frontend/availability_manager.js"></script>
+    <script src="/frontend/notification_system.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #4CAF50;
+            border-bottom-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .tab-button:hover {
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .specialists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .specialist-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .specialist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .specialist-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .specialist-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .specialist-info h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .specialist-info .specialization {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-available {
+            background: #4CAF50;
+            animation: pulse-green 2s infinite;
+        }
+
+        .status-partially {
+            background: #FF9800;
+            animation: pulse-orange 2s infinite;
+        }
+
+        .status-unavailable {
+            background: #f44336;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        @keyframes pulse-orange {
+            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 152, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+        }
+
+        .specialist-details {
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .detail-icon {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+        }
+
+        .specialist-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .consult-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .consult-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .consult-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .chat-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .chat-btn:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .view-btn {
+            background: #FF9800;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background: #F57C00;
+            transform: translateY(-2px);
+        }
+
+        .consultation-requests {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .request-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .request-info h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .request-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-in-progress {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .filter-select, .filter-input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .emergency-banner {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .emergency-icon {
+            font-size: 24px;
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Request Form Styles */
+        .request-form-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .request-form {
+            background: white;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-section {
+            padding: 25px 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-section h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .file-upload-area:hover {
+            border-color: #4CAF50;
+            background: #f0f8f0;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 8px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 5px;
+            font-size: 12px;
+            position: relative;
+            padding-right: 30px;
+        }
+
+        .file-remove {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .form-actions {
+            padding: 25px 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            background: #f8f9fa;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-header h3 {
+            color: #333;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .requests-list {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .request-form-container {
+                padding: 10px;
+            }
+            
+            .request-form {
+                max-height: 95vh;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .specialists-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .specialist-actions {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🩺 Specialist Consultation</h1>
+            <p>Connect with medical specialists for second opinions and expert guidance</p>
+        </div>
+
+        <div class="content">
+            <!-- Emergency Banner (shown when needed) -->
+            <div class="emergency-banner" id="emergencyBanner" style="display: none;">
+                <div class="emergency-icon">🚨</div>
+                <div>
+                    <strong>Emergency Consultation Required</strong><br>
+                    Critical case detected. Emergency specialists have been notified.
+                </div>
+            </div>
+
+            <!-- Section Tabs -->
+            <div class="section-tabs">
+                <button class="tab-button active" onclick="switchTab('specialists')">Available Specialists</button>
+                <button class="tab-button" onclick="switchTab('requests')">My Requests</button>
+                <button class="tab-button" onclick="switchTab('chat')">Active Chats</button>
+                <button class="tab-button" onclick="switchTab('statistics')">Statistics</button>
+            </div>
+
+            <!-- Available Specialists Tab -->
+            <div class="tab-content active" id="specialists-tab">
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Specialization</label>
+                        <select class="filter-select" id="specializationFilter" onchange="filterSpecialists()">
+                            <option value="">All Specializations</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="neurology">Neurology</option>
+                            <option value="pediatrics">Pediatrics</option>
+                            <option value="infectious-diseases">Infectious Diseases</option>
+                            <option value="emergency-medicine">Emergency Medicine</option>
+                            <option value="internal-medicine">Internal Medicine</option>
+                            <option value="surgery">Surgery</option>
+                            <option value="radiology">Radiology</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Availability</label>
+                        <select class="filter-select" id="availabilityFilter" onchange="filterSpecialists()">
+                            <option value="">All Status</option>
+                            <option value="available">Available</option>
+                            <option value="partially">Partially Available</option>
+                            <option value="unavailable">Unavailable</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Location</label>
+                        <select class="filter-select" id="locationFilter" onchange="filterSpecialists()">
+                            <option value="">All Locations</option>
+                            <option value="local">Local</option>
+                            <option value="national">National</option>
+                            <option value="international">International</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <input type="text" class="filter-input" id="searchFilter" placeholder="Search specialists..." oninput="filterSpecialists()">
+                    </div>
+                </div>
+
+                <!-- Specialists Grid -->
+                <div class="specialists-grid" id="specialistsGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading specialists...
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Requests Tab -->
+            <div class="tab-content" id="requests-tab">
+                <div class="requests-section">
+                    <div class="section-header">
+                        <h3>📋 My Consultation Requests</h3>
+                        <button class="action-btn primary" onclick="showRequestForm()">
+                            ➕ New Request
+                        </button>
+                    </div>
+                    
+                    <!-- New Request Form -->
+                    <div class="request-form-container" id="requestFormContainer" style="display: none;">
+                        <div class="request-form">
+                            <div class="form-header">
+                                <h3>🩺 New Consultation Request</h3>
+                                <button class="close-btn" onclick="hideRequestForm()">✕</button>
+                            </div>
+                            
+                            <form id="consultationRequestForm">
+                                <!-- Patient Information -->
+                                <div class="form-section">
+                                    <h4>👤 Patient Information</h4>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="patientName">Patient Name *</label>
+                                            <input type="text" id="patientName" name="patientName" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="patientAge">Age *</label>
+                                            <input type="number" id="patientAge" name="patientAge" min="0" max="120" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="patientGender">Gender *</label>
+                                            <select id="patientGender" name="patientGender" required>
+                                                <option value="">Select Gender</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="patientId">Patient ID</label>
+                                            <input type="text" id="patientId" name="patientId" placeholder="Optional">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Clinical Information -->
+                                <div class="form-section">
+                                    <h4>🩺 Clinical Information</h4>
+                                    <div class="form-group">
+                                        <label for="chiefComplaint">Chief Complaint *</label>
+                                        <textarea id="chiefComplaint" name="chiefComplaint" rows="3" required placeholder="Brief description of the main problem"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="symptoms">Detailed Symptoms *</label>
+                                        <textarea id="symptoms" name="symptoms" rows="4" required placeholder="Describe all symptoms, duration, severity, etc."></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="medicalHistory">Medical History</label>
+                                        <textarea id="medicalHistory" name="medicalHistory" rows="3" placeholder="Previous conditions, surgeries, medications, allergies"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Vital Signs -->
+                                <div class="form-section">
+                                    <h4>📊 Vital Signs</h4>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="bloodPressure">Blood Pressure</label>
+                                            <input type="text" id="bloodPressure" name="bloodPressure" placeholder="e.g., 120/80">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="heartRate">Heart Rate (bpm)</label>
+                                            <input type="number" id="heartRate" name="heartRate" placeholder="e.g., 72">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="temperature">Temperature (°C)</label>
+                                            <input type="number" id="temperature" name="temperature" step="0.1" placeholder="e.g., 36.5">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="oxygenSaturation">Oxygen Saturation (%)</label>
+                                            <input type="number" id="oxygenSaturation" name="oxygenSaturation" min="0" max="100" placeholder="e.g., 98">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="respiratoryRate">Respiratory Rate</label>
+                                            <input type="number" id="respiratoryRate" name="respiratoryRate" placeholder="e.g., 16">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="weight">Weight (kg)</label>
+                                            <input type="number" id="weight" name="weight" step="0.1" placeholder="e.g., 70">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Specialist Selection -->
+                                <div class="form-section">
+                                    <h4>👨‍⚕️ Specialist Selection</h4>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="specialization">Required Specialization *</label>
+                                            <select id="specialization" name="specialization" required onchange="filterSpecialistsBySpecialization()">
+                                                <option value="">Select Specialization</option>
+                                                <option value="cardiology">Cardiology</option>
+                                                <option value="neurology">Neurology</option>
+                                                <option value="pediatrics">Pediatrics</option>
+                                                <option value="orthopedics">Orthopedics</option>
+                                                <option value="dermatology">Dermatology</option>
+                                                <option value="psychiatry">Psychiatry</option>
+                                                <option value="oncology">Oncology</option>
+                                                <option value="endocrinology">Endocrinology</option>
+                                                <option value="gastroenterology">Gastroenterology</option>
+                                                <option value="pulmonology">Pulmonology</option>
+                                                <option value="infectious_disease">Infectious Disease</option>
+                                                <option value="emergency_medicine">Emergency Medicine</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="preferredSpecialist">Preferred Specialist</label>
+                                            <select id="preferredSpecialist" name="preferredSpecialist">
+                                                <option value="">Any available specialist</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="urgency">Urgency Level *</label>
+                                            <select id="urgency" name="urgency" required>
+                                                <option value="">Select Urgency</option>
+                                                <option value="low">🟢 Low - Routine consultation</option>
+                                                <option value="medium">🟡 Medium - Needs attention within hours</option>
+                                                <option value="high">🔴 High - Urgent, needs immediate attention</option>
+                                                <option value="emergency">🚨 Emergency - Life threatening</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Additional Information -->
+                                <div class="form-section">
+                                    <h4>📎 Additional Information</h4>
+                                    <div class="form-group">
+                                        <label for="currentTreatment">Current Treatment/Medications</label>
+                                        <textarea id="currentTreatment" name="currentTreatment" rows="3" placeholder="List current medications, treatments, or interventions"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="specificQuestions">Specific Questions for Specialist</label>
+                                        <textarea id="specificQuestions" name="specificQuestions" rows="3" placeholder="What specific guidance or opinion are you seeking?"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="attachments">Attachments</label>
+                                        <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                                            <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" style="display: none;" onchange="handleFileUpload(event)">
+                                            <div class="upload-text">
+                                                📎 Click to upload files (Lab results, X-rays, ECG, etc.)
+                                            </div>
+                                            <div class="file-list" id="fileList"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Form Actions -->
+                                <div class="form-actions">
+                                    <button type="button" class="action-btn secondary" onclick="hideRequestForm()">
+                                        Cancel
+                                    </button>
+                                    <button type="button" class="action-btn secondary" onclick="saveDraft()">
+                                        💾 Save Draft
+                                    </button>
+                                    <button type="submit" class="action-btn primary">
+                                        🚀 Submit Request
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="consultation-requests" id="consultationRequests">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading consultation requests...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Chats Tab -->
+            <div class="tab-content" id="chat-tab">
+                <div id="activeChats">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading active chats...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div class="tab-content" id="statistics-tab">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalSpecialists">0</div>
+                        <div class="stat-label">Total Specialists</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="availableSpecialists">0</div>
+                        <div class="stat-label">Available Now</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeConsultations">0</div>
+                        <div class="stat-label">Active Consultations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgResponseTime">0</div>
+                        <div class="stat-label">Avg Response (min)</div>
+                    </div>
+                </div>
+                
+                <!-- Demo Notification Section -->
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px;">
+                    <h3 style="margin-bottom: 15px;">🔔 Notification System Demo</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="action-btn primary" onclick="demoConsultationRequest()">Demo Consultation Request</button>
+                        <button class="action-btn secondary" onclick="demoSpecialistOnline()">Demo Specialist Online</button>
+                        <button class="action-btn" onclick="demoEmergencyAlert()" style="background: #dc3545; color: white;">Demo Emergency Alert</button>
+                        <button class="action-btn" onclick="demoConsultationResponse()">Demo Response</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        // Initialize navigation
+        const navigation = new AfriDiagNavigation('navigation-container');
+
+        // Sample specialists data
+        // Get specialists data from database
+        let specialistsData = [];
+        let filteredSpecialists = [];
+
+        // Initialize specialists data from database
+        function initializeSpecialistsData() {
+            if (window.specialistDB) {
+                specialistsData = window.specialistDB.getAllSpecialists().map(specialist => ({
+                    id: specialist.id,
+                    name: specialist.name,
+                    specialization: specialist.specialization,
+                    location: specialist.location,
+                    status: specialist.availability?.status || 'unavailable',
+                    avatar: specialist.avatar,
+                    experience: `${specialist.experience} years`,
+                    languages: specialist.languages,
+                    rating: specialist.rating,
+                    responseTime: getResponseTime(specialist.availability?.status),
+                    consultationFee: `$${specialist.consultationFee}`,
+                    nextAvailable: getNextAvailableTime(specialist.availability),
+                    subSpecialties: specialist.subSpecialties,
+                    bio: specialist.bio,
+                    isOnline: specialist.availability?.isOnline || false
+                }));
+                filteredSpecialists = [...specialistsData];
+            }
+        }
+
+        function getResponseTime(status) {
+            switch(status) {
+                case 'available': return '< 5 min';
+                case 'partially-available': return '< 15 min';
+                case 'busy': return '< 30 min';
+                default: return 'Not available';
+            }
+        }
+
+        function getNextAvailableTime(availability) {
+            if (!availability) return 'Unknown';
+            
+            if (availability.status === 'available') {
+                return 'Now';
+            } else if (availability.nextAvailable) {
+                const nextTime = new Date(availability.nextAvailable);
+                const now = new Date();
+                const diffHours = Math.ceil((nextTime - now) / (1000 * 60 * 60));
+                
+                if (diffHours < 1) {
+                    return 'Within 1 hour';
+                } else if (diffHours < 24) {
+                    return `In ${diffHours} hours`;
+                } else {
+                    return nextTime.toLocaleDateString();
+                }
+            }
+            return 'Unknown';
+        }
+
+        // Sample consultation requests
+        const consultationRequests = [
+            {
+                id: 1,
+                patientName: "John Doe",
+                specialist: "Dr. Sarah Johnson",
+                specialization: "Cardiology",
+                status: "pending",
+                requestDate: "2024-01-15 10:30",
+                urgency: "medium",
+                symptoms: "Chest pain, shortness of breath"
+            },
+            {
+                id: 2,
+                patientName: "Mary Smith",
+                specialist: "Dr. Amina Hassan",
+                specialization: "Pediatrics",
+                status: "in-progress",
+                requestDate: "2024-01-15 09:15",
+                urgency: "high",
+                symptoms: "High fever, rash"
+            }
+        ];
+
+        filteredSpecialists = [...specialistsData];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for specialist database and availability manager to be ready
+            if (window.specialistDB && window.availabilityManager) {
+                initializeSpecialistsData();
+                loadSpecialists();
+                loadConsultationRequests();
+                updateStatistics();
+                
+                // Listen for real-time availability changes
+                document.addEventListener('specialistAvailabilityChanged', function(event) {
+                    const { specialistId, newStatus } = event.detail;
+                    updateSpecialistStatus(specialistId, newStatus);
+                });
+                
+                // Listen for availability manager status changes
+                window.addEventListener('specialistStatusChanged', function(event) {
+                    const { specialistId, newStatus } = event.detail;
+                    updateSpecialistStatus(specialistId, newStatus);
+                    
+                    // Update statistics if on statistics tab
+                    if (document.getElementById('statistics-tab').classList.contains('active')) {
+                        updateStatistics();
+                    }
+                });
+                
+                // Add availability manager status change listener
+                window.availabilityManager.addStatusChangeListener(function(event) {
+                    updateSpecialistStatus(event.specialistId, event.newStatus);
+                    
+                    // Show notification for important status changes
+                    if (event.newStatus === 'emergency') {
+                        showStatusNotification(`${getSpecialistName(event.specialistId)} is now handling an emergency`, 'warning');
+                        
+                        // Show emergency notification
+                        if (window.notificationSystem) {
+                            const specialist = window.specialistDB.getSpecialistById(event.specialistId);
+                            if (specialist) {
+                                window.notificationSystem.showEmergencyAlert(
+                                    `${specialist.name} is now handling an emergency case`,
+                                    specialist.location
+                                );
+                            }
+                        }
+                    } else if (event.newStatus === 'available' && event.previousStatus?.status === 'offline') {
+                        showStatusNotification(`${getSpecialistName(event.specialistId)} is now online`, 'success');
+                        
+                        // Show specialist online notification
+                        if (window.notificationSystem) {
+                            const specialist = window.specialistDB.getSpecialistById(event.specialistId);
+                            if (specialist) {
+                                window.notificationSystem.showSpecialistOnline(
+                                    specialist.name, 
+                                    specialist.specialization
+                                );
+                            }
+                        }
+                    } else if (event.newStatus === 'available' && event.previousStatus?.status !== 'available') {
+                        // Show notification when specialist becomes available from any other status
+                        if (window.notificationSystem) {
+                            const specialist = window.specialistDB.getSpecialistById(event.specialistId);
+                            if (specialist) {
+                                window.notificationSystem.showSpecialistOnline(
+                                    specialist.name, 
+                                    specialist.specialization
+                                );
+                            }
+                        }
+                    }
+                });
+                
+            } else {
+                // Retry after a short delay if systems not ready
+                setTimeout(() => {
+                    if (window.specialistDB && window.availabilityManager) {
+                        initializeSpecialistsData();
+                        loadSpecialists();
+                        loadConsultationRequests();
+                        updateStatistics();
+                    }
+                }, 100);
+            }
+            
+            // Initialize form submission handler
+            const form = document.getElementById('consultationRequestForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitConsultationRequest();
+                });
+            }
+            
+            // Load existing requests and check for drafts
+            loadDraft();
+            
+            // Populate specialization filter
+            populateSpecializationFilter();
+        });
+
+        function updateSpecialistStatus(specialistId, newStatus) {
+            // Update local data
+            const specialist = specialistsData.find(s => s.id === specialistId);
+            if (specialist) {
+                specialist.status = newStatus;
+                specialist.responseTime = getResponseTime(newStatus);
+                specialist.nextAvailable = newStatus === 'available' ? 'Now' : 'Unknown';
+                
+                // Update filtered specialists
+                const filteredSpecialist = filteredSpecialists.find(s => s.id === specialistId);
+                if (filteredSpecialist) {
+                    filteredSpecialist.status = newStatus;
+                    filteredSpecialist.responseTime = getResponseTime(newStatus);
+                    filteredSpecialist.nextAvailable = newStatus === 'available' ? 'Now' : 'Unknown';
+                }
+                
+                // Refresh the display
+                loadSpecialists();
+                updateStatistics();
+            }
+        }
+
+        function populateSpecializationFilter() {
+            if (window.specialistDB) {
+                const specializations = window.specialistDB.getSpecializations();
+                const filterSelect = document.getElementById('specializationFilter');
+                if (filterSelect) {
+                    filterSelect.innerHTML = '<option value="">All Specializations</option>' +
+                        specializations.map(spec => `<option value="${spec}">${spec}</option>`).join('');
+                }
+            }
+        }
+
+        function getSpecialistName(specialistId) {
+            const specialist = specialistsData.find(s => s.id === specialistId);
+            return specialist ? specialist.name : `Specialist ${specialistId}`;
+        }
+
+        function showStatusNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `status-notification ${type}`;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : type === 'warning' ? '#FF9800' : '#2196F3'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 300px;
+                font-size: 14px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to selected tab and button
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            // Load content based on tab
+            switch(tabName) {
+                case 'specialists':
+                    loadSpecialists();
+                    break;
+                case 'requests':
+                    loadConsultationRequests();
+                    break;
+                case 'chat':
+                    loadActiveChats();
+                    break;
+                case 'statistics':
+                    updateStatistics();
+                    break;
+            }
+        }
+
+        function loadSpecialists() {
+            const grid = document.getElementById('specialistsGrid');
+            
+            if (filteredSpecialists.length === 0) {
+                grid.innerHTML = '<div class="loading">No specialists found matching your criteria.</div>';
+                return;
+            }
+            
+            grid.innerHTML = filteredSpecialists.map(specialist => {
+                // Get enhanced status from availability manager
+                const statusInfo = window.availabilityManager ? 
+                    window.availabilityManager.getStatus(specialist.id) : 
+                    { status: specialist.status, responseTime: specialist.responseTime, nextAvailable: specialist.nextAvailable };
+                
+                const statusColor = window.availabilityManager ? 
+                    window.availabilityManager.getStatusColor(statusInfo.status) : '#666';
+                
+                const statusLabel = window.availabilityManager ? 
+                    window.availabilityManager.getStatusLabel(statusInfo.status) : statusInfo.status;
+                
+                const nextAvailableFormatted = window.availabilityManager && statusInfo.nextAvailable ? 
+                    window.availabilityManager.formatNextAvailable(statusInfo.nextAvailable) : specialist.nextAvailable;
+                
+                const isAvailable = statusInfo.status === 'available';
+                const isBusy = statusInfo.status === 'busy' || statusInfo.status === 'in_consultation';
+                const isOffline = statusInfo.status === 'offline';
+                
+                return `
+                <div class="specialist-card" data-specialization="${specialist.specialization.toLowerCase()}" data-status="${statusInfo.status}" data-location="${specialist.location.toLowerCase()}" id="specialist-card-${specialist.id}">
+                    <div class="status-indicator" style="background-color: ${statusColor}; position: relative;">
+                        ${statusInfo.status === 'emergency' ? '<span style="position: absolute; top: -2px; right: -2px; font-size: 8px;">🚨</span>' : ''}
+                    </div>
+                    <div class="specialist-header">
+                        <div class="specialist-avatar">${specialist.avatar}</div>
+                        <div class="specialist-info">
+                            <h3>${specialist.name}</h3>
+                            <div class="specialization">${specialist.specialization}</div>
+                            <div class="status-label" style="color: ${statusColor}; font-size: 12px; font-weight: bold;">
+                                ${statusLabel}
+                                ${statusInfo.reason ? ` - ${statusInfo.reason}` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="specialist-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">📍</span>
+                            ${specialist.location}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">⭐</span>
+                            ${specialist.rating}/5.0 (${specialist.experience})
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">⏱️</span>
+                            Response: ${statusInfo.responseTime}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">💰</span>
+                            ${specialist.consultationFee}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🗣️</span>
+                            ${specialist.languages.join(', ')}
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            Next: ${nextAvailableFormatted}
+                        </div>
+                        ${statusInfo.estimatedDuration ? `
+                        <div class="detail-item">
+                            <span class="detail-icon">⏳</span>
+                            Duration: ${statusInfo.estimatedDuration}
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="specialist-actions">
+                        <button class="action-btn consult-btn" onclick="requestConsultation(${specialist.id})" ${isOffline ? 'disabled' : ''}>
+                            ${isAvailable ? 'Consult Now' : isBusy ? 'Request' : 'Unavailable'}
+                        </button>
+                        <button class="action-btn chat-btn" onclick="startChat(${specialist.id})" ${isOffline ? 'disabled' : ''}>
+                            ${isAvailable ? 'Chat Now' : 'Message'}
+                        </button>
+                        <button class="action-btn view-btn" onclick="viewProfile(${specialist.id})">
+                            Profile
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        function filterSpecialists() {
+            const specializationFilter = document.getElementById('specializationFilter').value.toLowerCase();
+            const availabilityFilter = document.getElementById('availabilityFilter').value;
+            const locationFilter = document.getElementById('locationFilter').value.toLowerCase();
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            
+            filteredSpecialists = specialistsData.filter(specialist => {
+                const matchesSpecialization = !specializationFilter || specialist.specialization.toLowerCase().includes(specializationFilter);
+                const matchesAvailability = !availabilityFilter || specialist.status === availabilityFilter;
+                const matchesLocation = !locationFilter || 
+                    (locationFilter === 'local' && specialist.location.includes('Kenya')) ||
+                    (locationFilter === 'national' && (specialist.location.includes('Kenya') || specialist.location.includes('Uganda') || specialist.location.includes('Tanzania'))) ||
+                    (locationFilter === 'international' && !specialist.location.includes('Kenya') && !specialist.location.includes('Uganda') && !specialist.location.includes('Tanzania'));
+                const matchesSearch = !searchFilter || 
+                    specialist.name.toLowerCase().includes(searchFilter) ||
+                    specialist.specialization.toLowerCase().includes(searchFilter) ||
+                    specialist.location.toLowerCase().includes(searchFilter);
+                
+                return matchesSpecialization && matchesAvailability && matchesLocation && matchesSearch;
+            });
+            
+            loadSpecialists();
+        }
+
+        function loadConsultationRequests() {
+            loadMyRequests();
+        }
+
+        function loadMyRequests() {
+            const requestsList = document.getElementById('consultationRequests');
+            if (!requestsList) return;
+            
+            if (myRequests.length === 0) {
+                requestsList.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">📋</div>
+                        <h3>No consultation requests yet</h3>
+                        <p>Click "New Request" to seek specialist opinion for your patients.</p>
+                        <button class="action-btn consult-btn" onclick="createNewRequest()" style="margin-top: 20px;">
+                            ➕ New Request
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            requestsList.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="color: #333; margin: 0;">My Consultation Requests</h3>
+                    <button class="action-btn consult-btn" onclick="createNewRequest()">
+                        ➕ New Request
+                    </button>
+                </div>
+                ${myRequests.map(request => `
+                    <div class="request-card ${request.urgency}">
+                        <div class="request-header">
+                            <div class="request-info">
+                                <h3>👤 ${request.patientName}</h3>
+                                <div class="request-meta">
+                                    <div class="meta-item">
+                                        <span>🆔</span>
+                                        <span>Request #${request.id}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>👨‍⚕️</span>
+                                        <span>${request.specialization}</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <span>⏰</span>
+                                        <span>${new Date(request.timestamp).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="status-badge status-${request.status}">
+                                ${request.status.toUpperCase()}
+                            </div>
+                        </div>
+                        
+                        <div class="request-summary">
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <span class="summary-label">Chief Complaint:</span>
+                                    <span class="summary-value">${request.chiefComplaint}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">Urgency:</span>
+                                    <span class="summary-value">${request.urgency}</span>
+                                </div>
+                                ${request.specialistName ? `
+                                <div class="summary-item">
+                                    <span class="summary-label">Assigned Specialist:</span>
+                                    <span class="summary-value">${request.specialistName}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="request-actions">
+                            <button class="action-btn view-btn" onclick="viewRequestDetails(${request.id})">
+                                👁️ View Details
+                            </button>
+                            ${request.status === 'pending' ? `
+                            <button class="action-btn secondary" onclick="editRequest(${request.id})">
+                                ✏️ Edit
+                            </button>
+                            <button class="action-btn danger" onclick="cancelRequestNew(${request.id})">
+                                ❌ Cancel
+                            </button>
+                            ` : ''}
+                            ${request.status === 'accepted' ? `
+                            <button class="action-btn primary" onclick="openChatFromRequest(${request.id})">
+                                💬 Chat with Specialist
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function viewRequestDetails(requestId) {
+            const request = myRequests.find(r => r.id === requestId);
+            if (request) {
+                alert(`Request Details:\n\nPatient: ${request.patientName} (${request.patientAge} years)\nComplaint: ${request.chiefComplaint}\nSymptoms: ${request.symptoms}\nSpecialization: ${request.specialization}\nUrgency: ${request.urgency}\nStatus: ${request.status}\nSubmitted: ${new Date(request.timestamp).toLocaleString()}`);
+            }
+        }
+
+        function editRequest(requestId) {
+            const request = myRequests.find(r => r.id === requestId);
+            if (request && request.status === 'pending') {
+                // Fill form with existing data
+                showRequestForm();
+                
+                setTimeout(() => {
+                    Object.keys(request).forEach(key => {
+                        const field = document.getElementById(key);
+                        if (field && key !== 'id' && key !== 'timestamp' && key !== 'status' && key !== 'files') {
+                            field.value = request[key];
+                        }
+                    });
+                }, 100);
+            }
+        }
+
+        function cancelRequestNew(requestId) {
+            if (confirm('Are you sure you want to cancel this consultation request?')) {
+                myRequests = myRequests.filter(r => r.id !== requestId);
+                localStorage.setItem('consultationRequests', JSON.stringify(myRequests));
+                loadMyRequests();
+                alert('Consultation request cancelled successfully.');
+            }
+        }
+
+        function openChatFromRequest(requestId) {
+            const request = myRequests.find(r => r.id === requestId);
+            if (request) {
+                // Open chat with specialist
+                window.open(`specialist_chat.html?requestId=${requestId}&specialistId=${request.preferredSpecialist}`, '_blank');
+            }
+        }
+
+        function loadActiveChats() {
+            const container = document.getElementById('activeChats');
+            
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">💬</div>
+                    <h3>No Active Chats</h3>
+                    <p>Start a consultation to begin chatting with specialists.</p>
+                    <button class="action-btn consult-btn" onclick="switchTab('specialists')" style="margin-top: 20px;">Find Specialists</button>
+                </div>
+            `;
+        }
+
+        function updateStatistics() {
+            if (window.availabilityManager) {
+                const stats = window.availabilityManager.getAvailabilityStats();
+                
+                document.getElementById('totalSpecialists').textContent = stats.total;
+                document.getElementById('availableSpecialists').textContent = stats.available;
+                document.getElementById('activeConsultations').textContent = stats.in_consultation + myRequests.filter(r => r.status === 'in-progress').length;
+                
+                // Calculate average response time based on current statuses
+                const avgResponseMinutes = Math.round(
+                    (stats.available * 5 + stats.busy * 30 + stats.in_consultation * 60 + stats.break * 20) / 
+                    Math.max(stats.total - stats.offline, 1)
+                );
+                document.getElementById('avgResponseTime').textContent = avgResponseMinutes;
+                
+                // Update additional statistics if elements exist
+                const busyElement = document.getElementById('busySpecialists');
+                if (busyElement) busyElement.textContent = stats.busy;
+                
+                const offlineElement = document.getElementById('offlineSpecialists');
+                if (offlineElement) offlineElement.textContent = stats.offline;
+                
+                const emergencyElement = document.getElementById('emergencySpecialists');
+                if (emergencyElement) emergencyElement.textContent = stats.emergency;
+                
+                // Update percentage indicators if they exist
+                const availablePercentElement = document.getElementById('availablePercent');
+                if (availablePercentElement) availablePercentElement.textContent = `${stats.available_percentage}%`;
+                
+            } else {
+                // Fallback to basic statistics
+                document.getElementById('totalSpecialists').textContent = specialistsData.length;
+                document.getElementById('availableSpecialists').textContent = specialistsData.filter(s => s.status === 'available').length;
+                document.getElementById('activeConsultations').textContent = consultationRequests.filter(r => r.status === 'in-progress').length;
+                document.getElementById('avgResponseTime').textContent = '8';
+            }
+        }
+
+        // Consultation Request Form Functions
+        let uploadedFiles = [];
+        let myRequests = JSON.parse(localStorage.getItem('consultationRequests') || '[]');
+
+        function requestConsultation(specialistId) {
+            const specialist = specialistsData.find(s => s.id === specialistId);
+            if (specialist) {
+                // Pre-select the specialist in the form
+                showRequestForm();
+                setTimeout(() => {
+                    document.getElementById('specialization').value = specialist.specialization.toLowerCase();
+                    filterSpecialistsBySpecialization();
+                    document.getElementById('preferredSpecialist').value = specialistId;
+                }, 100);
+            }
+        }
+
+        function showRequestForm() {
+            document.getElementById('requestFormContainer').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideRequestForm() {
+            document.getElementById('requestFormContainer').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('consultationRequestForm').reset();
+            uploadedFiles = [];
+            document.getElementById('fileList').innerHTML = '';
+        }
+
+        function filterSpecialistsBySpecialization() {
+            const specialization = document.getElementById('specialization').value;
+            const preferredSelect = document.getElementById('preferredSpecialist');
+            
+            // Clear existing options except the first one
+            preferredSelect.innerHTML = '<option value="">Any available specialist</option>';
+            
+            if (specialization) {
+                // Filter specialists by specialization
+                const filteredSpecialists = specialistsData.filter(s => s.specialization.toLowerCase() === specialization);
+                
+                filteredSpecialists.forEach(specialist => {
+                    const option = document.createElement('option');
+                    option.value = specialist.id;
+                    option.textContent = `${specialist.name} - ${specialist.location} (${specialist.status})`;
+                    preferredSelect.appendChild(option);
+                });
+            }
+        }
+
+        function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+                    return;
+                }
+                
+                uploadedFiles.push(file);
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+                    <span class="file-remove" onclick="removeFile('${file.name}')">×</span>
+                `;
+                
+                document.getElementById('fileList').appendChild(fileItem);
+            });
+            
+            // Clear the input
+            event.target.value = '';
+        }
+
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(file => file.name !== fileName);
+            
+            // Remove from display
+            const fileItems = document.querySelectorAll('.file-item');
+            fileItems.forEach(item => {
+                if (item.textContent.includes(fileName)) {
+                    item.remove();
+                }
+            });
+        }
+
+        function saveDraft() {
+            const formData = new FormData(document.getElementById('consultationRequestForm'));
+            const draftData = Object.fromEntries(formData.entries());
+            draftData.files = uploadedFiles.map(f => f.name);
+            draftData.isDraft = true;
+            draftData.timestamp = new Date().toISOString();
+            
+            localStorage.setItem('consultationDraft', JSON.stringify(draftData));
+            alert('Draft saved successfully! You can continue editing later.');
+        }
+
+        function loadDraft() {
+            const draft = localStorage.getItem('consultationDraft');
+            if (draft) {
+                const draftData = JSON.parse(draft);
+                
+                if (confirm('A draft was found. Would you like to load it?')) {
+                    showRequestForm();
+                    
+                    setTimeout(() => {
+                        // Fill form fields
+                        Object.keys(draftData).forEach(key => {
+                            const field = document.getElementById(key);
+                            if (field && key !== 'files' && key !== 'isDraft' && key !== 'timestamp') {
+                                field.value = draftData[key];
+                            }
+                        });
+                    }, 100);
+                }
+            }
+        }
+
+        function submitConsultationRequest() {
+            const formData = new FormData(document.getElementById('consultationRequestForm'));
+            const requestData = Object.fromEntries(formData.entries());
+            
+            // Add additional data
+            requestData.id = Date.now();
+            requestData.timestamp = new Date().toISOString();
+            requestData.status = 'pending';
+            requestData.files = uploadedFiles.map(f => f.name);
+            requestData.requestedBy = 'Current User'; // In real app, get from auth
+            
+            // Find selected specialist info
+            const selectedSpecialist = specialistsData.find(s => s.id == requestData.preferredSpecialist);
+            if (selectedSpecialist) {
+                requestData.specialistName = selectedSpecialist.name;
+                requestData.specialistLocation = selectedSpecialist.location;
+            }
+            
+            // Save to localStorage
+            myRequests.unshift(requestData);
+            localStorage.setItem('consultationRequests', JSON.stringify(myRequests));
+            
+            // Clear draft
+            localStorage.removeItem('consultationDraft');
+            
+            // Show success notification
+            if (window.notificationSystem) {
+                window.notificationSystem.showSystemNotification(
+                    'Consultation Request Submitted',
+                    `Your request for ${requestData.specialization} consultation has been submitted. Request ID: ${requestData.id}`
+                );
+                
+                // Simulate specialist notification (in real app, this would be sent to the specialist)
+                setTimeout(() => {
+                    if (selectedSpecialist) {
+                        window.notificationSystem.showConsultationRequest(
+                            selectedSpecialist.name,
+                            requestData.requestedBy,
+                            requestData.urgency
+                        );
+                    }
+                }, 2000);
+            } else {
+                // Fallback alert
+                alert(`Consultation request submitted successfully!\n\nRequest ID: ${requestData.id}\nSpecialization: ${requestData.specialization}\nUrgency: ${requestData.urgency}\n\nYou will be notified when a specialist responds.`);
+            }
+            
+            // Hide form and reload requests
+            hideRequestForm();
+            loadMyRequests();
+            
+            // Switch to My Requests tab
+            switchTab('requests');
+        }
+
+        function createNewRequest() {
+            showRequestForm();
+        }
+
+        function startChat(specialistId) {
+            const specialist = specialistsData.find(s => s.id === specialistId);
+            if (specialist) {
+                // In a real app, this would open the chat interface
+                alert(`Starting chat with ${specialist.name}.\n\nThis will open the real-time chat interface for immediate communication.`);
+            }
+        }
+
+        function viewProfile(specialistId) {
+            const specialist = specialistsData.find(s => s.id === specialistId);
+            if (specialist) {
+                // In a real app, this would show detailed profile
+                alert(`Viewing profile of ${specialist.name}\n\nSpecialization: ${specialist.specialization}\nExperience: ${specialist.experience}\nLocation: ${specialist.location}\nRating: ${specialist.rating}/5.0\nLanguages: ${specialist.languages.join(', ')}`);
+            }
+        }
+
+        function viewRequest(requestId) {
+            const request = consultationRequests.find(r => r.id === requestId);
+            if (request) {
+                alert(`Consultation Request Details:\n\nPatient: ${request.patientName}\nSpecialist: ${request.specialist}\nStatus: ${request.status}\nSymptoms: ${request.symptoms}\nRequested: ${request.requestDate}`);
+            }
+        }
+
+        function openChat(requestId) {
+            alert('Opening chat interface...\n\nThis will launch the real-time chat with the specialist.');
+        }
+
+        function cancelRequest(requestId) {
+            if (confirm('Are you sure you want to cancel this consultation request?')) {
+                const index = consultationRequests.findIndex(r => r.id === requestId);
+                if (index > -1) {
+                    consultationRequests.splice(index, 1);
+                    loadConsultationRequests();
+                }
+            }
+        }
+
+        // Demo notification functions
+        function demoConsultationRequest() {
+            if (window.notificationSystem) {
+                window.notificationSystem.showConsultationRequest(
+                    'Dr. Sarah Johnson',
+                    'John Doe',
+                    'high'
+                );
+            } else {
+                alert('Notification system not loaded yet. Please wait a moment and try again.');
+            }
+        }
+
+        function demoSpecialistOnline() {
+            if (window.notificationSystem) {
+                window.notificationSystem.showSpecialistOnline('Dr. Michael Chen', 'Cardiology');
+            } else {
+                alert('Notification system not loaded yet. Please wait a moment and try again.');
+            }
+        }
+
+        function demoEmergencyAlert() {
+            if (window.notificationSystem) {
+                window.notificationSystem.showEmergencyAlert(
+                    'Critical patient condition detected',
+                    'Emergency specialists have been notified'
+                );
+            } else {
+                alert('Notification system not loaded yet. Please wait a moment and try again.');
+            }
+        }
+
+        function demoConsultationResponse() {
+            if (window.notificationSystem) {
+                window.notificationSystem.showConsultationResponse(
+                    'Dr. Emily Rodriguez',
+                    'Thank you for your consultation request. I have reviewed your case and have some recommendations...'
+                );
+            } else {
+                alert('Notification system not loaded yet. Please wait a moment and try again.');
+            }
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            // Randomly update specialist availability
+            specialistsData.forEach(specialist => {
+                if (Math.random() < 0.1) { // 10% chance of status change
+                    const statuses = ['available', 'partially', 'unavailable'];
+                    specialist.status = statuses[Math.floor(Math.random() * statuses.length)];
+                }
+            });
+            
+            // Update display if on specialists tab
+            if (document.getElementById('specialists-tab').classList.contains('active')) {
+                loadSpecialists();
+            }
+            
+            updateStatistics();
+        }, 30000); // Update every 30 seconds
+    </script>
+</body>
+</html>

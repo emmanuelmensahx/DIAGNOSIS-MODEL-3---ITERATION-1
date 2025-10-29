@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Syntax Check</title>
+</head>
+<body>
+    <div id="result"></div>
+    <script>
+        // Test if the toggleAIFeatures function is accessible
+        try {
+            // Load the diagnosis screen script content
+            fetch('diagnosis_screen.html')
+                .then(response => response.text())
+                .then(html => {
+                    // Extract script content
+                    const scriptMatch = html.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+                    if (scriptMatch) {
+                        const scriptContent = scriptMatch[1];
+                        
+                        // Try to evaluate the script
+                        try {
+                            eval(scriptContent);
+                            document.getElementById('result').innerHTML = '<p style="color: green;">✅ No syntax errors found</p>';
+                        } catch (syntaxError) {
+                            document.getElementById('result').innerHTML = `<p style="color: red;">❌ Syntax Error: ${syntaxError.message}</p>`;
+                            console.error('Syntax error:', syntaxError);
+                        }
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = `<p style="color: red;">❌ Error loading file: ${error.message}</p>`;
+                });
+        } catch (error) {
+            document.getElementById('result').innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html>

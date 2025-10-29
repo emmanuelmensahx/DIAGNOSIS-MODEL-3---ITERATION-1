@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Diagnosis Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Diagnosis Fix</h1>
+    
+    <div class="test-section info">
+        <h3>Test Purpose</h3>
+        <p>This test verifies that the diagnosis submission works correctly after fixing the endpoint URL from <code>/diagnoses/enhanced</code> to <code>/predict/enhanced</code>.</p>
+    </div>
+
+    <div class="test-section">
+        <h3>Authentication</h3>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Enhanced Diagnosis Test</h3>
+        <button onclick="testEnhancedDiagnosis()">Test Enhanced Diagnosis</button>
+        <div id="diagnosisResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Results</h3>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8001/api/v1';
+        let authToken = null;
+
+        async function testLogin() {
+            const loginResult = document.getElementById('loginResult');
+            loginResult.innerHTML = '<p>Testing login...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'frontline_worker',
+                        password: 'password123'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Login failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                authToken = data.access_token;
+                
+                loginResult.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Login Successful</h4>
+                        <p>Token received: ${authToken ? 'Yes' : 'No'}</p>
+                    </div>
+                `;
+            } catch (error) {
+                loginResult.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Login Failed</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testEnhancedDiagnosis() {
+            const diagnosisResult = document.getElementById('diagnosisResult');
+            
+            if (!authToken) {
+                diagnosisResult.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Authentication Required</h4>
+                        <p>Please login first</p>
+                    </div>
+                `;
+                return;
+            }
+
+            diagnosisResult.innerHTML = '<p>Testing enhanced diagnosis...</p>';
+
+            try {
+                const testData = {
+                    patient_id: 1,
+                    disease_type: 'tuberculosis',
+                    symptoms: JSON.stringify(['cough', 'fever', 'weight_loss']),
+                    notes: 'Test diagnosis submission after URL fix'
+                };
+
+                const medicalHistory = encodeURIComponent('No significant medical history');
+                const endpoint = `/predict/enhanced?medical_history=${medicalHistory}`;
+                const fullUrl = `${API_BASE_URL}${endpoint}`;
+
+                console.log('Making request to:', fullUrl);
+                console.log('Request data:', testData);
+
+                const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log('Response data:', result);
+
+                diagnosisResult.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Enhanced Diagnosis Successful</h4>
+                        <p><strong>Endpoint:</strong> ${endpoint}</p>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Response:</strong></p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    </div>
+                `;
+
+                updateTestResults('Enhanced Diagnosis', true, `Successfully called ${endpoint}`);
+
+            } catch (error) {
+                console.error('Enhanced diagnosis error:', error);
+                
+                diagnosisResult.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Enhanced Diagnosis Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Endpoint:</strong> /predict/enhanced</p>
+                    </div>
+                `;
+
+                updateTestResults('Enhanced Diagnosis', false, error.message);
+            }
+        }
+
+        function updateTestResults(testName, success, message) {
+            const testResults = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = success ? 'success' : 'error';
+            resultDiv.innerHTML = `
+                <p><strong>${timestamp}</strong> - ${testName}: ${success ? '✅ PASS' : '❌ FAIL'}</p>
+                <p>${message}</p>
+            `;
+            
+            testResults.appendChild(resultDiv);
+        }
+
+        // Auto-run login test on page load
+        window.onload = function() {
+            console.log('Page loaded, testing login...');
+            testLogin();
+        };
+    </script>
+</body>
+</html>

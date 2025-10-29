@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug URL Construction</title>
+</head>
+<body>
+    <h1>Debug URL Construction</h1>
+    <button onclick="testUrlConstruction()">Test URL Construction</button>
+    <div id="result"></div>
+
+    <script>
+        // Simulate the API configuration from the React Native app
+        const API_BASE_URL = 'http://localhost:8001/api/v1';
+        
+        function testUrlConstruction() {
+            console.log('Testing URL construction...');
+            
+            // Test the endpoint construction like in diagnosisService.js
+            const medicalHistory = encodeURIComponent('No significant medical history');
+            const endpoint = `/diagnoses/enhanced?medical_history=${medicalHistory}`;
+            const fullUrl = `${API_BASE_URL}${endpoint}`;
+            
+            console.log('API_BASE_URL:', API_BASE_URL);
+            console.log('endpoint:', endpoint);
+            console.log('Full URL:', fullUrl);
+            
+            document.getElementById('result').innerHTML = `
+                <h3>URL Construction Test:</h3>
+                <p><strong>API_BASE_URL:</strong> ${API_BASE_URL}</p>
+                <p><strong>endpoint:</strong> ${endpoint}</p>
+                <p><strong>Full URL:</strong> ${fullUrl}</p>
+                <hr>
+                <h3>Expected vs Actual:</h3>
+                <p><strong>Expected:</strong> http://localhost:8001/api/v1/diagnoses/enhanced</p>
+                <p><strong>Actual:</strong> ${fullUrl}</p>
+                <p><strong>Match:</strong> ${fullUrl.includes('/diagnoses/enhanced') ? '✅ Correct' : '❌ Incorrect'}</p>
+            `;
+            
+            // Test what the backend logs show
+            const backendLogUrl = 'http://localhost:8001/api/v1/predict/enhanced';
+            document.getElementById('result').innerHTML += `
+                <hr>
+                <h3>Backend Log Analysis:</h3>
+                <p><strong>Backend logs show:</strong> ${backendLogUrl}</p>
+                <p><strong>Status:</strong> URL corrected - removed extra '/prediction' segment</p>
+            `;
+        }
+    </script>
+</body>
+</html>

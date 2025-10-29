@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Grok AI Diagnosis</title>
+    <link rel="stylesheet" href="css/navigation.css">
+    <!-- Performance Optimization Scripts -->
+    <script src="js/optimized-diagnosis.js?v=1.3"></script>
+    <script src="js/symptom-autocomplete.js?v=1.1"></script>
+    <script src="js/progressive-loader.js?v=1.1"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .section h2 {
+            color: #1E88E5;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #1E88E5;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+        
+        .checkbox-item:hover {
+            background-color: #f0f8ff;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .vital-signs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .ai-toggle {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .ai-toggle label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .ai-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+        }
+        
+        .ai-features {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e8f5e8;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .ai-features.active {
+            display: block;
+        }
+        
+        .image-upload {
+            border: 2px dashed #1E88E5;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background-color: #f0f8ff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .image-upload:hover {
+            background-color: #e6f3ff;
+        }
+        
+        .image-upload input[type="file"] {
+            display: none;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            text-decoration: none;
+            color: #757575;
+            transition: color 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #1E88E5;
+        }
+        
+        .nav-item:hover {
+            color: #1E88E5;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+        }
+        
+        .nav-text {
+            font-size: 12px;
+        }
+        
+        .container {
+            padding-bottom: 80px;
+        }
+
+        /* Diagnosis Results Styling */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .result-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .result-card h3 {
+            color: #1E88E5;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #e8f4fd;
+            padding-bottom: 8px;
+        }
+
+        .primary-diagnosis {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .diagnosis-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 10px;
+        }
+
+        .confidence-score {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .confidence-value {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .patient-info {
+            border-left: 4px solid #2196F3;
+        }
+
+        .patient-info p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .diagnosis-details, .analyzed-symptoms, .treatment-recommendations, 
+        .specialist-referral, .critical-indicators {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .diagnosis-details h3, .analyzed-symptoms h3, .treatment-recommendations h3,
+        .specialist-referral h3, .critical-indicators h3 {
+            color: #1E88E5;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #e8f4fd;
+            padding-bottom: 8px;
+        }
+
+        .details-content, .symptoms-content, .treatment-content, 
+        .referral-content, .critical-content {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .treatment-recommendations {
+            border-left: 4px solid #FF9800;
+        }
+
+        .specialist-referral {
+            border-left: 4px solid #9C27B0;
+        }
+
+        .specialist-recommendations {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .specialist-recommendations h4 {
+            color: #6f42c1;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .specialists-list {
+            margin-bottom: 20px;
+        }
+
+        .specialist-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.2s;
+        }
+
+        .specialist-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .specialist-info h5 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .specialist-info p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .specialist-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-busy {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .referral-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .primary-btn {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #5a359a;
+        }
+
+        .secondary-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .secondary-btn:hover {
+            background: #545b62;
+        }
+
+        .critical-indicators {
+            border-left: 4px solid #F44336;
+            background-color: #fff3f3;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .treatment-btn {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+        }
+
+        .treatment-btn:hover {
+            background: linear-gradient(135deg, #45a049, #5cb85c);
+            transform: translateY(-2px);
+        }
+
+        .opinion-btn {
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+            color: white;
+        }
+
+        .opinion-btn:hover {
+            background: linear-gradient(135deg, #1976D2, #1E88E5);
+            transform: translateY(-2px);
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #757575, #9E9E9E);
+            color: white;
+        }
+
+        .print-btn:hover {
+            background: linear-gradient(135deg, #616161, #757575);
+            transform: translateY(-2px);
+        }
+
+        /* Alert styles for enhanced AI display */
+        .alert {
+            padding: 12px 16px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert strong {
+            font-weight: 600;
+        }
+
+        .alert small {
+            display: block;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        /* Treatment Section Styling */
+        .treatment-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+        }
+
+        .treatment-section h6 {
+            color: #2c5530;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .treatment-section ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .treatment-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .treatment-section li strong {
+            color: #2c5530;
+        }
+
+        .treatment-section em {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .treatment-section .alert {
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Grok AI Diagnosis</h1>
+            <p>Advanced AI-Powered Medical Diagnosis with Grok</p>
+        </div>
+
+        <!-- Diagnosis Results Section (shown when results are available) -->
+        <div id="diagnosisResults" class="section" style="display: none;">
+            <h2>🎯 AI Diagnosis Results</h2>
+            
+            <div class="results-grid">
+                <div class="result-card primary-diagnosis">
+                    <h3>Primary Diagnosis</h3>
+                    <div class="diagnosis-name" id="diagnosisName">-</div>
+                    <div class="confidence-score">
+                        <span>Confidence: </span>
+                        <span id="confidenceScore" class="confidence-value">-</span>
+                    </div>
+                </div>
+                
+                <div class="result-card patient-info">
+                    <h3>Patient Information</h3>
+                    <div id="patientInfo">
+                        <p><strong>Name:</strong> <span id="resultPatientName">-</span></p>
+                        <p><strong>ID:</strong> <span id="resultPatientId">-</span></p>
+                        <p><strong>Age:</strong> <span id="resultPatientAge">-</span></p>
+                        <p><strong>Gender:</strong> <span id="resultPatientGender">-</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diagnosis-details">
+                <h3>📋 Diagnosis Details</h3>
+                <div id="diagnosisDetailsContent" class="details-content">-</div>
+            </div>
+
+            <div class="analyzed-symptoms">
+                <h3>🔍 Analyzed Symptoms</h3>
+                <div id="analyzedSymptomsContent" class="symptoms-content">-</div>
+            </div>
+
+            <div class="treatment-recommendations">
+                <h3>💊 Treatment Recommendations</h3>
+                <div id="treatmentContent" class="treatment-content">-</div>
+            </div>
+
+            <div class="specialist-referral" id="specialistReferralSection" style="display: none;">
+                <h3>👨‍⚕️ Specialist Referral</h3>
+                <div id="specialistContent" class="referral-content">-</div>
+                
+                <!-- Enhanced Specialist Recommendations -->
+                <div id="specialistRecommendations" class="specialist-recommendations" style="display: none;">
+                    <h4>🎯 Recommended Specialists</h4>
+                    <div id="recommendedSpecialists" class="specialists-list"></div>
+                    
+                    <div class="referral-actions">
+                        <button onclick="requestConsultation()" class="action-btn primary-btn">
+                            📞 Request Consultation
+                        </button>
+                        <button onclick="viewAllSpecialists()" class="action-btn secondary-btn">
+                            👥 View All Specialists
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="critical-indicators" id="criticalIndicatorsSection" style="display: none;">
+                <h3>⚠️ Critical Indicators</h3>
+                <div id="criticalContent" class="critical-content">-</div>
+            </div>
+
+            <div class="action-buttons">
+                <button onclick="generateTreatmentGuide()" class="action-btn treatment-btn">📋 Generate Treatment Guide</button>
+                <button onclick="requestSecondOpinion()" class="action-btn opinion-btn">👥 Request Second Opinion</button>
+                <button onclick="printResults()" class="action-btn print-btn">🖨️ Print Results</button>
+            </div>
+        </div>
+
+        <!-- Grok AI Diagnosis Toggle -->
+        <div class="ai-toggle">
+            <label>
+                <input type="checkbox" id="aiToggle" onchange="toggleAIFeatures()">
+                <span>🚀 Grok AI Diagnosis</span>
+            </label>
+            <div class="ai-features" id="aiFeatures">
+                <!-- Emergency Text Parser -->
+                <div class="emergency-parser" style="margin-bottom: 20px; padding: 20px; background: linear-gradient(135deg, #ff6b6b, #ff8e8e); border-radius: 10px; color: white;">
+                    <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+                        🚨 Emergency Quick Input
+                        <span style="font-size: 14px; font-weight: normal; opacity: 0.9;">(Paste complete patient history)</span>
+                    </h3>
+                    <div class="form-group">
+                        <textarea id="emergencyTextInput" rows="6" 
+                                  placeholder="EMERGENCY MODE: Paste the complete patient history here...
+
+Example: 'Patient John Doe, ID: P12345, 45-year-old male presenting with severe chest pain, difficulty breathing, and fever of 39.2°C for the past 3 days. Blood pressure 140/90, heart rate 95 bpm. History of hypertension. Suspect pneumonia. Requires immediate attention.'
+
+The AI will automatically extract:
+• Patient name and ID
+• Age, gender, vital signs  
+• Symptoms and duration
+• Medical history
+• Suspected diagnosis
+• Additional notes"
+                                  style="background: rgba(255,255,255,0.95); color: #333; border: none; border-radius: 8px; padding: 15px; font-size: 14px; line-height: 1.5;"
+                                  onpaste="setTimeout(parseEmergencyText, 100)"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" onclick="parseEmergencyText()" 
+                                style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                            🔍 Parse Text
+                        </button>
+                        <button type="button" onclick="clearEmergencyText()" 
+                                style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                            🗑️ Clear
+                        </button>
+                        <div id="parseStatus" style="margin-left: auto; font-size: 14px; opacity: 0.9;"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="medicalHistory">📋 Medical History</label>
+                    <textarea id="medicalHistory" rows="4" placeholder="Enter patient's medical history, previous conditions, medications, allergies, etc."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="section">
+            <h2>👤 Patient Information</h2>
+            <div class="form-group">
+                <label for="patientId">Patient ID</label>
+                <input type="text" id="patientId" placeholder="Enter patient ID">
+            </div>
+            <div class="form-group">
+                <label for="patientName">Patient Name</label>
+                <input type="text" id="patientName" placeholder="Enter patient name">
+            </div>
+        </div>
+
+        <!-- Symptoms -->
+        <div class="section">
+            <h2>🤒 Symptoms</h2>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="cough" name="symptoms" value="cough">
+                    <label for="cough">Cough</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="fever" name="symptoms" value="fever">
+                    <label for="fever">Fever</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="shortness_of_breath" name="symptoms" value="shortness_of_breath">
+                    <label for="shortness_of_breath">Shortness of Breath</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="chest_pain" name="symptoms" value="chest_pain">
+                    <label for="chest_pain">Chest Pain</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="fatigue" name="symptoms" value="fatigue">
+                    <label for="fatigue">Fatigue</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="headache" name="symptoms" value="headache">
+                    <label for="headache">Headache</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="nausea" name="symptoms" value="nausea">
+                    <label for="nausea">Nausea</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="vomiting" name="symptoms" value="vomiting">
+                    <label for="vomiting">Vomiting</label>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="symptomDuration">Symptom Duration</label>
+                <select id="symptomDuration">
+                    <option value="">Select duration</option>
+                    <option value="1-2 days">1-2 days</option>
+                    <option value="3-7 days">3-7 days</option>
+                    <option value="1-2 weeks">1-2 weeks</option>
+                    <option value="2-4 weeks">2-4 weeks</option>
+                    <option value="1+ months">1+ months</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Vital Signs -->
+        <div class="section">
+            <h2>📊 Vital Signs</h2>
+            <div class="vital-signs">
+                <div class="form-group">
+                    <label for="temperature">Temperature (°C)</label>
+                    <input type="number" id="temperature" step="0.1" placeholder="36.5">
+                </div>
+                <div class="form-group">
+                    <label for="heartRate">Heart Rate (bpm)</label>
+                    <input type="number" id="heartRate" placeholder="72">
+                </div>
+                <div class="form-group">
+                    <label for="respiratoryRate">Respiratory Rate</label>
+                    <input type="number" id="respiratoryRate" placeholder="16">
+                </div>
+                <div class="form-group">
+                    <label for="bloodPressure">Blood Pressure</label>
+                    <input type="text" id="bloodPressure" placeholder="120/80">
+                </div>
+                <div class="form-group">
+                    <label for="oxygenSaturation">Oxygen Saturation (%)</label>
+                    <input type="number" id="oxygenSaturation" min="0" max="100" placeholder="98">
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical Images -->
+        <div class="section">
+            <h2>📷 Medical Images</h2>
+            <div class="image-upload" onclick="document.getElementById('imageUpload').click()">
+                <input type="file" id="imageUpload" multiple accept="image/*" onchange="handleImageUpload(event)">
+                <p>📸 Click to upload medical images</p>
+                <p style="font-size: 14px; color: #666; margin-top: 10px;">X-rays, CT scans, photos, etc.</p>
+            </div>
+            <div id="imagePreview" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px;"></div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="section">
+            <h2>📝 Additional Notes</h2>
+            <div class="form-group">
+                <label for="additionalNotes">Additional Notes</label>
+                <textarea id="additionalNotes" rows="4" placeholder="Any additional observations, notes, or relevant information..."></textarea>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button class="submit-btn" onclick="submitDiagnosis()">
+            🚀 Submit for AI Analysis
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <div id="navigation-container"></div>
+
+    <script>
+        function toggleAIFeatures() {
+            const aiToggle = document.getElementById('aiToggle');
+            const aiFeatures = document.getElementById('aiFeatures');
+            const submitBtn = document.querySelector('.submit-btn');
+            
+            if (aiToggle.checked) {
+                aiFeatures.classList.add('active');
+                submitBtn.textContent = '🚀 Submit for Grok AI Analysis';
+            } else {
+                aiFeatures.classList.remove('active');
+                submitBtn.textContent = '🚀 Submit for AI Analysis';
+            }
+        }
+
+        function formatAIResponse(text) {
+            if (!text || typeof text !== 'string') {
+                return '<p>No information available.</p>';
+            }
+            
+            // Clean up the text
+            let formatted = text.trim();
+            
+            // Convert line breaks to HTML
+            formatted = formatted.replace(/\n\n/g, '</p><p>');
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Wrap in paragraph tags if not already wrapped
+            if (!formatted.startsWith('<')) {
+                formatted = '<p>' + formatted + '</p>';
+            }
+            
+            // Format bullet points
+            formatted = formatted.replace(/^[-•*]\s+/gm, '• ');
+            formatted = formatted.replace(/(\n|<br>)[-•*]\s+/g, '$1• ');
+            
+            // Format numbered lists
+            formatted = formatted.replace(/^(\d+)\.\s+/gm, '$1. ');
+            
+            // Bold important terms
+            formatted = formatted.replace(/\b(URGENT|EMERGENCY|CRITICAL|IMMEDIATE|WARNING)\b/gi, '<strong>$1</strong>');
+            
+            return formatted;
+        }
+
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('imagePreview');
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100px';
+                    img.style.height = '100px';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '8px';
+                    img.style.border = '2px solid #e0e0e0';
+                    preview.appendChild(img);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Helper function to extract information from text when JSON parsing fails
+        function extractFromText(text, key, defaultValue) {
+            try {
+                // Try to find the key in the text and extract its value
+                const regex = new RegExp(`"${key}"\\s*:\\s*"([^"]*)"`, 'i');
+                const match = text.match(regex);
+                if (match && match[1]) {
+                    return match[1];
+                }
+                
+                // Try without quotes but with more specific patterns
+                const regex2 = new RegExp(`"${key}"\\s*:\\s*"?([^",}\\n]+)"?`, 'i');
+                const match2 = text.match(regex2);
+                if (match2 && match2[1]) {
+                    return match2[1].trim().replace(/['"]/g, '');
+                }
+                
+                // Try with colon and capture until comma or newline
+                const regex3 = new RegExp(`${key}\\s*:\\s*"?([^",}\\n]+)"?`, 'i');
+                const match3 = text.match(regex3);
+                if (match3 && match3[1]) {
+                    return match3[1].trim().replace(/['"]/g, '');
+                }
+                
+                return defaultValue;
+            } catch (e) {
+                console.error('Error extracting from text:', e);
+                return defaultValue;
+            }
+        }
+
+        // Function to get authentication token
+        async function getAuthToken() {
+            try {
+                const response = await fetch('http://localhost:8001/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'username': 'frontline@afridiag.org',
+                'password': 'frontline123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.access_token;
+                } else {
+                    console.error('Authentication failed:', response.status, response.statusText);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                return null;
+            }
+        }
+
+        // Emergency Text Parsing Functions
+        function parseEmergencyText() {
+            const emergencyText = document.getElementById('emergencyTextInput').value.trim();
+            const parseStatus = document.getElementById('parseStatus');
+            
+            if (!emergencyText) {
+                parseStatus.textContent = '⚠️ No text to parse';
+                parseStatus.style.color = '#ffeb3b';
+                return;
+            }
+            
+            parseStatus.textContent = '🔄 Parsing...';
+            parseStatus.style.color = '#4caf50';
+            
+            try {
+                // Extract patient information
+                extractPatientInfo(emergencyText);
+                
+                // Extract symptoms
+                extractSymptoms(emergencyText);
+                
+                // Extract vital signs
+                extractVitalSigns(emergencyText);
+                
+                // Extract additional information
+                extractAdditionalInfo(emergencyText);
+                
+                parseStatus.textContent = '✅ Parsed successfully!';
+                parseStatus.style.color = '#4caf50';
+                
+                // Enable AI toggle for emergency mode
+                document.getElementById('aiToggle').checked = true;
+                toggleAIFeatures();
+                
+                // Show emergency mode indicator
+                showEmergencyModeIndicator();
+                
+                // Auto-scroll to show filled fields
+                setTimeout(() => {
+                    document.getElementById('patientName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500);
+                
+            } catch (error) {
+                console.error('Parsing error:', error);
+                parseStatus.textContent = '❌ Parsing failed';
+                parseStatus.style.color = '#f44336';
+            }
+        }
+        
+        function extractPatientInfo(text) {
+            // Extract patient name
+            const namePatterns = [
+                /(?:patient|pt\.?)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i,
+                /name[:\s]+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i,
+                /^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),?\s+(?:ID|id|#)/i
+            ];
+            
+            for (const pattern of namePatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    document.getElementById('patientName').value = match[1].trim();
+                    break;
+                }
+            }
+            
+            // Extract patient ID
+            const idPatterns = [
+                /(?:ID|id|#)[:\s]*([A-Z0-9]+)/i,
+                /patient\s+(?:ID|id|#)[:\s]*([A-Z0-9]+)/i
+            ];
+            
+            for (const pattern of idPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    document.getElementById('patientId').value = match[1].trim();
+                    break;
+                }
+            }
+        }
+        
+        function extractSymptoms(text) {
+            // Clear existing symptom selections
+            const symptomCheckboxes = document.querySelectorAll('input[name="symptoms"]');
+            symptomCheckboxes.forEach(checkbox => checkbox.checked = false);
+            
+            // Define symptom mappings
+            const symptomMappings = {
+                'cough': ['cough', 'coughing', 'persistent cough', 'dry cough', 'productive cough'],
+                'fever': ['fever', 'febrile', 'temperature', 'pyrexia', 'high temperature'],
+                'shortness_of_breath': ['shortness of breath', 'difficulty breathing', 'dyspnea', 'breathless', 'breathing difficulty', 'sob'],
+                'chest_pain': ['chest pain', 'chest discomfort', 'thoracic pain', 'chest tightness'],
+                'fatigue': ['fatigue', 'tired', 'weakness', 'exhausted', 'lethargy', 'malaise'],
+                'headache': ['headache', 'head pain', 'cephalgia', 'migraine'],
+                'nausea': ['nausea', 'nauseous', 'feeling sick', 'queasy'],
+                'vomiting': ['vomiting', 'vomit', 'throwing up', 'emesis']
+            };
+            
+            // Check for symptoms in text
+            const lowerText = text.toLowerCase();
+            for (const [symptomId, keywords] of Object.entries(symptomMappings)) {
+                for (const keyword of keywords) {
+                    if (lowerText.includes(keyword)) {
+                        const checkbox = document.getElementById(symptomId);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            // Extract symptom duration
+            const durationPatterns = [
+                /(?:for|past|last)\s+(\d+[-\s]*(?:day|week|month)s?)/i,
+                /(\d+[-\s]*(?:day|week|month)s?)\s+(?:duration|history)/i,
+                /since\s+(\d+[-\s]*(?:day|week|month)s?\s+ago)/i
+            ];
+            
+            for (const pattern of durationPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const duration = match[1].toLowerCase().replace(/\s+/g, ' ').trim();
+                    const durationSelect = document.getElementById('symptomDuration');
+                    
+                    // Map to available options
+                    if (duration.includes('1') && duration.includes('day')) {
+                        durationSelect.value = '1-2 days';
+                    } else if (duration.includes('3') || duration.includes('4') || duration.includes('5') || duration.includes('6') || duration.includes('7')) {
+                        durationSelect.value = '3-7 days';
+                    } else if (duration.includes('week')) {
+                        if (duration.includes('1')) {
+                            durationSelect.value = '1-2 weeks';
+                        } else {
+                            durationSelect.value = '2-4 weeks';
+                        }
+                    } else if (duration.includes('month')) {
+                        durationSelect.value = '1+ months';
+                    }
+                    break;
+                }
+            }
+        }
+        
+        function extractVitalSigns(text) {
+            // Extract temperature
+            const tempPatterns = [
+                /(?:temperature|temp|fever)[:\s]*(\d+\.?\d*)\s*°?[CF]?/i,
+                /(\d+\.?\d*)\s*°[CF]/i
+            ];
+            
+            for (const pattern of tempPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    let temp = parseFloat(match[1]);
+                    // Convert Fahrenheit to Celsius if needed
+                    if (temp > 45) {
+                        temp = (temp - 32) * 5/9;
+                    }
+                    document.getElementById('temperature').value = temp.toFixed(1);
+                    break;
+                }
+            }
+            
+            // Extract blood pressure
+            const bpPatterns = [
+                /(?:blood pressure|bp|BP)[:\s]*(\d+\/\d+)/i,
+                /(\d+\/\d+)\s*(?:mmHg|mm Hg)?/i
+            ];
+            
+            for (const pattern of bpPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    document.getElementById('bloodPressure').value = match[1];
+                    break;
+                }
+            }
+            
+            // Extract heart rate
+            const hrPatterns = [
+                /(?:heart rate|hr|pulse)[:\s]*(\d+)\s*(?:bpm|beats)/i,
+                /(\d+)\s*bpm/i
+            ];
+            
+            for (const pattern of hrPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const hr = parseInt(match[1]);
+                    if (hr >= 40 && hr <= 200) { // Reasonable heart rate range
+                        document.getElementById('heartRate').value = hr;
+                    }
+                    break;
+                }
+            }
+            
+            // Extract respiratory rate
+            const rrPatterns = [
+                /(?:respiratory rate|rr|breathing rate)[:\s]*(\d+)/i,
+                /(\d+)\s*(?:breaths per minute|respirations)/i
+            ];
+            
+            for (const pattern of rrPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const rr = parseInt(match[1]);
+                    if (rr >= 8 && rr <= 40) { // Reasonable respiratory rate range
+                        document.getElementById('respiratoryRate').value = rr;
+                    }
+                    break;
+                }
+            }
+            
+            // Extract oxygen saturation
+            const o2Patterns = [
+                /(?:oxygen saturation|o2 sat|spo2)[:\s]*(\d+)%?/i,
+                /(\d+)%\s*(?:oxygen|o2)/i
+            ];
+            
+            for (const pattern of o2Patterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    const o2 = parseInt(match[1]);
+                    if (o2 >= 70 && o2 <= 100) { // Reasonable oxygen saturation range
+                        document.getElementById('oxygenSaturation').value = o2;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        function extractAdditionalInfo(text) {
+            // Extract suspected disease/diagnosis
+            const diseasePatterns = [
+                /(?:suspect|suspected|diagnosis|likely)[:\s]*(pneumonia|tuberculosis|malaria|lung cancer)/i,
+                /(?:rule out|r\/o)[:\s]*(pneumonia|tuberculosis|malaria|lung cancer)/i
+            ];
+            
+            // Disease type auto-detection removed - relying on Grok AI for analysis
+            
+            // Extract medical history and additional notes
+            const historyPatterns = [
+                /(?:history|hx)[:\s]*([^.]+)/i,
+                /(?:past medical history|pmh)[:\s]*([^.]+)/i,
+                /(?:background|previous)[:\s]*([^.]+)/i
+            ];
+            
+            let extractedHistory = '';
+            for (const pattern of historyPatterns) {
+                const match = text.match(pattern);
+                if (match) {
+                    extractedHistory += match[1].trim() + '. ';
+                }
+            }
+            
+            // Set medical history
+            const medicalHistoryField = document.getElementById('medicalHistory');
+            if (extractedHistory) {
+                medicalHistoryField.value = extractedHistory.trim();
+            } else {
+                // If no specific history found, use the entire text as context
+                medicalHistoryField.value = text;
+            }
+            
+            // Set additional notes with parsing summary
+            const additionalNotesField = document.getElementById('additionalNotes');
+            const timestamp = new Date().toLocaleString();
+            additionalNotesField.value = `[Auto-parsed from emergency text on ${timestamp}]\n\nOriginal text: ${text}`;
+        }
+        
+        function clearEmergencyText() {
+            document.getElementById('emergencyTextInput').value = '';
+            document.getElementById('parseStatus').textContent = '';
+            
+            // Hide emergency mode indicator
+            hideEmergencyModeIndicator();
+            
+            // Optionally clear all parsed fields
+            if (confirm('Clear all parsed data from the form?')) {
+                // Clear patient info
+                document.getElementById('patientId').value = '';
+                document.getElementById('patientName').value = '';
+                
+                // Clear symptoms
+                const symptomCheckboxes = document.querySelectorAll('input[name="symptoms"]');
+                symptomCheckboxes.forEach(checkbox => checkbox.checked = false);
+                
+                // Clear vital signs
+                document.getElementById('temperature').value = '';
+                document.getElementById('heartRate').value = '';
+                document.getElementById('respiratoryRate').value = '';
+                document.getElementById('bloodPressure').value = '';
+                document.getElementById('oxygenSaturation').value = '';
+                
+                // Clear other fields
+                document.getElementById('symptomDuration').value = '';
+                document.getElementById('medicalHistory').value = '';
+                document.getElementById('additionalNotes').value = '';
+            }
+        }
+
+        function showEmergencyModeIndicator() {
+            // Add emergency mode indicator
+            let indicator = document.getElementById('emergencyModeIndicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'emergencyModeIndicator';
+                indicator.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #ff4444;
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    z-index: 1000;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                    animation: pulse 2s infinite;
+                `;
+                indicator.innerHTML = '🚨 EMERGENCY MODE ACTIVE';
+                document.body.appendChild(indicator);
+                
+                // Add pulse animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes pulse {
+                        0% { opacity: 1; }
+                        50% { opacity: 0.7; }
+                        100% { opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            indicator.style.display = 'block';
+        }
+
+        function hideEmergencyModeIndicator() {
+            const indicator = document.getElementById('emergencyModeIndicator');
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+        }
+
+        async function submitDiagnosis() {
+            const aiEnabled = document.getElementById('aiToggle').checked;
+            const patientId = document.getElementById('patientId').value;
+            const patientName = document.getElementById('patientName').value;
+            const medicalHistory = document.getElementById('medicalHistory').value;
+            const additionalNotes = document.getElementById('additionalNotes').value;
+            const emergencyText = document.getElementById('emergencyTextInput').value;
+            
+            // Collect symptoms
+            const symptoms = [];
+            const symptomCheckboxes = document.querySelectorAll('input[name="symptoms"]:checked');
+            symptomCheckboxes.forEach(checkbox => {
+                symptoms.push(checkbox.value);
+            });
+            
+            if (!patientName.trim()) {
+                alert('⚠️ Please enter patient name');
+                return;
+            }
+            
+            if (symptoms.length === 0 && !medicalHistory.trim()) {
+                alert('⚠️ Please select symptoms or enter medical history');
+                return;
+            }
+            
+            // Start progressive loading
+            let loaderId = null;
+            if (window.progressiveLoader) {
+                loaderId = window.progressiveLoader.startDiagnosisLoading('diagnosisForm');
+            }
+            
+            // Prepare diagnosis data
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Processing...';
+            
+            try {
+                // Get authentication token first
+                const token = await getAuthToken();
+                if (!token) {
+                    throw new Error('Failed to authenticate. Please check backend server.');
+                }
+                
+                let result;
+                
+                // Prepare diagnosis data for optimized processing
+                const diagnosisData = {
+                    patient_data: {
+                        name: patientName,
+                        age: 32, // Default age, could be made configurable
+                        gender: "male", // Default gender, could be made configurable
+                        region: "east_africa",
+                        medical_history: this.buildMedicalHistory(medicalHistory, symptoms, emergencyText)
+                    },
+                    symptoms: symptoms,
+                    additional_context: additionalNotes || (emergencyText ? `Emergency context provided: ${emergencyText}` : ''),
+                    aiEnabled: aiEnabled,
+                    emergencyMode: emergencyText.trim() ? true : false
+                };
+
+                // Use optimized diagnosis processor if available
+                if (window.optimizedDiagnosisProcessor) {
+                    console.log('🚀 Using optimized diagnosis processor');
+                    
+                    // Update loading progress
+                    if (loaderId) {
+                        window.progressiveLoader.updateProgress(loaderId, 25, 'Optimizing request...');
+                    }
+                    
+                    result = await window.optimizedDiagnosisProcessor.submitOptimizedDiagnosis(diagnosisData);
+                    
+                    // Show performance stats
+                    const stats = window.optimizedDiagnosisProcessor.getPerformanceStats();
+                    console.log('📊 Performance stats:', stats);
+                    
+                } else {
+                    console.log('⚠️ Falling back to standard diagnosis processing');
+                    
+                if (aiEnabled) {
+                    // Collect vital signs for enhanced analysis
+                    const vitalSigns = {
+                        temperature: document.getElementById('temperature').value,
+                        heartRate: document.getElementById('heartRate').value,
+                        respiratoryRate: document.getElementById('respiratoryRate').value,
+                        bloodPressure: document.getElementById('bloodPressure').value,
+                        oxygenSaturation: document.getElementById('oxygenSaturation').value
+                    };
+                    
+                    // Prepare comprehensive medical history
+                    let comprehensiveMedicalHistory = this.buildMedicalHistory(medicalHistory, symptoms, emergencyText, vitalSigns);
+                    
+                    // Use enhanced AI prediction system
+                    const predictionData = {
+                        patient_data: {
+                            name: patientName,
+                            age: 32, // Default age, could be made configurable
+                            gender: "male", // Default gender, could be made configurable
+                            region: "east_africa",
+                            medical_history: comprehensiveMedicalHistory || `Symptoms: ${symptoms.join(', ')}`
+                        },
+                        symptoms: symptoms,
+                        additional_context: additionalNotes || (emergencyText ? `Emergency context provided: ${emergencyText}` : ''),
+                        use_ai: true,
+                        detailed_analysis: true,
+                        emergency_mode: emergencyText.trim() ? true : false
+                    };
+                    
+                    console.log('Submitting emergency diagnosis with Grok AI:', predictionData);
+                    
+                    // Use only Grok AI via emergency diagnosis endpoint
+                    if (predictionData.emergency_mode) {
+                        // Use emergency diagnosis endpoint for emergency cases (Grok AI only)
+                        const response = await fetch('http://localhost:8001/api/v1/emergency-diagnosis', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(predictionData)
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Emergency diagnosis failed! status: ${response.status}`);
+                        }
+                        
+                        result = await response.json();
+                        console.log('Emergency diagnosis result (Grok AI):', result);
+                        
+                        // Add flags to indicate this came from the emergency diagnosis (Grok) engine
+                        result.grok_engine_used = true;
+                        result.enhanced_engine_used = true; // Keep for backward compatibility
+                        result.emergency_diagnosis_used = true;
+                    } else {
+                        throw new Error('Only emergency mode with Grok AI is supported');
+                    }
+                    
+                } else {
+                    // Use emergency diagnosis for quick analysis
+                    const emergencyData = {
+                        patient_name: patientName,
+                        medical_history: medicalHistory || `Symptoms: ${symptoms.join(', ')}`,
+                        additional_notes: additionalNotes || ''
+                    };
+                    
+                    console.log('Submitting emergency diagnosis:', emergencyData);
+                    
+                    // Make API call to emergency diagnosis endpoint
+                    const response = await fetch('http://localhost:8001/api/v1/emergency-diagnosis', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify(emergencyData)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    
+                    result = await response.json();
+                    console.log('Emergency diagnosis result:', result);
+                }
+                
+                } // End of fallback block
+                
+                // Display the diagnosis results
+                displayEnhancedDiagnosisResults(result, { patientName, symptoms, medicalHistory, additionalNotes, aiEnabled });
+                
+            } catch (error) {
+                console.error('Error submitting diagnosis:', error);
+                alert('❌ Error submitting diagnosis: ' + error.message + '\n\nPlease check if the backend server is running.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = aiEnabled ? '🚀 Submit for Grok AI Analysis' : '🚀 Submit for AI Analysis';
+            }
+        }
+        
+        // Function to display enhanced diagnosis results
+        function displayEnhancedDiagnosisResults(result, originalData) {
+            console.log('Displaying enhanced diagnosis results:', result);
+            
+            let primaryDiagnosis = 'Analysis Complete';
+            let confidence = 'High';
+            let detailedAnalysis = '';
+            let treatmentRecommendations = '';
+            let specialistReferrals = '';
+            let criticalIndicators = '';
+            
+            // Handle enhanced AI prediction results
+            if (originalData.aiEnabled && (result.prediction || result.predictions)) {
+                const prediction = result.prediction || (result.predictions && result.predictions[0]);
+                
+                // Extract primary diagnosis from the first/highest confidence prediction
+                if (prediction) {
+                    primaryDiagnosis = prediction.disease_name || prediction.primary_diagnosis?.disease_name || prediction.primary_diagnosis;
+                    
+                    // Handle confidence display with better messaging
+                    if (prediction.confidence) {
+                        let confValue = prediction.confidence;
+                        
+                        // Check if confidence is already a percentage (> 1) or decimal (0-1)
+                        if (confValue > 1) {
+                            // Already a percentage, use as-is
+                            confValue = Math.round(confValue);
+                        } else {
+                            // Decimal format, convert to percentage
+                            confValue = Math.round(confValue * 100);
+                        }
+                        
+                        // Ensure confidence is within reasonable bounds (10-95%)
+                        confValue = Math.max(10, Math.min(95, confValue));
+                        
+                        if (confValue < 20) {
+                            confidence = `${confValue}% (Low confidence - Multiple conditions possible)`;
+                        } else if (confValue < 40) {
+                            confidence = `${confValue}% (Low-Moderate confidence)`;
+                        } else if (confValue < 60) {
+                            confidence = `${confValue}% (Moderate confidence)`;
+                        } else if (confValue < 80) {
+                            confidence = `${confValue}% (High confidence)`;
+                        } else {
+                            confidence = `${confValue}% (Very high confidence)`;
+                        }
+                    } else {
+                        confidence = 'Moderate';
+                    }
+                    
+                    // Special handling for uncertain diagnoses
+                    if (primaryDiagnosis === 'Multiple conditions possible' || primaryDiagnosis === 'Unknown condition') {
+                        primaryDiagnosis = '⚠️ Multiple Conditions Possible';
+                        confidence = 'Requires further evaluation';
+                    }
+                }
+                
+                // Build detailed analysis with AI engine information
+                if (result.grok_engine_used) {
+                    detailedAnalysis = '<h4>🚀 Grok AI Engine Analysis (Advanced Reasoning)</h4>';
+                    detailedAnalysis += `<div class="alert alert-success" style="border-left: 4px solid #28a745; background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);">
+                        <strong>🤖 AI Engine:</strong> Grok (xAI)<br>
+                        <strong>🧠 Analysis Type:</strong> Comprehensive Medical Reasoning<br>
+                        <strong>🔬 Model:</strong> ${result.model_used || 'grok-4-fast-reasoning'}<br>
+                        <small><em>Powered by Grok's advanced language model for medical diagnosis</em></small>
+                    </div>`;
+                    
+                    // Show AI metadata if available
+                    if (result.ai_metadata) {
+                        const metadata = result.ai_metadata;
+                        detailedAnalysis += `<div class="alert alert-info" style="border-left: 4px solid #17a2b8; margin-top: 15px;">
+                            <strong>🔍 Advanced AI Analysis Details:</strong><br>
+                            <div style="margin-top: 10px;">`;
+                        
+                        if (metadata.primary_engine) {
+                            detailedAnalysis += `<div style="margin-bottom: 8px;"><strong>🎯 Primary Engine:</strong> ${metadata.primary_engine}</div>`;
+                        }
+                        if (metadata.analysis_depth) {
+                            detailedAnalysis += `<div style="margin-bottom: 8px;"><strong>📊 Analysis Depth:</strong> ${metadata.analysis_depth}</div>`;
+                        }
+                        if (metadata.reasoning_approach) {
+                            detailedAnalysis += `<div style="margin-bottom: 8px;"><strong>🧠 Reasoning Approach:</strong> ${metadata.reasoning_approach}</div>`;
+                        }
+                        
+                        // Enhanced confidence factors display
+                        if (metadata.confidence_factors && metadata.confidence_factors.length > 0) {
+                            detailedAnalysis += `<div style="margin-bottom: 8px;"><strong>🎯 Confidence Factors:</strong></div>`;
+                            detailedAnalysis += '<ul style="margin-left: 20px; margin-bottom: 10px;">';
+                            metadata.confidence_factors.forEach(factor => {
+                                detailedAnalysis += `<li style="margin-bottom: 4px;">${factor}</li>`;
+                            });
+                            detailedAnalysis += '</ul>';
+                        }
+                        
+                        // Engine capabilities display
+                        if (metadata.engine_capabilities && metadata.engine_capabilities.length > 0) {
+                            detailedAnalysis += `<div style="margin-bottom: 8px;"><strong>⚡ Engine Capabilities:</strong></div>`;
+                            detailedAnalysis += '<ul style="margin-left: 20px; margin-bottom: 10px;">';
+                            metadata.engine_capabilities.forEach(capability => {
+                                detailedAnalysis += `<li style="margin-bottom: 4px;">${capability}</li>`;
+                            });
+                            detailedAnalysis += '</ul>';
+                        }
+                        
+                        detailedAnalysis += '</div></div>';
+                    }
+                    
+                    // Add analysis quality indicator
+                    if (result.validation_status && result.validation_status.analysis_quality) {
+                        detailedAnalysis += `<div class="alert alert-success" style="border-left: 4px solid #28a745; margin-top: 10px;">
+                            <strong>✅ Quality Assessment:</strong> ${result.validation_status.analysis_quality}<br>
+                            <strong>📈 Quality Score:</strong> ${Math.round((result.validation_status.quality_score || 0.95) * 100)}%
+                        </div>`;
+                    }
+                    
+                    // Show model agreement and uncertainty if available
+                    if (prediction.model_agreement !== undefined) {
+                        detailedAnalysis += '<div class="alert alert-info">' +
+                            '<strong>🎯 Model Agreement:</strong> ' + Math.round(prediction.model_agreement * 100) + '%<br>' +
+                            '<small>This indicates how much the different AI models agree on the diagnosis</small>' +
+                        '</div>';
+                    }
+                    
+                    if (prediction.uncertainty !== undefined) {
+                        const uncertaintyLevel = prediction.uncertainty < 0.3 ? 'Low' : prediction.uncertainty < 0.6 ? 'Medium' : 'High';
+                        const uncertaintyColor = prediction.uncertainty < 0.3 ? 'success' : prediction.uncertainty < 0.6 ? 'warning' : 'danger';
+                        detailedAnalysis += '<div class="alert alert-' + uncertaintyColor + '">' +
+                            '<strong>📊 Uncertainty Level:</strong> ' + uncertaintyLevel + ' (' + Math.round(prediction.uncertainty * 100) + '%)<br>' +
+                            '<small>Lower uncertainty indicates higher confidence in the diagnosis</small>' +
+                        '</div>';
+                    }
+                } else if (result.enhanced_engine_used) {
+                    detailedAnalysis = '<h4>🧠 Advanced AI Engine Analysis (Ensemble Learning)</h4>';
+                    detailedAnalysis += '<div class="alert alert-info">' +
+                        '<strong>🤖 AI Engine:</strong> Enhanced AI (Fallback)<br>' +
+                        '<small>Using enhanced AI analysis as Grok engine was unavailable</small>' +
+                    '</div>';
+                    
+                    // Show model agreement and uncertainty if available
+                    if (prediction.model_agreement !== undefined) {
+                        detailedAnalysis += '<div class="alert alert-info">' +
+                            '<strong>🎯 Model Agreement:</strong> ' + Math.round(prediction.model_agreement * 100) + '%<br>' +
+                            '<small>This indicates how much the different AI models agree on the diagnosis</small>' +
+                        '</div>';
+                    }
+                    
+                    if (prediction.uncertainty !== undefined) {
+                        const uncertaintyLevel = prediction.uncertainty < 0.3 ? 'Low' : prediction.uncertainty < 0.6 ? 'Medium' : 'High';
+                        const uncertaintyColor = prediction.uncertainty < 0.3 ? 'success' : prediction.uncertainty < 0.6 ? 'warning' : 'danger';
+                        detailedAnalysis += '<div class="alert alert-' + uncertaintyColor + '">' +
+                            '<strong>📊 Uncertainty Level:</strong> ' + uncertaintyLevel + ' (' + Math.round(prediction.uncertainty * 100) + '%)<br>' +
+                            '<small>Lower uncertainty indicates higher confidence in the diagnosis</small>' +
+                        '</div>';
+                    }
+                } else {
+                    detailedAnalysis = '<h4>🤖 Standard AI Analysis</h4>';
+                    detailedAnalysis += '<div class="alert alert-warning">' +
+                        '<strong>🤖 AI Engine:</strong> Standard (Fallback)<br>' +
+                        '<small>Using standard AI analysis as advanced engines were unavailable</small>' +
+                    '</div>';
+                }
+                
+                // Handle differential diagnoses from the structured response
+                const differentialDiagnoses = prediction.differential_diagnoses || prediction.differential_diagnosis;
+                if (differentialDiagnoses && differentialDiagnoses.length > 0) {
+                    detailedAnalysis += '<h5>Differential Diagnosis:</h5><ul>';
+                    differentialDiagnoses.forEach(diagnosis => {
+                        let conf = 'N/A';
+                        if (diagnosis.confidence) {
+                            let confValue = diagnosis.confidence;
+                            // Check if confidence is already a percentage (> 1) or decimal (0-1)
+                            if (confValue > 1) {
+                                confValue = Math.round(confValue);
+                            } else {
+                                confValue = Math.round(confValue * 100);
+                            }
+                            conf = `${confValue}%`;
+                        }
+                        detailedAnalysis += `<li><strong>${diagnosis.disease_name}</strong> - Confidence: ${conf}`;
+                        if (diagnosis.reasoning) {
+                            detailedAnalysis += ` (${diagnosis.reasoning})`;
+                        }
+                        detailedAnalysis += `</li>`;
+                    });
+                    detailedAnalysis += '</ul>';
+                }
+                
+                // Show reasoning for primary diagnosis
+                if (prediction.reasoning) {
+                    detailedAnalysis += `<h5>Primary Diagnosis Reasoning:</h5><p>${prediction.reasoning}</p>`;
+                }
+                
+                // Show all predictions if multiple are available
+                if (result.predictions && result.predictions.length > 1) {
+                    detailedAnalysis += '<h5>All Diagnostic Possibilities:</h5><ul>';
+                    result.predictions.forEach((pred, index) => {
+                        let conf = 'N/A';
+                        if (pred.confidence) {
+                            let confValue = pred.confidence;
+                            // Check if confidence is already a percentage (> 1) or decimal (0-1)
+                            if (confValue > 1) {
+                                confValue = Math.round(confValue);
+                            } else {
+                                confValue = Math.round(confValue * 100);
+                            }
+                            conf = `${confValue}%`;
+                        }
+                        const severity = pred.severity ? ` (${pred.severity})` : '';
+                        detailedAnalysis += `<li><strong>${pred.disease_name}</strong> - Confidence: ${conf}${severity}`;
+                        if (pred.reasoning) {
+                            detailedAnalysis += `<br><em>${pred.reasoning}</em>`;
+                        }
+                        detailedAnalysis += `</li>`;
+                    });
+                    detailedAnalysis += '</ul>';
+                }
+                
+                if (prediction.risk_factors && prediction.risk_factors.length > 0) {
+                    detailedAnalysis += '<h5>Risk Factors:</h5><ul>';
+                    prediction.risk_factors.forEach(factor => {
+                        detailedAnalysis += `<li>${factor}</li>`;
+                    });
+                    detailedAnalysis += '</ul>';
+                }
+                
+                if (prediction.recommended_tests && prediction.recommended_tests.length > 0) {
+                    detailedAnalysis += '<h5>Recommended Tests:</h5><ul>';
+                    prediction.recommended_tests.forEach(test => {
+                        detailedAnalysis += `<li>${test}</li>`;
+                    });
+                    detailedAnalysis += '</ul>';
+                }
+                
+                // Enhanced Treatment Plan from Grok AI
+                if (prediction.treatment_plan) {
+                    treatmentRecommendations = '<h5>🏥 Comprehensive Treatment Plan:</h5>';
+                    
+                    // Medications section
+                    if (prediction.treatment_plan.medications && prediction.treatment_plan.medications.length > 0) {
+                        treatmentRecommendations += '<div class="treatment-section"><h6>💊 Medications:</h6><ul>';
+                        prediction.treatment_plan.medications.forEach(med => {
+                            treatmentRecommendations += `<li><strong>${med.name}</strong> - ${med.dosage}`;
+                            if (med.duration) treatmentRecommendations += ` for ${med.duration}`;
+                            if (med.instructions) treatmentRecommendations += `<br><em>Instructions: ${med.instructions}</em>`;
+                            treatmentRecommendations += '</li>';
+                        });
+                        treatmentRecommendations += '</ul></div>';
+                    }
+                    
+                    // Non-pharmacological interventions
+                    if (prediction.treatment_plan.non_pharmacological && prediction.treatment_plan.non_pharmacological.length > 0) {
+                        treatmentRecommendations += '<div class="treatment-section"><h6>🌿 Non-Pharmacological Interventions:</h6><ul>';
+                        prediction.treatment_plan.non_pharmacological.forEach(intervention => {
+                            treatmentRecommendations += `<li>${intervention}</li>`;
+                        });
+                        treatmentRecommendations += '</ul></div>';
+                    }
+                    
+                    // Monitoring requirements
+                    if (prediction.treatment_plan.monitoring && prediction.treatment_plan.monitoring.length > 0) {
+                        treatmentRecommendations += '<div class="treatment-section"><h6>📊 Monitoring Requirements:</h6><ul>';
+                        prediction.treatment_plan.monitoring.forEach(monitor => {
+                            treatmentRecommendations += `<li>${monitor}</li>`;
+                        });
+                        treatmentRecommendations += '</ul></div>';
+                    }
+                } else if (prediction.treatment_recommendations) {
+                    // Fallback to old format
+                    treatmentRecommendations = '<h5>AI Treatment Recommendations:</h5>';
+                    if (Array.isArray(prediction.treatment_recommendations)) {
+                        treatmentRecommendations += '<ul>';
+                        prediction.treatment_recommendations.forEach(rec => {
+                            treatmentRecommendations += `<li>${rec}</li>`;
+                        });
+                        treatmentRecommendations += '</ul>';
+                    } else {
+                        treatmentRecommendations += `<p>${prediction.treatment_recommendations}</p>`;
+                    }
+                }
+                
+                // Patient Education from Grok AI
+                if (prediction.patient_education && prediction.patient_education.length > 0) {
+                    treatmentRecommendations += '<div class="treatment-section"><h6>📚 Patient Education:</h6><ul>';
+                    prediction.patient_education.forEach(education => {
+                        treatmentRecommendations += `<li>${education}</li>`;
+                    });
+                    treatmentRecommendations += '</ul></div>';
+                }
+                
+                // Follow-up Care from Grok AI
+                if (prediction.follow_up_care) {
+                    treatmentRecommendations += '<div class="treatment-section"><h6>📅 Follow-up Care:</h6>';
+                    
+                    if (prediction.follow_up_care.timeline) {
+                        treatmentRecommendations += `<p><strong>Timeline:</strong> ${prediction.follow_up_care.timeline}</p>`;
+                    }
+                    
+                    if (prediction.follow_up_care.appointments && prediction.follow_up_care.appointments.length > 0) {
+                        treatmentRecommendations += '<p><strong>Scheduled Appointments:</strong></p><ul>';
+                        prediction.follow_up_care.appointments.forEach(appointment => {
+                            treatmentRecommendations += `<li>${appointment}</li>`;
+                        });
+                        treatmentRecommendations += '</ul>';
+                    }
+                    
+                    if (prediction.follow_up_care.emergency_criteria && prediction.follow_up_care.emergency_criteria.length > 0) {
+                        treatmentRecommendations += '<div class="alert alert-warning"><strong>⚠️ Return Immediately If:</strong><ul>';
+                        prediction.follow_up_care.emergency_criteria.forEach(criteria => {
+                            treatmentRecommendations += `<li>${criteria}</li>`;
+                        });
+                        treatmentRecommendations += '</ul></div>';
+                    }
+                    
+                    treatmentRecommendations += '</div>';
+                }
+                
+                // Specialist referrals
+                if (prediction.specialist_referral) {
+                    specialistReferrals = `<p><strong>Recommended Specialist:</strong> ${prediction.specialist_referral}</p>`;
+                } else {
+                    specialistReferrals = '<p>General practitioner consultation recommended.</p>';
+                }
+                
+                // Critical indicators
+                if (prediction.urgency_level) {
+                    const urgency = prediction.urgency_level.toLowerCase();
+                    if (urgency.includes('high') || urgency.includes('urgent') || urgency.includes('critical')) {
+                        criticalIndicators = `
+                            <div class="alert alert-danger">
+                                <strong>⚠️ High Urgency Level Detected</strong><br>
+                                Urgency: ${prediction.urgency_level}<br>
+                                This case may require immediate medical attention.
+                            </div>
+                        `;
+                    } else {
+                        criticalIndicators = `<p class="text-success">✅ Urgency Level: ${prediction.urgency_level}</p>`;
+                    }
+                }
+                
+            } else {
+                // Handle emergency diagnosis results (fallback)
+                let aiResponse = '';
+                if (result.ai_response) {
+                    aiResponse = result.ai_response;
+                } else if (result.diagnosis) {
+                    aiResponse = result.diagnosis;
+                } else if (result.response) {
+                    aiResponse = result.response;
+                } else {
+                    aiResponse = JSON.stringify(result, null, 2);
+                }
+                
+                // Extract primary diagnosis and confidence
+                const diagnosisMatch = aiResponse.match(/(?:Primary Diagnosis|Diagnosis|Most Likely Condition)[:\s]*([^\n\r]+)/i);
+                if (diagnosisMatch) {
+                    primaryDiagnosis = diagnosisMatch[1].trim();
+                }
+                
+                const confidenceMatch = aiResponse.match(/(?:Confidence|Certainty)[:\s]*(\d+%?|High|Medium|Low)/i);
+                if (confidenceMatch) {
+                    confidence = confidenceMatch[1].trim();
+                }
+                
+                detailedAnalysis = formatAIResponse(aiResponse);
+                
+                // Extract treatment recommendations
+                const treatmentMatch = aiResponse.match(/(?:Treatment|Recommendations?|Management)[:\s]*([^]*?)(?=\n\n|\n[A-Z]|$)/i);
+                if (treatmentMatch) {
+                    treatmentRecommendations = formatAIResponse(treatmentMatch[1].trim());
+                } else {
+                    treatmentRecommendations = '<p>Consult with healthcare provider for appropriate treatment plan.</p>';
+                }
+                
+                // Extract specialist referrals
+                const specialistMatch = aiResponse.match(/(?:Specialist|Referral|Consultation)[:\s]*([^]*?)(?=\n\n|\n[A-Z]|$)/i);
+                if (specialistMatch) {
+                    specialistReferrals = formatAIResponse(specialistMatch[1].trim());
+                } else {
+                    specialistReferrals = '<p>General practitioner consultation recommended.</p>';
+                }
+                
+                // Check for critical indicators
+                const criticalKeywords = ['urgent', 'emergency', 'critical', 'immediate', 'severe', 'tuberculosis', 'tb'];
+                const hasCritical = criticalKeywords.some(keyword => 
+                    aiResponse.toLowerCase().includes(keyword.toLowerCase())
+                );
+                
+                if (hasCritical) {
+                    criticalIndicators = `
+                        <div class="alert alert-danger">
+                            <strong>⚠️ Critical Indicators Detected</strong><br>
+                            This case may require immediate medical attention. Please consult with a healthcare provider promptly.
+                        </div>
+                    `;
+                    
+                    if (aiResponse.toLowerCase().includes('tuberculosis') || aiResponse.toLowerCase().includes('tb')) {
+                        criticalIndicators += `
+                            <div class="alert alert-warning mt-2">
+                                <strong>🔬 TB Screening Recommended</strong><br>
+                                Consider sputum testing, chest X-ray, and contact tracing protocols.
+                            </div>
+                        `;
+                    }
+                } else {
+                    criticalIndicators = '<p class="text-success">✅ No critical indicators detected.</p>';
+                }
+            }
+            
+            // Show results section and hide form
+            document.getElementById('diagnosisResults').style.display = 'block';
+            
+            // Update UI elements
+            document.getElementById('diagnosisName').textContent = primaryDiagnosis;
+            document.getElementById('confidenceScore').textContent = confidence;
+            document.getElementById('resultPatientName').textContent = originalData.patientName || 'Unknown';
+            document.getElementById('resultPatientId').textContent = 'N/A';
+            document.getElementById('resultPatientAge').textContent = '32 years';
+            document.getElementById('resultPatientGender').textContent = 'Male';
+            document.getElementById('diagnosisDetailsContent').innerHTML = detailedAnalysis;
+            document.getElementById('treatmentContent').innerHTML = treatmentRecommendations;
+            document.getElementById('specialistContent').innerHTML = specialistReferrals;
+            
+            // Update symptoms
+            if (originalData.symptoms && originalData.symptoms.length > 0) {
+                document.getElementById('analyzedSymptomsContent').innerHTML = 
+                    originalData.symptoms.map(symptom => '<li>' + symptom + '</li>').join('');
+            } else {
+                document.getElementById('analyzedSymptomsContent').innerHTML = 
+                    '<li>Medical History: ' + (originalData.medicalHistory || 'Not provided') + '</li>';
+            }
+            
+            // Handle specialist referral section
+            document.getElementById('specialistReferralSection').style.display = 'block';
+            
+            // Handle critical indicators section
+            document.getElementById('criticalIndicatorsSection').style.display = 'block';
+            document.getElementById('criticalContent').innerHTML = criticalIndicators;
+            
+            // Show success message
+            alert('✅ Diagnosis Completed!\n\n' + 
+                  'Primary Diagnosis: ' + primaryDiagnosis + '\n' +
+                  'Confidence: ' + confidence + '\n' +
+                  'Patient: ' + originalData.patientName);
+        }
+        
+        // Function to display actual diagnosis results (backward compatibility)
+        function displayActualDiagnosisResults(result, emergencyData) {
+            displayEnhancedDiagnosisResults(result, { 
+                patientName: emergencyData.patient_name,
+                symptoms: emergencyData.symptoms || [],
+                medicalHistory: emergencyData.medical_history,
+                additionalNotes: emergencyData.additional_notes,
+                aiEnabled: false
+            });
+        }
+
+        // Function to display diagnosis results
+        function displayDiagnosisResults() {
+            // Try to get data from the new structure first (current_diagnosis)
+            const currentDiagnosisData = localStorage.getItem('current_diagnosis');
+            let diagnosis = null;
+            let patient = null;
+            
+            if (currentDiagnosisData) {
+                try {
+                    const diagnosisInfo = JSON.parse(currentDiagnosisData);
+                    patient = diagnosisInfo.patient;
+                    diagnosis = diagnosisInfo.diagnosis;
+                } catch (error) {
+                    console.error('Error parsing current_diagnosis:', error);
+                }
+            }
+            
+            // Fallback to old structure if new structure not found
+            if (!diagnosis || !patient) {
+                const diagnosisResult = localStorage.getItem('diagnosisResult');
+                const patientData = localStorage.getItem('patientData');
+                
+                if (diagnosisResult && patientData) {
+                    try {
+                        diagnosis = JSON.parse(diagnosisResult);
+                        patient = JSON.parse(patientData);
+                    } catch (error) {
+                        console.error('Error parsing old diagnosis structure:', error);
+                        return;
+                    }
+                } else {
+                    return; // No diagnosis data found
+                }
+            }
+            
+            if (diagnosis && patient) {
+                try {
+                    
+                    // Show results section and hide form
+                    document.getElementById('diagnosisResults').style.display = 'block';
+                    document.querySelector('.container > div:not(#diagnosisResults)').style.display = 'none';
+                    
+                    // Populate diagnosis information
+                    document.getElementById('diagnosisName').textContent = diagnosis.disease_type || 'Unknown';
+                    
+                    // Handle confidence display properly
+                    let confidenceText = 'N/A';
+                    if (diagnosis.confidence) {
+                        let confValue = diagnosis.confidence;
+                        // Check if confidence is already a percentage (> 1) or decimal (0-1)
+                        if (confValue > 1) {
+                            confValue = Math.round(confValue);
+                        } else {
+                            confValue = Math.round(confValue * 100);
+                        }
+                        confidenceText = `${confValue}%`;
+                    }
+                    document.getElementById('confidenceValue').textContent = confidenceText;
+                    
+                    // Populate patient information
+                    document.getElementById('resultPatientId').textContent = patient.patientId || 'N/A';
+                    document.getElementById('resultPatientName').textContent = 
+                        `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || 'N/A';
+                    document.getElementById('resultPatientAge').textContent = patient.age || 'N/A';
+                    document.getElementById('resultPatientGender').textContent = patient.gender || 'N/A';
+                    
+                    // Populate diagnosis details
+                    document.getElementById('detailsContent').textContent = 
+                        diagnosis.diagnosis || 'No detailed diagnosis available.';
+                    
+                    // Populate analyzed symptoms
+                    if (diagnosis.analyzed_symptoms && diagnosis.analyzed_symptoms.length > 0) {
+                        document.getElementById('symptomsContent').innerHTML = 
+                            diagnosis.analyzed_symptoms.map(symptom => `<li>${symptom}</li>`).join('');
+                    } else {
+                        document.getElementById('symptomsContent').textContent = 
+                            'No specific symptoms analyzed.';
+                    }
+                    
+                    // Populate treatment recommendations
+                    if (diagnosis.treatment_recommendations) {
+                        document.getElementById('treatmentContent').textContent = 
+                            diagnosis.treatment_recommendations;
+                    } else {
+                        document.getElementById('treatmentContent').textContent = 
+                            'Treatment recommendations will be generated based on the diagnosis.';
+                    }
+                    
+                    // Handle optional sections
+                    if (diagnosis.specialist_referral) {
+                        document.getElementById('specialistReferral').style.display = 'block';
+                        document.getElementById('referralContent').textContent = diagnosis.specialist_referral;
+                    }
+                    
+                    if (diagnosis.critical_indicators && diagnosis.critical_indicators.length > 0) {
+                        document.getElementById('criticalIndicators').style.display = 'block';
+                        document.getElementById('criticalContent').innerHTML = 
+                            diagnosis.critical_indicators.map(indicator => `<li>${indicator}</li>`).join('');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error displaying diagnosis results:', error);
+                    alert('Error displaying diagnosis results. Please try again.');
+                }
+            }
+        }
+        
+        // Function to get specialist recommendations based on diagnosis
+        function getSpecialistRecommendations(diagnosis, specialistReferral) {
+            // Define specialist mapping based on common conditions
+            const specialistMapping = {
+                'cardiology': ['chest pain', 'heart', 'cardiac', 'hypertension', 'blood pressure', 'arrhythmia'],
+                'dermatology': ['skin', 'rash', 'dermatitis', 'acne', 'eczema', 'psoriasis'],
+                'neurology': ['headache', 'migraine', 'seizure', 'neurological', 'brain', 'nerve'],
+                'orthopedics': ['bone', 'joint', 'fracture', 'arthritis', 'back pain', 'muscle'],
+                'gastroenterology': ['stomach', 'digestive', 'abdominal', 'nausea', 'diarrhea', 'constipation'],
+                'pulmonology': ['lung', 'respiratory', 'breathing', 'cough', 'asthma', 'pneumonia'],
+                'endocrinology': ['diabetes', 'thyroid', 'hormone', 'metabolic', 'insulin'],
+                'psychiatry': ['depression', 'anxiety', 'mental health', 'psychological', 'stress'],
+                'ophthalmology': ['eye', 'vision', 'sight', 'visual', 'retina', 'glaucoma'],
+                'urology': ['kidney', 'bladder', 'urinary', 'prostate', 'urological']
+            };
+
+            const diagnosisLower = diagnosis.toLowerCase();
+            const recommendedSpecializations = [];
+
+            // Check for direct specialist referral
+            if (specialistReferral && specialistReferral !== 'General practitioner consultation recommended.') {
+                const referralLower = specialistReferral.toLowerCase();
+                for (const [specialization, keywords] of Object.entries(specialistMapping)) {
+                    if (keywords.some(keyword => referralLower.includes(keyword)) || referralLower.includes(specialization)) {
+                        recommendedSpecializations.push(specialization);
+                    }
+                }
+            }
+
+            // Check diagnosis for relevant keywords
+            for (const [specialization, keywords] of Object.entries(specialistMapping)) {
+                if (keywords.some(keyword => diagnosisLower.includes(keyword))) {
+                    if (!recommendedSpecializations.includes(specialization)) {
+                        recommendedSpecializations.push(specialization);
+                    }
+                }
+            }
+
+            // Default to internal medicine if no specific specialization found
+            if (recommendedSpecializations.length === 0) {
+                recommendedSpecializations.push('internal medicine');
+            }
+
+            return recommendedSpecializations;
+        }
+
+        // Function to display specialist recommendations
+        function displaySpecialistRecommendations(diagnosis, specialistReferral) {
+            const recommendedSpecializations = getSpecialistRecommendations(diagnosis, specialistReferral);
+            
+            // Mock specialist data (in real app, this would come from the specialist database)
+            const mockSpecialists = [
+                { id: 1, name: 'Dr. Sarah Johnson', specialization: 'cardiology', status: 'available', experience: '15 years', rating: 4.8 },
+                { id: 2, name: 'Dr. Michael Chen', specialization: 'dermatology', status: 'busy', experience: '12 years', rating: 4.9 },
+                { id: 3, name: 'Dr. Emily Rodriguez', specialization: 'neurology', status: 'available', experience: '18 years', rating: 4.7 },
+                { id: 4, name: 'Dr. James Wilson', specialization: 'orthopedics', status: 'offline', experience: '20 years', rating: 4.6 },
+                { id: 5, name: 'Dr. Lisa Thompson', specialization: 'gastroenterology', status: 'available', experience: '14 years', rating: 4.8 },
+                { id: 6, name: 'Dr. David Kumar', specialization: 'pulmonology', status: 'available', experience: '16 years', rating: 4.9 },
+                { id: 7, name: 'Dr. Maria Garcia', specialization: 'endocrinology', status: 'busy', experience: '13 years', rating: 4.7 },
+                { id: 8, name: 'Dr. Robert Lee', specialization: 'internal medicine', status: 'available', experience: '22 years', rating: 4.8 }
+            ];
+
+            // Filter specialists based on recommendations
+            const relevantSpecialists = mockSpecialists.filter(specialist => 
+                recommendedSpecializations.includes(specialist.specialization)
+            );
+
+            // If no specific specialists found, show internal medicine specialists
+            if (relevantSpecialists.length === 0) {
+                relevantSpecialists.push(...mockSpecialists.filter(s => s.specialization === 'internal medicine'));
+            }
+
+            // Display the recommendations
+            const recommendationsDiv = document.getElementById('specialistRecommendations');
+            const specialistsListDiv = document.getElementById('recommendedSpecialists');
+            
+            if (relevantSpecialists.length > 0) {
+                let specialistsHtml = '';
+                relevantSpecialists.slice(0, 3).forEach(specialist => { // Show top 3 recommendations
+                    const statusClass = `status-${specialist.status}`;
+                    const statusText = specialist.status.charAt(0).toUpperCase() + specialist.status.slice(1);
+                    
+                    specialistsHtml += `
+                        <div class="specialist-card">
+                            <div class="specialist-info">
+                                <h5>${specialist.name}</h5>
+                                <p>${specialist.specialization.charAt(0).toUpperCase() + specialist.specialization.slice(1)} • ${specialist.experience} • ⭐ ${specialist.rating}</p>
+                            </div>
+                            <div class="specialist-status ${statusClass}">${statusText}</div>
+                        </div>
+                    `;
+                });
+                
+                specialistsListDiv.innerHTML = specialistsHtml;
+                recommendationsDiv.style.display = 'block';
+                
+                // Store recommended specialists for consultation request
+                localStorage.setItem('recommendedSpecialists', JSON.stringify(relevantSpecialists));
+            }
+        }
+
+        // Function to request consultation
+        function requestConsultation() {
+            const diagnosisResult = localStorage.getItem('diagnosisResult');
+            const patientData = localStorage.getItem('patientData');
+            
+            if (diagnosisResult && patientData) {
+                // Store consultation context
+                const consultationContext = {
+                    diagnosis: JSON.parse(diagnosisResult),
+                    patient: JSON.parse(patientData),
+                    timestamp: new Date().toISOString(),
+                    source: 'diagnosis_results'
+                };
+                
+                localStorage.setItem('consultationContext', JSON.stringify(consultationContext));
+                
+                // Navigate to specialist consultation page
+                window.location.href = 'specialist_consultation.html?source=diagnosis';
+            } else {
+                alert('Unable to request consultation. Please ensure diagnosis and patient data are available.');
+            }
+        }
+
+        // Function to view all specialists
+        function viewAllSpecialists() {
+            window.location.href = 'specialist_consultation.html';
+        }
+
+        // Function to generate comprehensive treatment guide
+        async function generateTreatmentGuide() {
+            const diagnosisResult = localStorage.getItem('diagnosisResult');
+            const patientData = JSON.parse(localStorage.getItem('patientData') || '{}');
+            
+            if (!diagnosisResult) {
+                alert('No diagnosis data available. Please perform a diagnosis first.');
+                return;
+            }
+
+            try {
+                const diagnosis = JSON.parse(diagnosisResult);
+                
+                // Show loading indicator
+                const loadingAlert = document.createElement('div');
+                loadingAlert.innerHTML = `
+                    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                                background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); 
+                                z-index: 10000; text-align: center;">
+                        <div style="margin-bottom: 15px;">🤖 Generating Comprehensive Treatment Guide...</div>
+                        <div style="margin-bottom: 10px;">Using Grok AI for personalized recommendations</div>
+                        <div style="width: 200px; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden;">
+                            <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #4CAF50, #2196F3); 
+                                        animation: loading 2s infinite;"></div>
+                        </div>
+                        <style>
+                            @keyframes loading {
+                                0% { transform: translateX(-100%); }
+                                100% { transform: translateX(100%); }
+                            }
+                        </style>
+                    </div>
+                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                                background: rgba(0,0,0,0.5); z-index: 9999;"></div>
+                `;
+                document.body.appendChild(loadingAlert);
+
+                // Prepare data for comprehensive treatment guide API
+                const treatmentData = {
+                    disease_type: diagnosis.disease_type || diagnosis.diagnosis,
+                    disease_code: diagnosis.disease_code || '',
+                    confidence: diagnosis.confidence || 0,
+                    severity: diagnosis.severity || 'moderate',
+                    patient_data: {
+                        age: patientData.age || '',
+                        gender: patientData.gender || '',
+                        weight: patientData.weight || '',
+                        medical_history: patientData.medical_history || '',
+                        current_medications: patientData.current_medications || '',
+                        allergies: patientData.allergies || ''
+                    },
+                    symptoms: diagnosis.symptoms || []
+                };
+
+                // Call the comprehensive treatment guide API
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE_URL}/treatments/generate-comprehensive-treatment-guide`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(treatmentData)
+                });
+
+                // Remove loading indicator
+                document.body.removeChild(loadingAlert);
+
+                if (!response.ok) {
+                    throw new Error('API Error: ' + response.status);
+                }
+
+                const result = await response.json();
+                const treatmentGuide = result.treatment_guide;
+
+                // Open comprehensive treatment guide in new window
+                const treatmentWindow = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+                
+                // Build HTML content using string concatenation to avoid template literal issues
+                let htmlContent = '<html><head>' +
+                    '<title>Comprehensive Treatment Guide - ' + treatmentGuide.diagnosis.disease_type + '</title>' +
+                    '<style>' +
+                        'body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; line-height: 1.6; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }' +
+                        '.container { max-width: 900px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }' +
+                        '.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }' +
+                        '.header h1 { margin: 0; font-size: 2.5em; }' +
+                        '.ai-badge { background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; display: inline-block; margin-top: 10px; font-size: 0.9em; }' +
+                        '.content { padding: 30px; }' +
+                        '.section { margin-bottom: 30px; padding: 20px; border-radius: 10px; background: #f8f9fa; border-left: 5px solid #4CAF50; }' +
+                        '.section.critical { border-left-color: #F44336; background: #fff5f5; }' +
+                        '.section.warning { border-left-color: #FF9800; background: #fff8e1; }' +
+                        '.section.info { border-left-color: #2196F3; background: #e3f2fd; }' +
+                        'h2 { color: #2c3e50; margin-top: 0; font-size: 1.5em; }' +
+                        'h3 { color: #34495e; margin-top: 20px; }' +
+                        '.confidence-badge { background: #4CAF50; color: white; padding: 5px 12px; border-radius: 15px; font-weight: bold; display: inline-block; }' +
+                        '.ai-engine { background: #E3F2FD; color: #1976D2; padding: 5px 10px; border-radius: 12px; font-size: 0.85em; display: inline-block; }' +
+                        '.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }' +
+                        '.list-item { background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border-left: 3px solid #4CAF50; }' +
+                        '.emergency-item { border-left-color: #F44336; }' +
+                        '.print-btn { background: #4CAF50; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin: 10px 5px; font-size: 1em; }' +
+                        '.print-btn:hover { background: #45a049; }' +
+                        '@media print { body { background: white; } .container { box-shadow: none; } .print-btn { display: none; } }' +
+                        '@media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .content { padding: 15px; } }' +
+                    '</style>' +
+                '</head><body>' +
+                    '<div class="container">' +
+                        '<div class="header">' +
+                            '<h1>🏥 Comprehensive Treatment Guide</h1>' +
+                            '<div class="ai-badge">' + (treatmentGuide.metadata.ai_enhanced ? '🤖 Enhanced with Grok AI' : '📋 Standard Protocol') + '</div>' +
+                        '</div>' +
+                        '<div class="content">' +
+                            '<div class="section info">' +
+                                '<h2>📋 Diagnosis Summary</h2>' +
+                                '<div class="grid">' +
+                                    '<div>' +
+                                        '<p><strong>Disease:</strong> ' + treatmentGuide.diagnosis.disease_type + '</p>' +
+                                        '<p><strong>Confidence:</strong> <span class="confidence-badge">' + Math.round(treatmentGuide.diagnosis.confidence) + '%</span></p>' +
+                                        '<p><strong>Severity:</strong> ' + treatmentGuide.diagnosis.severity + '</p>' +
+                                    '</div>' +
+                                    '<div>' +
+                                        '<p><strong>AI Engine:</strong> <span class="ai-engine">' + treatmentGuide.diagnosis.ai_engine + '</span></p>' +
+                                        '<p><strong>Generated:</strong> ' + new Date(treatmentGuide.generated_at).toLocaleString() + '</p>' +
+                                        '<p><strong>Generated by:</strong> ' + treatmentGuide.generated_by + '</p>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>';
+
+                // Add patient profile if available
+                if (Object.keys(treatmentGuide.patient_profile).length > 0) {
+                    htmlContent += '<div class="section">' +
+                        '<h2>👤 Patient Profile</h2>' +
+                        '<div class="grid">';
+                    
+                    Object.entries(treatmentGuide.patient_profile)
+                        .filter(([key, value]) => value && value.trim())
+                        .forEach(([key, value]) => {
+                            const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            htmlContent += '<p><strong>' + formattedKey + ':</strong> ' + value + '</p>';
+                        });
+                    
+                    htmlContent += '</div></div>';
+                }
+
+                // Add Grok AI recommendations if available
+                if (treatmentGuide.grok_ai_recommendations && treatmentGuide.grok_ai_recommendations.ai_generated_guide) {
+                    htmlContent += '<div class="section">' +
+                        '<h2>🤖 Grok AI Personalized Recommendations</h2>' +
+                        '<div style="background: white; padding: 20px; border-radius: 8px; white-space: pre-line;">' +
+                            treatmentGuide.grok_ai_recommendations.ai_generated_guide +
+                        '</div>' +
+                    '</div>';
+                }
+
+                // Add base treatment protocols if available
+                if (treatmentGuide.base_protocols && treatmentGuide.base_protocols.length > 0) {
+                    htmlContent += '<div class="section">' +
+                        '<h2>💊 Evidence-Based Treatment Protocols</h2>';
+                    
+                    treatmentGuide.base_protocols.forEach(protocol => {
+                        htmlContent += '<div style="margin-bottom: 25px; background: white; padding: 20px; border-radius: 8px;">' +
+                            '<h3>' + protocol.protocol_name + '</h3>' +
+                            '<p><strong>Type:</strong> ' + protocol.treatment_type + '</p>';
+                        
+                        // Add medications if available
+                        if (protocol.medications && protocol.medications.length > 0) {
+                            htmlContent += '<h4>💊 Medications:</h4>';
+                            
+                            protocol.medications.forEach((med, medIndex) => {
+                                htmlContent += '<div class="list-item">' +
+                                    '<strong>' + med.name + '</strong><br>' +
+                                    '<strong>Dosage:</strong> ' + med.dosage + ' | ' +
+                                    '<strong>Frequency:</strong> ' + med.frequency + ' | ' +
+                                    '<strong>Duration:</strong> ' + med.duration + ' | ' +
+                                    '<strong>Route:</strong> ' + med.route +
+                                '</div>';
+                            });
+                        }
+                        
+                        // Add procedures if available
+                        if (protocol.procedures && protocol.procedures.length > 0) {
+                            htmlContent += '<h4>Procedures:</h4>';
+                            protocol.procedures.forEach(proc => {
+                                htmlContent += '<div class="list-item">' +
+                                    '<strong>' + proc.name + '</strong><br>' +
+                                    proc.description + '<br>' +
+                                    '<em>Indications: ' + proc.indications + '</em>' +
+                                '</div>';
+                            });
+                        }
+                        
+                        // Add lifestyle recommendations if available
+                        if (protocol.lifestyle_recommendations && protocol.lifestyle_recommendations.length > 0) {
+                            htmlContent += '<h4>Lifestyle Recommendations:</h4>';
+                            protocol.lifestyle_recommendations.forEach(rec => {
+                                htmlContent += '<div class="list-item">' +
+                                    '<strong>' + rec.category + ':</strong> ' + rec.recommendation + '<br>' +
+                                    '<em>Importance: ' + rec.importance + ' | Timeline: ' + rec.timeline + '</em>' +
+                                '</div>';
+                            });
+                        }
+                        
+                        htmlContent += '</div>';
+                    });
+                    
+                    htmlContent += '</div>';
+                }
+
+                // Add emergency indicators and disclaimers
+                htmlContent += '<div class="section critical">' +
+                        '<h2>🚨 Emergency Indicators</h2>' +
+                        '<p><strong>Seek immediate medical attention if you experience:</strong></p>' +
+                        '<div class="list-item emergency-item">Severe worsening of symptoms</div>' +
+                        '<div class="list-item emergency-item">Difficulty breathing or chest pain</div>' +
+                        '<div class="list-item emergency-item">High fever (>39°C/102°F)</div>' +
+                        '<div class="list-item emergency-item">Severe allergic reactions</div>' +
+                        '<div class="list-item emergency-item">Loss of consciousness</div>' +
+                    '</div>' +
+                    '<div class="section warning">' +
+                        '<h2>⚠️ Important Medical Disclaimers</h2>' +
+                        '<ul>' +
+                            '<li><strong>AI-Generated Content:</strong> This treatment guide is generated by AI and should not replace professional medical advice.</li>' +
+                            '<li><strong>Consultation Required:</strong> Always consult with a qualified healthcare provider before starting any treatment.</li>' +
+                            '<li><strong>Individual Variation:</strong> Treatment responses may vary between individuals.</li>' +
+                            '<li><strong>Emergency Care:</strong> Seek immediate medical attention for severe or worsening symptoms.</li>' +
+                            '<li><strong>Medication Safety:</strong> Verify all medications and dosages with a healthcare professional.</li>' +
+                            '<li><strong>African Context:</strong> Recommendations consider African healthcare contexts but may need local adaptation.</li>' +
+                        '</ul>' +
+                    '</div>' +
+                    '<div style="text-align: center; margin-top: 30px;">' +
+                        '<button class="print-btn" onclick="window.print()">🖨️ Print Guide</button>' +
+                        '<button class="print-btn" onclick="window.close()" style="background: #666;">✖️ Close</button>' +
+                    '</div>' +
+                    '<p style="text-align: center; margin-top: 30px; color: #666; font-size: 0.9em;">' +
+                        'Generated by AfriDiag ' + (treatmentGuide.metadata.ai_enhanced ? 'Grok AI' : 'Standard') + ' System<br>' +
+                        new Date().toLocaleString() +
+                    '</p>' +
+                        '</div>' +
+                    '</div>' +
+                '</body>' +
+                '</html>';
+                
+                // Write the complete HTML content to the new window
+                treatmentWindow.document.write(htmlContent);
+                
+                treatmentWindow.document.close();
+
+                // Show success message
+                if (result.warning) {
+                    alert('⚠️ ' + result.message + '\n\n' + result.warning);
+                } else {
+                    alert('✅ ' + result.message + '\n\nComprehensive treatment guide generated successfully!');
+                }
+
+            } catch (error) {
+                // Remove loading indicator if still present
+                const loadingElement = document.querySelector('[style*="position: fixed"]');
+                if (loadingElement && loadingElement.parentElement) {
+                    loadingElement.parentElement.remove();
+                }
+
+                console.error('Error generating comprehensive treatment guide:', error);
+                
+                // Fallback to basic treatment guide
+                try {
+                    const diagnosis = JSON.parse(diagnosisResult);
+                    const treatmentWindow = window.open('', '_blank', 'width=800,height=600');
+                    
+                    treatmentWindow.document.write(
+                        '<html>' +
+                        '<head>' +
+                            '<title>Basic Treatment Guide - ' + (diagnosis.disease_type || 'Unknown') + '</title>' +
+                            '<style>' +
+                                'body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }' +
+                                'h1 { color: #1E88E5; border-bottom: 2px solid #e8f4fd; padding-bottom: 10px; }' +
+                                'h2 { color: #2E7D32; margin-top: 25px; }' +
+                                '.section { margin-bottom: 20px; padding: 15px; border-left: 4px solid #4CAF50; background: #f9f9f9; }' +
+                                '.confidence { background: #4CAF50; color: white; padding: 5px 10px; border-radius: 15px; }' +
+                                '.error { background: #ffebee; border-left-color: #f44336; color: #c62828; }' +
+                                '@media print { body { margin: 0; } }' +
+                            '</style>' +
+                        '</head>' +
+                        '<body>' +
+                            '<h1>🏥 AfriDiag Treatment Guide (Basic)</h1>' +
+                            '<div class="section error">' +
+                                '<h2>⚠️ Limited Functionality</h2>' +
+                                '<p>Enhanced AI features are temporarily unavailable. This is a basic treatment guide.</p>' +
+                            '</div>' +
+                            '<div class="section">' +
+                                '<h2>Diagnosis</h2>' +
+                                '<p><strong>Disease:</strong> ' + (diagnosis.disease_type || 'Unknown') + '</p>' +
+                                '<p><strong>Confidence:</strong> <span class="confidence">' + Math.round((diagnosis.confidence || 0) * 100) + '%</span></p>' +
+                                '<p><strong>Details:</strong> ' + (diagnosis.diagnosis || 'No detailed diagnosis available.') + '</p>' +
+                            '</div>' +
+                            '<div class="section">' +
+                                '<h2>Treatment Recommendations</h2>' +
+                                '<p>' + (diagnosis.treatment_recommendations || 'Consult with a healthcare professional for appropriate treatment.') + '</p>' +
+                            '</div>' +
+                            '<div class="section">' +
+                                '<h2>Important Notes</h2>' +
+                                '<p>• This is a basic treatment guide due to system limitations.</p>' +
+                                '<p>• Always consult with a qualified healthcare provider before starting any treatment.</p>' +
+                                '<p>• Seek immediate medical attention if symptoms worsen.</p>' +
+                            '</div>' +
+                            '<p style="text-align: center; margin-top: 30px; color: #666;">' +
+                                'Generated by AfriDiag AI System (Basic Mode) on ' + new Date().toLocaleString() +
+                            '</p>' +
+                        '</body>' +
+                        '</html>'
+                    );
+                    
+                    treatmentWindow.document.close();
+                    alert('⚠️ Enhanced features unavailable. Basic treatment guide generated.\n\nError: ' + error.message);
+                } catch (fallbackError) {
+                    alert('❌ Error generating treatment guide. Please try again later.\n\nError: ' + error.message);
+                }
+            }
+        }
+        
+        // Function to request second opinion
+        async function requestSecondOpinion() {
+            try {
+                // Gather current diagnosis information
+                const diagnosisData = {
+                    symptoms: document.getElementById('symptoms')?.value || '',
+                    medicalHistory: document.getElementById('medicalHistory')?.value || '',
+                    diagnosis: document.getElementById('diagnosisContent')?.textContent || '',
+                    treatment: document.getElementById('treatmentContent')?.textContent || '',
+                    followUp: document.getElementById('followUpContent')?.textContent || '',
+                    specialist: document.getElementById('specialistContent')?.textContent || '',
+                    critical: document.getElementById('criticalContent')?.textContent || '',
+                    timestamp: new Date().toISOString()
+                };
+
+                // Get current patient and diagnosis data from localStorage
+                const currentDiagnosisData = JSON.parse(localStorage.getItem('current_diagnosis') || '{}');
+                
+                if (!currentDiagnosisData.patient || !currentDiagnosisData.diagnosis) {
+                    alert('⚠️ Patient or diagnosis information not found. Please ensure you have completed the diagnosis process.');
+                    return;
+                }
+                
+                const currentPatient = currentDiagnosisData.patient;
+                const currentDiagnosis = currentDiagnosisData.diagnosis;
+
+                // Determine required specialization based on diagnosis
+                const specialization = determineSpecialization(diagnosisData.diagnosis, diagnosisData.specialist);
+                
+                // Create consultation request
+                const consultationRequest = {
+                    patient_id: currentPatient.patientId,
+                    diagnosis_id: currentDiagnosis.timestamp || Date.now(), // Use timestamp as diagnosis ID
+                    priority: diagnosisData.critical ? 'high' : 'medium',
+                    specialization_required: specialization,
+                    description: `Second opinion request for patient diagnosis.
+
+**Patient Information:**
+- Symptoms: ${diagnosisData.symptoms}
+- Medical History: ${diagnosisData.medicalHistory}
+
+**Current Diagnosis:**
+${diagnosisData.diagnosis}
+
+**Recommended Treatment:**
+${diagnosisData.treatment}
+
+**Follow-up Care:**
+${diagnosisData.followUp}
+
+**Specialist Referral:**
+${diagnosisData.specialist}
+
+Please review this diagnosis and provide your expert opinion.`,
+                    estimated_duration: 30
+                };
+
+                // Send consultation request to API
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('/api/v1/consultations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(consultationRequest)
+                });
+
+                if (response.ok) {
+                    const consultation = await response.json();
+                    alert('✅ Second opinion request submitted successfully!\n\nYour consultation request has been sent to available specialists. You will be notified when a specialist accepts your request.');
+                    
+                    // Store consultation ID for reference
+                    localStorage.setItem('lastConsultationId', consultation.id);
+                    
+                    // Optionally redirect to chat or stay on current page
+                    if (confirm('Would you like to go to the specialist chat to monitor your request?')) {
+                        window.location.href = 'specialist_chat.html';
+                    }
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to create consultation request');
+                }
+                
+            } catch (error) {
+                console.error('Error creating second opinion request:', error);
+                alert('⚠️ Unable to submit second opinion request. Please try again.\n\nError: ' + error.message);
+            }
+        }
+
+        // Helper function to determine specialization based on diagnosis
+        function determineSpecialization(diagnosis, specialistReferral) {
+            const diagnosisLower = (diagnosis + ' ' + specialistReferral).toLowerCase();
+            
+            // Mapping of keywords to specializations
+            const specializationMap = {
+                'cardiology': ['heart', 'cardiac', 'cardiovascular', 'chest pain', 'hypertension', 'arrhythmia'],
+                'neurology': ['brain', 'neurological', 'headache', 'seizure', 'stroke', 'migraine'],
+                'orthopedics': ['bone', 'joint', 'fracture', 'arthritis', 'back pain', 'spine'],
+                'dermatology': ['skin', 'rash', 'dermatitis', 'acne', 'eczema'],
+                'gastroenterology': ['stomach', 'digestive', 'abdominal', 'liver', 'intestinal'],
+                'pulmonology': ['lung', 'respiratory', 'breathing', 'asthma', 'pneumonia'],
+                'endocrinology': ['diabetes', 'thyroid', 'hormone', 'endocrine'],
+                'psychiatry': ['mental', 'depression', 'anxiety', 'psychiatric'],
+                'pediatrics': ['child', 'pediatric', 'infant', 'adolescent'],
+                'gynecology': ['gynecological', 'reproductive', 'menstrual', 'pregnancy']
+            };
+            
+            for (const [specialization, keywords] of Object.entries(specializationMap)) {
+                if (keywords.some(keyword => diagnosisLower.includes(keyword))) {
+                    return specialization;
+                }
+            }
+            
+            return 'general medicine'; // Default specialization
+        }
+        
+        // Function to print results
+        function printResults() {
+            window.print();
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🩺 AfriDiag Diagnosis Screen loaded');
+            console.log('✅ Enhanced AI Diagnosis features available');
+            
+            // Check if we have diagnosis results to display
+            displayDiagnosisResults();
+            
+            // Initialize navigation with error handling
+            try {
+                if (typeof AfriDiagNavigation !== 'undefined') {
+                    const navigation = new AfriDiagNavigation('navigation-container');
+                    navigation.setActiveTab('diagnosis');
+                } else {
+                    console.warn('AfriDiagNavigation class not found');
+                }
+            } catch (error) {
+                console.error('Navigation initialization error:', error);
+            }
+
+            // Initialize performance optimizations
+            initializeOptimizations();
+        });
+
+        // Helper function to build comprehensive medical history
+        function buildMedicalHistory(medicalHistory, symptoms, emergencyText, vitalSigns = null) {
+            let comprehensiveMedicalHistory = '';
+            
+            if (emergencyText && emergencyText.trim()) {
+                comprehensiveMedicalHistory += `[EMERGENCY CONTEXT]: ${emergencyText.trim()}\n\n`;
+            }
+            if (medicalHistory && medicalHistory.trim()) {
+                comprehensiveMedicalHistory += `[MEDICAL HISTORY]: ${medicalHistory.trim()}\n\n`;
+            }
+            if (symptoms && symptoms.length > 0) {
+                comprehensiveMedicalHistory += `[SYMPTOMS]: ${symptoms.join(', ')}\n\n`;
+            }
+            
+            // Add vital signs if available
+            if (vitalSigns) {
+                const availableVitals = Object.entries(vitalSigns).filter(([key, value]) => value && value.trim());
+                if (availableVitals.length > 0) {
+                    comprehensiveMedicalHistory += `[VITAL SIGNS]: ${availableVitals.map(([key, value]) => `${key}: ${value}`).join(', ')}\n\n`;
+                }
+            }
+            
+            // Add symptom duration if available
+            const symptomDuration = document.getElementById('symptomDuration');
+            if (symptomDuration && symptomDuration.value) {
+                comprehensiveMedicalHistory += `[SYMPTOM DURATION]: ${symptomDuration.value}\n\n`;
+            }
+            
+            return comprehensiveMedicalHistory;
+        }
+
+        // Initialize optimization features
+        function initializeOptimizations() {
+            console.log('🚀 Initializing performance optimizations...');
+            
+            // Initialize optimized diagnosis processor
+            if (window.OptimizedDiagnosisProcessor) {
+                window.optimizedDiagnosisProcessor = new window.OptimizedDiagnosisProcessor();
+                console.log('✅ Optimized diagnosis processor initialized');
+            } else {
+                console.warn('⚠️ OptimizedDiagnosisProcessor not available');
+            }
+            
+            // Initialize progressive loader
+            if (window.ProgressiveLoader) {
+                window.progressiveLoader = new window.ProgressiveLoader();
+                console.log('✅ Progressive loader initialized');
+            } else {
+                console.warn('⚠️ ProgressiveLoader not available');
+            }
+            
+            // Initialize symptom autocomplete
+            if (window.SymptomAutocomplete) {
+                // Initialize for symptom inputs
+                const symptomInputs = document.querySelectorAll('input[type="text"][placeholder*="symptom"], input[data-symptom-input], textarea[placeholder*="symptom"]');
+                symptomInputs.forEach(input => {
+                    new window.SymptomAutocomplete(input);
+                    console.log('✅ Symptom autocomplete initialized for:', input.id || input.name || 'unnamed input');
+                });
+
+                // Add autocomplete to additional symptoms input
+                const additionalSymptomsInput = document.getElementById('additionalSymptoms');
+                if (additionalSymptomsInput) {
+                    new window.SymptomAutocomplete(additionalSymptomsInput);
+                    console.log('✅ Symptom autocomplete initialized for additional symptoms');
+                }
+            } else {
+                console.warn('⚠️ SymptomAutocomplete not available');
+            }
+
+            console.log('🎉 Performance optimizations initialized successfully!');
+        }
+    </script>
+</body>
+</html>

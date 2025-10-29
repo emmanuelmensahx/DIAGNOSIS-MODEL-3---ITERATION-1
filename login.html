@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1E88E5, #42A5F5, #FF9800);
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(30, 136, 229, 0.3);
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1E88E5;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #1E88E5;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-group input::placeholder {
+            color: #999;
+            font-size: 15px;
+        }
+        
+        .demo-users {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .demo-users h3 {
+            color: #1E88E5;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .demo-user {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-user:hover {
+            border-color: #1E88E5;
+            box-shadow: 0 2px 8px rgba(30, 136, 229, 0.1);
+        }
+        
+        .demo-user.selected {
+            border-color: #1E88E5;
+            background: #e3f2fd;
+        }
+        
+        .demo-user-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .demo-user-role {
+            font-size: 12px;
+            color: #1E88E5;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .demo-user-email {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 25px 0 20px 0;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+        
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 136, 229, 0.4);
+        }
+        
+        .login-btn:hover::before {
+            left: 100%;
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .login-btn:disabled::before {
+            display: none;
+        }
+        
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .quick-access {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .quick-access h3 {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .quick-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-link {
+            flex: 1;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #1E88E5;
+            font-size: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-link:hover {
+            background: #e3f2fd;
+            border-color: #1E88E5;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1E88E5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🩺</div>
+        <h1 class="title">AfriDiag</h1>
+        <p class="subtitle">AI-Driven Diagnosis Platform</p>
+        
+        <div id="status" class="status"></div>
+        
+        <form id="loginForm">
+            <div class="demo-users">
+                <h3>👥 Quick Select Demo Users</h3>
+                <div class="demo-user" data-email="worker@afridiag.com" data-password="demo123">
+                    <div class="demo-user-name">Healthcare Worker</div>
+                    <div class="demo-user-role">Frontline Worker</div>
+                    <div class="demo-user-email">worker@afridiag.com</div>
+                </div>
+                <div class="demo-user" data-email="specialist@afridiag.com" data-password="demo123">
+                    <div class="demo-user-name">Medical Specialist</div>
+                    <div class="demo-user-role">Specialist</div>
+                    <div class="demo-user-email">specialist@afridiag.com</div>
+                </div>
+                <div class="demo-user" data-email="admin@afridiag.org" data-password="admin123">
+                    <div class="demo-user-name">System Administrator</div>
+                    <div class="demo-user-role">Admin</div>
+                    <div class="demo-user-email">admin@afridiag.org</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username (Email)</label>
+                <input type="email" id="username" name="username" placeholder="Enter your email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                🔐 Login to AfriDiag
+            </button>
+        </form>
+        
+        <div class="quick-access">
+            <h3>Quick Access After Login</h3>
+            <div class="quick-links">
+                <a href="diagnosis_screen.html" class="quick-link">🩺 Diagnosis</a>
+                <a href="patient_management.html" class="quick-link">👥 Patients</a>
+                <a href="test_connection.html" class="quick-link">🔧 Test</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:8001/api/v1';
+        let authToken = null;
+
+        // Demo user selection
+        document.querySelectorAll('.demo-user').forEach(user => {
+            user.addEventListener('click', function() {
+                // Remove selection from all users
+                document.querySelectorAll('.demo-user').forEach(u => u.classList.remove('selected'));
+                // Add selection to clicked user
+                this.classList.add('selected');
+                
+                // Fill form with selected user data
+                document.getElementById('username').value = this.dataset.email;
+                document.getElementById('password').value = this.dataset.password;
+            });
+        });
+
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const statusDiv = document.getElementById('status');
+            
+            if (!username || !password) {
+                showStatus('Please enter both username and password', 'error');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading"></span>Logging in...';
+            showStatus('Authenticating...', 'info');
+            
+            try {
+                // Prepare form data for OAuth2PasswordRequestForm
+                const formData = new URLSearchParams();
+                formData.append('username', username);
+                formData.append('password', password);
+                
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.access_token) {
+                    authToken = data.access_token;
+                    
+                    // Store token in localStorage for other pages (both keys for compatibility)
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('access_token', authToken);
+                    localStorage.setItem('userEmail', username);
+                    
+                    showStatus('✅ Login successful! Getting user info...', 'success');
+                    
+                    // Get user role to determine redirect destination
+                    try {
+                        const userResponse = await fetch(`${API_BASE}/auth/me`, {
+                            headers: {
+                                'Authorization': `Bearer ${authToken}`
+                            }
+                        });
+                        
+                        if (userResponse.ok) {
+                            const userData = await userResponse.json();
+                            const userRole = userData.role;
+                            
+                            // Store user role for other pages
+                            localStorage.setItem('userRole', userRole);
+                            
+                            showStatus('✅ Login successful! Redirecting...', 'success');
+                            
+                            // Role-based redirection
+                            setTimeout(() => {
+                                if (userRole === 'specialist') {
+                                    window.location.href = 'specialist_dashboard.html';
+                                } else {
+                                    window.location.href = 'index.html';
+                                }
+                            }, 2000);
+                        } else {
+                            // Fallback to general home page if user info fetch fails
+                            showStatus('✅ Login successful! Redirecting...', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 2000);
+                        }
+                    } catch (error) {
+                        // Fallback to general home page if user info fetch fails
+                        showStatus('✅ Login successful! Redirecting...', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 2000);
+                    }
+                    
+                } else {
+                    showStatus(`❌ Login failed: ${data.detail || 'Invalid credentials'}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showStatus(`❌ Login error: ${error.message}`, 'error');
+            } finally {
+                // Reset button state
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '🔐 Login to AfriDiag';
+            }
+        });
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide success/info messages after 5 seconds
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', function() {
+            const existingToken = localStorage.getItem('authToken');
+            const userEmail = localStorage.getItem('userEmail');
+            
+            if (existingToken && userEmail) {
+                showStatus(`Already logged in as ${userEmail}. Click below to access the system.`, 'info');
+            }
+        });
+    </script>
+</body>
+</html>

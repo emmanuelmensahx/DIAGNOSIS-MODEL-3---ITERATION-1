@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Display Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .test-title {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .test-message {
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #f0f0f0;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .navigation-links {
+            margin-top: 30px;
+        }
+        
+        .nav-link {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .system-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-title">🏥 AfriDiag</div>
+        <div class="test-message">
+            <span class="status-indicator"></span>
+            System Display Test - SUCCESS!
+        </div>
+        
+        <p>If you can see this page with colors and styling, the server is working correctly.</p>
+        
+        <div class="navigation-links">
+            <a href="index.html" class="nav-link">🏠 Main Dashboard</a>
+            <a href="patients_screen.html" class="nav-link">👥 Patients</a>
+            <a href="new_patient_screen.html" class="nav-link">➕ New Patient</a>
+            <a href="diagnosis_screen.html" class="nav-link">🔬 Diagnosis</a>
+            <a href="patients_minimal.html" class="nav-link">📋 Minimal View</a>
+        </div>
+        
+        <div class="system-info">
+            <div>✅ HTML: Loaded</div>
+            <div>✅ CSS: Applied</div>
+            <div>✅ JavaScript: <span id="js-status">Loading...</span></div>
+            <div>✅ Server: Active on port 8080</div>
+            <div>🌐 URL: <span id="current-url"></span></div>
+        </div>
+    </div>
+    
+    <script>
+        // Test JavaScript functionality
+        document.getElementById('js-status').textContent = 'Working!';
+        document.getElementById('current-url').textContent = window.location.href;
+        
+        // Add a visual confirmation
+        console.log('✅ AfriDiag Display Test - JavaScript is working!');
+        
+        // Add click handlers for navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                console.log('Navigating to:', this.href);
+            });
+        });
+        
+        // Add a floating success indicator
+        const floatingIndicator = document.createElement('div');
+        floatingIndicator.innerHTML = '✅ DISPLAY OK';
+        floatingIndicator.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            z-index: 9999;
+            animation: slideIn 0.5s ease;
+        `;
+        document.body.appendChild(floatingIndicator);
+        
+        // Add slideIn animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

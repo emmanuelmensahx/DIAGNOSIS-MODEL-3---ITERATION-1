@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 AfriDiag Connection Test</h1>
+        <p>This page tests the connection between frontend and backend.</p>
+
+        <div class="test-section info">
+            <h3>📋 Test Configuration</h3>
+            <p><strong>Backend URL:</strong> <span id="backend-url">http://localhost:8001</span></p>
+            <p><strong>API Base:</strong> <span id="api-base">http://localhost:8001/api/v1</span></p>
+            <p><strong>Frontend Server:</strong> <span id="frontend-url">http://localhost:8080</span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>🏥 Backend Health Check</h3>
+            <button onclick="testBackendHealth()">Test Backend Health</button>
+            <div id="health-result" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔐 Authentication Test</h3>
+            <button onclick="testAuthentication()">Test Login</button>
+            <div id="auth-result" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🩺 AI Prediction Test</h3>
+            <button onclick="testAIPrediction()">Test AI Prediction</button>
+            <div id="ai-result" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Complete Workflow Test</h3>
+            <button onclick="runCompleteTest()">Run All Tests</button>
+            <div id="complete-result" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api/v1';
+        let authToken = null;
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}\n`;
+            element.textContent += logMessage;
+            element.scrollTop = element.scrollHeight;
+            
+            // Update parent section styling
+            const section = element.closest('.test-section');
+            section.className = 'test-section ' + type;
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).textContent = '';
+            const section = document.getElementById(elementId).closest('.test-section');
+            section.className = 'test-section';
+        }
+
+        async function testBackendHealth() {
+            clearLog('health-result');
+            log('health-result', '🔍 Testing backend health...');
+            
+            try {
+                const response = await fetch(`${API_BASE.replace('/api/v1', '')}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('health-result', `✅ Backend is healthy: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    log('health-result', `❌ Backend health check failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log('health-result', `❌ Connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAuthentication() {
+            clearLog('auth-result');
+            log('auth-result', '🔐 Testing authentication...');
+            
+            try {
+                // Backend expects OAuth2PasswordRequestForm with form data
+                const formData = new URLSearchParams();
+                formData.append('username', 'worker@afridiag.com');  // Use username field, not email
+                formData.append('password', 'demo123');
+
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.access_token) {
+                    authToken = data.access_token;
+                    log('auth-result', `✅ Authentication successful!`, 'success');
+                    log('auth-result', `Token: ${authToken.substring(0, 20)}...`);
+                } else {
+                    log('auth-result', `❌ Authentication failed: ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log('auth-result', `❌ Authentication error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAIPrediction() {
+            clearLog('ai-result');
+            log('ai-result', '🩺 Testing AI prediction...');
+            
+            if (!authToken) {
+                log('ai-result', '⚠️ No auth token. Running authentication first...', 'info');
+                await testAuthentication();
+                if (!authToken) {
+                    log('ai-result', '❌ Cannot test AI without authentication', 'error');
+                    return;
+                }
+            }
+
+            try {
+                const testSymptoms = {
+                    symptoms: [
+                        "High fever (39.5°C)",
+                        "Chills and sweating",
+                        "Headache",
+                        "Muscle aches",
+                        "Nausea and vomiting",
+                        "Fatigue"
+                    ],
+                    patient_info: {
+                        age: 35,
+                        gender: "male",
+                        location: "Uganda"
+                    }
+                };
+
+                log('ai-result', `Sending symptoms: ${JSON.stringify(testSymptoms, null, 2)}`);
+
+                const response = await fetch(`${API_BASE}/predict/enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(testSymptoms)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('ai-result', `✅ AI prediction successful!`, 'success');
+                    log('ai-result', `Result: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    log('ai-result', `❌ AI prediction failed: ${response.status}`, 'error');
+                    log('ai-result', `Error: ${JSON.stringify(data, null, 2)}`);
+                }
+            } catch (error) {
+                log('ai-result', `❌ AI prediction error: ${error.message}`, 'error');
+            }
+        }
+
+        async function runCompleteTest() {
+            clearLog('complete-result');
+            log('complete-result', '🚀 Running complete workflow test...');
+            
+            // Test 1: Backend Health
+            log('complete-result', '\n--- Test 1: Backend Health ---');
+            try {
+                const healthResponse = await fetch(`${API_BASE.replace('/api/v1', '')}/health`);
+                const healthData = await healthResponse.json();
+                if (healthResponse.ok) {
+                    log('complete-result', '✅ Backend health: PASS');
+                } else {
+                    log('complete-result', '❌ Backend health: FAIL');
+                    return;
+                }
+            } catch (error) {
+                log('complete-result', `❌ Backend health: FAIL - ${error.message}`);
+                return;
+            }
+
+            // Test 2: Authentication
+            log('complete-result', '\n--- Test 2: Authentication ---');
+            try {
+                const formData = new URLSearchParams();
+                formData.append('username', 'worker@afridiag.com');
+                formData.append('password', 'demo123');
+
+                const authResponse = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                const authData = await authResponse.json();
+                if (authResponse.ok && authData.access_token) {
+                    authToken = authData.access_token;
+                    log('complete-result', '✅ Authentication: PASS');
+                } else {
+                    log('complete-result', '❌ Authentication: FAIL');
+                    return;
+                }
+            } catch (error) {
+                log('complete-result', `❌ Authentication: FAIL - ${error.message}`);
+                return;
+            }
+
+            // Test 3: AI Prediction
+            log('complete-result', '\n--- Test 3: AI Prediction ---');
+            try {
+                const predictionResponse = await fetch(`${API_BASE}/predict/enhanced`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        symptoms: ["fever", "headache", "chills"],
+                        patient_info: { age: 35, gender: "male", location: "Uganda" }
+                    })
+                });
+                const predictionData = await predictionResponse.json();
+                if (predictionResponse.ok) {
+                    log('complete-result', '✅ AI Prediction: PASS');
+                    log('complete-result', `Predicted: ${predictionData.predicted_disease || 'N/A'}`);
+                } else {
+                    log('complete-result', '❌ AI Prediction: FAIL');
+                }
+            } catch (error) {
+                log('complete-result', `❌ AI Prediction: FAIL - ${error.message}`);
+            }
+
+            log('complete-result', '\n🎉 Complete workflow test finished!', 'success');
+        }
+
+        // Auto-run health check on page load
+        window.addEventListener('load', () => {
+            setTimeout(testBackendHealth, 1000);
+        });
+    </script>
+</body>
+</html>

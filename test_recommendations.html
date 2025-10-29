@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Specialist Recommendations</title>
+    <script src="/frontend/specialist_database.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .recommendation-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .match-score {
+            background: #4CAF50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Specialist Recommendation System Test</h1>
+        
+        <div class="test-section">
+            <h3>Test 1: Cardiac Diagnosis</h3>
+            <div id="test1-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 2: Neurological Diagnosis</h3>
+            <div id="test2-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 3: Pediatric Diagnosis</h3>
+            <div id="test3-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Database Status</h3>
+            <div id="database-status"></div>
+        </div>
+    </div>
+
+    <script>
+        function displayRecommendations(recommendations, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (!recommendations || recommendations.length === 0) {
+                container.innerHTML = '<p style="color: red;">No recommendations found</p>';
+                return;
+            }
+            
+            const html = recommendations.map(rec => `
+                <div class="recommendation-card">
+                    <strong>${rec.name}</strong> - ${rec.specialization}<br>
+                    <small>${rec.location} • ${rec.experience} years • 
+                    <span class="match-score">${Math.round(rec.matchScore)}% match</span></small><br>
+                    <em>${rec.recommendationReason}</em>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function runTests() {
+            try {
+                const specialistDb = new SpecialistDatabase();
+                
+                // Test database status
+                const allSpecialists = specialistDb.getAllSpecialists();
+                document.getElementById('database-status').innerHTML = 
+                    `<p style="color: green;">✓ Database loaded successfully with ${allSpecialists.length} specialists</p>`;
+                
+                // Test 1: Cardiac diagnosis
+                const cardiacDiagnosis = {
+                    primary_diagnosis: "Acute Myocardial Infarction",
+                    ai_diagnosis: "Heart attack",
+                    symptoms: ["chest pain", "shortness of breath", "nausea"],
+                    patient: { age: 55 }
+                };
+                const cardiacRecs = specialistDb.recommendSpecialists(cardiacDiagnosis);
+                displayRecommendations(cardiacRecs, 'test1-results');
+                
+                // Test 2: Neurological diagnosis
+                const neuroDiagnosis = {
+                    primary_diagnosis: "Migraine",
+                    ai_diagnosis: "Severe headache",
+                    symptoms: ["headache", "nausea", "light sensitivity"],
+                    patient: { age: 35 }
+                };
+                const neuroRecs = specialistDb.recommendSpecialists(neuroDiagnosis);
+                displayRecommendations(neuroRecs, 'test2-results');
+                
+                // Test 3: Pediatric diagnosis
+                const pediatricDiagnosis = {
+                    primary_diagnosis: "Asthma",
+                    ai_diagnosis: "Breathing difficulties",
+                    symptoms: ["wheezing", "cough", "shortness of breath"],
+                    patient: { age: 8 }
+                };
+                const pediatricRecs = specialistDb.recommendSpecialists(pediatricDiagnosis);
+                displayRecommendations(pediatricRecs, 'test3-results');
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                document.getElementById('database-status').innerHTML = 
+                    `<p style="color: red;">✗ Error: ${error.message}</p>`;
+            }
+        }
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

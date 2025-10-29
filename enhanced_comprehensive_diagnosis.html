@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced AI Comprehensive Diagnosis - AfriDiag</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .ai-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-badge::before {
+            content: '🤖';
+            font-size: 1.2em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            border-color: #2a5298;
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            color: #2a5298;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: #2a5298;
+            margin-right: 12px;
+            border-radius: 2px;
+        }
+
+        .patient-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .symptom-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .symptom-item:hover {
+            border-color: #2a5298;
+            background: #f8f9ff;
+        }
+
+        .symptom-item.selected {
+            border-color: #4caf50;
+            background: #e8f5e8;
+        }
+
+        .symptom-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: auto;
+        }
+
+        .ai-enhancement-section {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+            border: 2px solid #4caf50;
+            position: relative;
+        }
+
+        .ai-enhancement-section::before {
+            content: '🤖 AI ENHANCED';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #4caf50;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(30px);
+        }
+
+        .ai-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .ai-feature {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .ai-feature h4 {
+            color: #2a5298;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-feature p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2a5298;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 600;
+            display: none;
+        }
+
+        .status.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            display: none;
+        }
+
+        .result h3 {
+            color: #2a5298;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .diagnosis-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f44336 0%, #ff9800 50%, #4caf50 100%);
+            transition: width 0.3s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .file-upload {
+            border: 2px dashed #2a5298;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: #1e3c72;
+            background: #f0f4ff;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .uploaded-files {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            border: 1px solid #4caf50;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .symptoms-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="ai-badge">AI Enhanced</div>
+            <h1>🏥 Enhanced AI Comprehensive Diagnosis</h1>
+            <p>Advanced medical diagnosis powered by Google Gemini AI</p>
+        </div>
+
+        <div class="content">
+            <!-- Patient Information -->
+            <div class="patient-info">
+                <h3>👤 Patient Information</h3>
+                <div id="patientDetails">
+                    <strong>Loading patient data...</strong>
+                </div>
+            </div>
+
+            <!-- AI Enhancement Section -->
+            <div class="section ai-enhancement-section">
+                <div class="section-title">🤖 AI Enhancement Settings</div>
+                
+                <div class="toggle-container">
+                    <label for="useEnhancedAI">Enable Enhanced AI Analysis:</label>
+                    <div class="toggle-switch active" id="toggleSwitch" onclick="toggleAI()"></div>
+                    <input type="checkbox" id="useEnhancedAI" checked style="display: none;">
+                    <span style="color: #4caf50; font-weight: 600;">ENABLED</span>
+                </div>
+
+                <div class="ai-features">
+                    <div class="ai-feature">
+                        <h4>🧠 Advanced Reasoning</h4>
+                        <p>Deep clinical analysis using Google Gemini AI for complex diagnostic reasoning</p>
+                    </div>
+                    <div class="ai-feature">
+                        <h4>🌍 Cultural Context</h4>
+                        <p>Culturally-aware recommendations tailored for African healthcare settings</p>
+                    </div>
+                    <div class="ai-feature">
+                        <h4>⚡ Real-time Analysis</h4>
+                        <p>Instant comprehensive diagnosis with confidence scoring and validation</p>
+                    </div>
+                    <div class="ai-feature">
+                        <h4>🎯 Differential Diagnosis</h4>
+                        <p>Multiple diagnostic possibilities with detailed clinical reasoning</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Symptoms Section -->
+            <div class="section">
+                <div class="section-title">🩺 Symptoms Assessment</div>
+                
+                <div class="form-group">
+                    <label for="primarySymptoms">Primary Symptoms (Select all that apply):</label>
+                    <div class="symptoms-grid" id="symptomsGrid">
+                        <!-- Symptoms will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalSymptoms">Additional Symptoms or Details:</label>
+                    <textarea id="additionalSymptoms" placeholder="Describe any additional symptoms, their duration, severity, or other relevant details..."></textarea>
+                </div>
+            </div>
+
+            <!-- Vital Signs -->
+            <div class="section">
+                <div class="section-title">📊 Vital Signs & Measurements</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="temperature">Temperature (°C):</label>
+                        <input type="number" id="temperature" step="0.1" placeholder="e.g., 37.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="heartRate">Heart Rate (bpm):</label>
+                        <input type="number" id="heartRate" placeholder="e.g., 80">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="respiratoryRate">Respiratory Rate (breaths/min):</label>
+                        <input type="number" id="respiratoryRate" placeholder="e.g., 16">
+                    </div>
+                    <div class="form-group">
+                        <label for="oxygenSaturation">Oxygen Saturation (%):</label>
+                        <input type="number" id="oxygenSaturation" min="0" max="100" placeholder="e.g., 98">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="systolicBP">Systolic BP (mmHg):</label>
+                        <input type="number" id="systolicBP" placeholder="e.g., 120">
+                    </div>
+                    <div class="form-group">
+                        <label for="diastolicBP">Diastolic BP (mmHg):</label>
+                        <input type="number" id="diastolicBP" placeholder="e.g., 80">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical History -->
+            <div class="section">
+                <div class="section-title">📋 Medical History & Context</div>
+                
+                <div class="form-group">
+                    <label for="medicalHistory">Medical History:</label>
+                    <textarea id="medicalHistory" placeholder="Previous illnesses, chronic conditions, medications, allergies, family history..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="diseaseType">Suspected Disease Category:</label>
+                        <select id="diseaseType">
+                            <option value="">Select if known...</option>
+                            <option value="malaria">Malaria</option>
+                            <option value="tuberculosis">Tuberculosis</option>
+                            <option value="pneumonia">Pneumonia</option>
+                            <option value="lung_cancer">Lung Cancer</option>
+                            <option value="gastroenteritis">Gastroenteritis</option>
+                            <option value="other">Other/Unknown</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="urgencyLevel">Urgency Level:</label>
+                        <select id="urgencyLevel">
+                            <option value="routine">Routine</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="clinicalNotes">Clinical Notes:</label>
+                    <textarea id="clinicalNotes" placeholder="Additional observations, examination findings, or clinical notes..."></textarea>
+                </div>
+            </div>
+
+            <!-- Medical Images -->
+            <div class="section">
+                <div class="section-title">📸 Medical Images (Optional)</div>
+                
+                <div class="file-upload" onclick="document.getElementById('medicalImages').click()">
+                    <input type="file" id="medicalImages" multiple accept="image/*" onchange="handleFileUpload(event)">
+                    <div class="file-upload-text">
+                        📁 Click to upload medical images (X-rays, photos, etc.)
+                    </div>
+                    <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                        Supported formats: JPG, PNG, GIF (Max 5MB each)
+                    </p>
+                </div>
+                <div id="uploadedFiles" class="uploaded-files hidden"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="button" class="submit-btn" id="submitBtn" onclick="submitDiagnosis()">
+                🤖 Generate Enhanced AI Diagnosis
+            </button>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>🤖 AI is analyzing the case... This may take a few moments.</p>
+            </div>
+
+            <!-- Status -->
+            <div class="status" id="status"></div>
+
+            <!-- Results -->
+            <div class="result" id="result">
+                <h3>🎯 Enhanced AI Diagnosis Results</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPatient = null;
+        let uploadedImages = [];
+
+        // Common symptoms for quick selection
+        const commonSymptoms = [
+            'fever', 'headache', 'cough', 'fatigue', 'nausea', 'vomiting',
+            'diarrhea', 'abdominal_pain', 'chest_pain', 'shortness_of_breath',
+            'dizziness', 'muscle_pain', 'joint_pain', 'sore_throat',
+            'runny_nose', 'loss_of_appetite', 'weight_loss', 'night_sweats',
+            'chills', 'rash', 'swelling', 'difficulty_swallowing'
+        ];
+
+        // Auto-login function
+        async function autoLogin() {
+            try {
+                const formData = new URLSearchParams();
+                formData.append('username', 'frontline@afridiag.org');
+                formData.append('password', 'frontline123');
+
+                const response = await fetch('http://127.0.0.1:8001/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('token', data.access_token);
+                    console.log('✅ Auto-login successful');
+                    loadMockPatient();
+                } else {
+                    showStatus('❌ Authentication failed. Please check backend connection.', 'error');
+                }
+            } catch (error) {
+                console.error('Auto-login error:', error);
+                showStatus('❌ Connection error. Please ensure backend is running.', 'error');
+            }
+        }
+
+        // Load mock patient data
+        function loadMockPatient() {
+            currentPatient = {
+                id: 1,
+                first_name: 'John',
+                last_name: 'Doe',
+                age: 45,
+                gender: 'Male',
+                phone: '+1234567890'
+            };
+            updatePatientInfo();
+            populateSymptoms();
+        }
+
+        function updatePatientInfo() {
+            if (currentPatient) {
+                document.getElementById('patientDetails').innerHTML = `
+                    <strong>${currentPatient.first_name} ${currentPatient.last_name}</strong> | 
+                    Age: ${currentPatient.age} | 
+                    Gender: ${currentPatient.gender} | 
+                    Phone: ${currentPatient.phone || 'N/A'}
+                `;
+            }
+        }
+
+        function populateSymptoms() {
+            const symptomsGrid = document.getElementById('symptomsGrid');
+            symptomsGrid.innerHTML = '';
+
+            commonSymptoms.forEach(symptom => {
+                const symptomDiv = document.createElement('div');
+                symptomDiv.className = 'symptom-item';
+                symptomDiv.onclick = () => toggleSymptom(symptom, symptomDiv);
+
+                symptomDiv.innerHTML = `
+                    <input type="checkbox" id="symptom_${symptom}" value="${symptom}">
+                    <label for="symptom_${symptom}">${symptom.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</label>
+                `;
+
+                symptomsGrid.appendChild(symptomDiv);
+            });
+        }
+
+        function toggleSymptom(symptom, element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            element.classList.toggle('selected', checkbox.checked);
+        }
+
+        function toggleAI() {
+            const checkbox = document.getElementById('useEnhancedAI');
+            const toggleSwitch = document.getElementById('toggleSwitch');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                toggleSwitch.classList.add('active');
+                submitBtn.innerHTML = '🤖 Generate Enhanced AI Diagnosis';
+            } else {
+                toggleSwitch.classList.remove('active');
+                submitBtn.innerHTML = '📊 Generate Standard Diagnosis';
+            }
+        }
+
+        function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            uploadedImages = files;
+
+            const uploadedFilesDiv = document.getElementById('uploadedFiles');
+            
+            if (files.length > 0) {
+                uploadedFilesDiv.classList.remove('hidden');
+                uploadedFilesDiv.innerHTML = `
+                    <h4>📁 Uploaded Files (${files.length}):</h4>
+                    ${files.map(file => `<p>• ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</p>`).join('')}
+                `;
+            } else {
+                uploadedFilesDiv.classList.add('hidden');
+            }
+        }
+
+        async function submitDiagnosis() {
+            if (!currentPatient) {
+                showStatus('❌ No patient selected', 'error');
+                return;
+            }
+
+            // Collect selected symptoms
+            const selectedSymptoms = Array.from(document.querySelectorAll('#symptomsGrid input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            // Add additional symptoms
+            const additionalSymptoms = document.getElementById('additionalSymptoms').value.trim();
+            if (additionalSymptoms) {
+                selectedSymptoms.push(additionalSymptoms);
+            }
+
+            if (selectedSymptoms.length === 0) {
+                showStatus('❌ Please select at least one symptom', 'error');
+                return;
+            }
+
+            const useEnhancedAI = document.getElementById('useEnhancedAI').checked;
+            
+            // Prepare comprehensive diagnosis data
+            const diagnosisData = {
+                patient_id: currentPatient.id,
+                disease_type: document.getElementById('diseaseType').value || 'other',
+                symptoms: JSON.stringify(selectedSymptoms),
+                notes: document.getElementById('clinicalNotes').value || '',
+                patient_data: {
+                    age: currentPatient.age,
+                    gender: currentPatient.gender,
+                    temperature: parseFloat(document.getElementById('temperature').value) || null,
+                    heart_rate: parseInt(document.getElementById('heartRate').value) || null,
+                    respiratory_rate: parseInt(document.getElementById('respiratoryRate').value) || null,
+                    systolic_bp: parseInt(document.getElementById('systolicBP').value) || null,
+                    diastolic_bp: parseInt(document.getElementById('diastolicBP').value) || null,
+                    oxygen_saturation: parseFloat(document.getElementById('oxygenSaturation').value) || null
+                },
+                medical_history: document.getElementById('medicalHistory').value || '',
+                urgency_level: document.getElementById('urgencyLevel').value || 'routine',
+                medical_images: uploadedImages.map(file => file.name)
+            };
+
+            console.log('Submitting enhanced diagnosis:', {
+                ...diagnosisData,
+                using_enhanced_ai: useEnhancedAI,
+                symptoms_count: selectedSymptoms.length,
+                images_count: uploadedImages.length
+            });
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            
+            try {
+                const endpoint = useEnhancedAI ? 
+                    'http://127.0.0.1:8001/api/v1/diagnoses/enhanced' : 
+                    'http://127.0.0.1:8001/api/v1/diagnoses/predict';
+                
+                const token = localStorage.getItem('token');
+                const medicalHistory = encodeURIComponent(diagnosisData.medical_history);
+                const finalEndpoint = useEnhancedAI ? 
+                    `${endpoint}?medical_history=${medicalHistory}` : 
+                    endpoint;
+
+                const response = await fetch(finalEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(diagnosisData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showStatus('✅ Enhanced AI diagnosis completed successfully!', 'success');
+                    displayEnhancedResults(result, useEnhancedAI);
+                } else {
+                    showStatus(`❌ Error: ${result.detail || 'Diagnosis failed'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Diagnosis error:', error);
+                showStatus('❌ Connection error. Please check if the backend is running.', 'error');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        function displayEnhancedResults(result, isEnhanced) {
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            
+            let content = '';
+            
+            if (isEnhanced && result.ai_diagnosis) {
+                // Enhanced AI results
+                const confidence = result.ai_confidence || 0;
+                let confidencePercent;
+                // Check if confidence is already a percentage (> 1) or decimal (0-1)
+                if (confidence > 1) {
+                    confidencePercent = Math.round(confidence);
+                } else {
+                    confidencePercent = Math.round(confidence * 100);
+                }
+                // Ensure confidence is within reasonable bounds (10-95%)
+                confidencePercent = Math.max(10, Math.min(95, confidencePercent));
+                
+                content = `
+                    <div class="diagnosis-card">
+                        <h4>🤖 AI-Enhanced Diagnosis</h4>
+                        <p><strong>Primary Diagnosis:</strong> ${result.ai_diagnosis}</p>
+                        <p><strong>Confidence Level:</strong> ${confidencePercent}%</p>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${confidencePercent}%"></div>
+                        </div>
+                        <p><strong>Clinical Reasoning:</strong> ${result.ai_reasoning || 'Advanced AI analysis completed'}</p>
+                    </div>
+                `;
+
+                // Add enhanced analysis if available
+                if (result.enhanced_analysis) {
+                    content += `
+                        <div class="diagnosis-card" style="border-left-color: #4caf50;">
+                            <h4>🧠 Detailed AI Analysis</h4>
+                            <p><strong>Diagnosis:</strong> ${result.enhanced_analysis.diagnosis || 'N/A'}</p>
+                            <p><strong>Differential Diagnoses:</strong> ${result.enhanced_analysis.differential_diagnoses || 'N/A'}</p>
+                            <p><strong>Treatment Recommendations:</strong> ${result.enhanced_analysis.treatment_recommendations || 'N/A'}</p>
+                            <p><strong>Cultural Considerations:</strong> ${result.enhanced_analysis.cultural_considerations || 'N/A'}</p>
+                        </div>
+                    `;
+                }
+
+                // Add validation status if available
+                if (result.validation_status) {
+                    const validation = result.validation_status;
+                    content += `
+                        <div class="diagnosis-card" style="border-left-color: #2196F3;">
+                            <h4>🔍 Validation & Quality Assessment</h4>
+                            <p><strong>Validation Status:</strong> ${validation.is_valid ? '✅ Valid' : '❌ Invalid'}</p>
+                            <p><strong>Quality Score:</strong> ${validation.quality_score || 'N/A'}</p>
+                            ${validation.warnings ? `<p><strong>Warnings:</strong> ${validation.warnings}</p>` : ''}
+                            ${validation.recommendations ? `<p><strong>Recommendations:</strong> ${validation.recommendations}</p>` : ''}
+                        </div>
+                    `;
+                }
+            } else if (result.prediction) {
+                // Standard prediction results
+                content = `
+                    <div class="diagnosis-card">
+                        <h4>📊 Standard AI Prediction</h4>
+                        <p><strong>Disease:</strong> ${result.prediction.disease || 'N/A'}</p>
+                        <p><strong>Confidence:</strong> ${(() => {
+                            if (!result.prediction.confidence) return 'N/A';
+                            let confValue = result.prediction.confidence;
+                            if (confValue > 1) {
+                                return Math.round(confValue) + '%';
+                            } else {
+                                return Math.round(confValue * 100) + '%';
+                            }
+                        })()}</p>
+                        <p><strong>Risk Level:</strong> ${result.prediction.risk_level || 'N/A'}</p>
+                    </div>
+                `;
+            }
+            
+            if (result.diagnosis_id) {
+                content += `
+                    <div style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 6px;">
+                        <p><strong>Diagnosis ID:</strong> ${result.diagnosis_id}</p>
+                        <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+                    </div>
+                `;
+            }
+            
+            resultContent.innerHTML = content;
+            resultDiv.style.display = 'block';
+            
+            // Scroll to results
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            autoLogin();
+        });
+    </script>
+</body>
+</html>

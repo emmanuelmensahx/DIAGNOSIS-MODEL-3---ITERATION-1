@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Loading Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Module Loading Diagnostic Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Console Logs</h2>
+        <pre id="console-logs"></pre>
+    </div>
+
+    <script>
+        const results = document.getElementById('test-results');
+        const consoleLogs = document.getElementById('console-logs');
+        let logOutput = '';
+
+        // Override console methods to capture logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        function addLog(type, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            logOutput += `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            consoleLogs.textContent = logOutput;
+        }
+
+        console.log = (...args) => {
+            originalLog(...args);
+            addLog('log', ...args);
+        };
+
+        console.error = (...args) => {
+            originalError(...args);
+            addLog('error', ...args);
+        };
+
+        console.warn = (...args) => {
+            originalWarn(...args);
+            addLog('warn', ...args);
+        };
+
+        function addResult(test, status, message) {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <strong>${test}:</strong> 
+                <span class="${status}">${status.toUpperCase()}</span> - ${message}
+            `;
+            results.appendChild(div);
+        }
+
+        // Test 1: Basic JavaScript functionality
+        try {
+            const testArray = [1, 2, 3];
+            const testResult = testArray.map(x => x * 2);
+            addResult('Basic JavaScript', 'success', 'Array methods working correctly');
+            console.log('✅ Basic JavaScript test passed');
+        } catch (error) {
+            addResult('Basic JavaScript', 'error', error.message);
+            console.error('❌ Basic JavaScript test failed:', error);
+        }
+
+        // Test 2: ES6 Module syntax support
+        try {
+            // Test if we can use ES6 features
+            const testObj = { a: 1, b: 2 };
+            const { a, ...rest } = testObj;
+            addResult('ES6 Support', 'success', 'Destructuring and spread operator working');
+            console.log('✅ ES6 support test passed');
+        } catch (error) {
+            addResult('ES6 Support', 'error', error.message);
+            console.error('❌ ES6 support test failed:', error);
+        }
+
+        // Test 3: Check if React is available
+        try {
+            if (typeof React !== 'undefined') {
+                addResult('React Availability', 'success', 'React is loaded and available');
+                console.log('✅ React is available:', React.version);
+            } else {
+                addResult('React Availability', 'warning', 'React not found in global scope');
+                console.warn('⚠️ React not found in global scope');
+            }
+        } catch (error) {
+            addResult('React Availability', 'error', error.message);
+            console.error('❌ React availability test failed:', error);
+        }
+
+        // Test 4: Check if ReactDOM is available
+        try {
+            if (typeof ReactDOM !== 'undefined') {
+                addResult('ReactDOM Availability', 'success', 'ReactDOM is loaded and available');
+                console.log('✅ ReactDOM is available');
+            } else {
+                addResult('ReactDOM Availability', 'warning', 'ReactDOM not found in global scope');
+                console.warn('⚠️ ReactDOM not found in global scope');
+            }
+        } catch (error) {
+            addResult('ReactDOM Availability', 'error', error.message);
+            console.error('❌ ReactDOM availability test failed:', error);
+        }
+
+        // Test 5: Try to load a simple React component
+        try {
+            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined') {
+                const TestComponent = React.createElement('div', {
+                    style: { padding: '10px', background: '#e8f5e8', borderRadius: '4px', margin: '10px 0' }
+                }, '🎉 React component rendered successfully!');
+                
+                const testContainer = document.createElement('div');
+                testContainer.id = 'react-test-container';
+                document.body.appendChild(testContainer);
+                
+                const root = ReactDOM.createRoot(testContainer);
+                root.render(TestComponent);
+                
+                addResult('React Component Rendering', 'success', 'Simple React component rendered');
+                console.log('✅ React component rendering test passed');
+            } else {
+                addResult('React Component Rendering', 'warning', 'Skipped - React/ReactDOM not available');
+                console.warn('⚠️ React component rendering test skipped');
+            }
+        } catch (error) {
+            addResult('React Component Rendering', 'error', error.message);
+            console.error('❌ React component rendering test failed:', error);
+        }
+
+        // Test 6: Check for common module loading errors
+        console.log('🔍 Checking for common module loading issues...');
+        
+        // Check if we're in a proper web environment
+        if (typeof window !== 'undefined') {
+            console.log('✅ Window object available');
+            addResult('Web Environment', 'success', 'Running in proper web environment');
+        } else {
+            console.error('❌ Window object not available');
+            addResult('Web Environment', 'error', 'Not running in web environment');
+        }
+
+        // Check for webpack/bundler issues
+        if (typeof __webpack_require__ !== 'undefined') {
+            console.log('✅ Webpack bundler detected');
+            addResult('Bundler Detection', 'success', 'Webpack bundler is active');
+        } else {
+            console.log('ℹ️ No webpack bundler detected (might be using different bundler)');
+            addResult('Bundler Detection', 'info', 'No webpack detected (using different bundler)');
+        }
+
+        console.log('🏁 Module loading diagnostic test completed');
+    </script>
+</body>
+</html>

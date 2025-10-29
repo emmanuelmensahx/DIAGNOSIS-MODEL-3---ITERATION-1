@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Treatment Guide</title>
+    <link rel="stylesheet" href="css/navigation.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #FF9800, #FFB74D);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .search-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #FF9800;
+        }
+        
+        .filter-select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            min-width: 150px;
+        }
+        
+        .search-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #FF9800, #FFB74D);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .categories-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .category-card {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .category-card.active {
+            border-color: #FF9800;
+            background-color: #fff3e0;
+        }
+        
+        .category-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .category-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .category-count {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .treatments-section {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .section-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .treatment-item {
+            padding: 25px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s;
+        }
+        
+        .treatment-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .treatment-item:last-child {
+            border-bottom: none;
+        }
+        
+        .treatment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            gap: 20px;
+        }
+        
+        .treatment-info {
+            flex: 1;
+        }
+        
+        .treatment-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .treatment-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .meta-item {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .severity-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .severity-low {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .severity-medium {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .severity-high {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .treatment-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .treatment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #FF9800;
+        }
+        
+        .detail-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-content {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .detail-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .detail-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .detail-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .treatment-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .view-btn {
+            background-color: #1E88E5;
+            color: white;
+        }
+        
+        .download-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .bookmark-btn {
+            background-color: #FF9800;
+            color: white;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            text-decoration: none;
+            color: #757575;
+            transition: color 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #FF9800;
+        }
+        
+        .nav-item:hover {
+            color: #FF9800;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+        }
+        
+        .nav-text {
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .interaction-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .interaction-result.success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .interaction-result.info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .interaction-result.warning {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .interaction-result.danger {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .treatment-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .treatment-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .treatment-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .treatment-actions {
+                flex-direction: column;
+            }
+            
+            .categories-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖 Treatment Guide</h1>
+            <p>Evidence-based treatment protocols and recommendations</p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search treatments, conditions, or medications...">
+                <select class="filter-select" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="respiratory">Respiratory</option>
+                    <option value="infectious">Infectious Diseases</option>
+                    <option value="oncology">Oncology</option>
+                    <option value="emergency">Emergency</option>
+                </select>
+                <select class="filter-select" id="severityFilter">
+                    <option value="">All Severity</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <button class="search-btn" onclick="searchTreatments()">🔍 Search</button>
+            </div>
+        </div>
+
+        <!-- Categories Section -->
+        <div class="categories-section">
+            <div class="category-card" onclick="filterByCategory('respiratory')">
+                <div class="category-icon">🫁</div>
+                <div class="category-title">Respiratory</div>
+                <div class="category-count">12 treatments</div>
+            </div>
+            <div class="category-card" onclick="filterByCategory('infectious')">
+                <div class="category-icon">🦠</div>
+                <div class="category-title">Infectious Diseases</div>
+                <div class="category-count">8 treatments</div>
+            </div>
+            <div class="category-card" onclick="filterByCategory('oncology')">
+                <div class="category-icon">🎗️</div>
+                <div class="category-title">Oncology</div>
+                <div class="category-count">6 treatments</div>
+            </div>
+            <div class="category-card" onclick="filterByCategory('emergency')">
+                <div class="category-icon">🚨</div>
+                <div class="category-title">Emergency</div>
+                <div class="category-count">15 treatments</div>
+            </div>
+        </div>
+
+        <!-- Treatments Section -->
+        <div class="treatments-section">
+            <div class="section-header">
+                <div class="section-title">📋 Treatment Protocols</div>
+                <div class="section-subtitle">Evidence-based medical treatment guidelines</div>
+            </div>
+            
+            <div id="treatmentsList">
+                <!-- Fallback content in case JavaScript doesn't load -->
+                <div class="treatment-item">
+                    <div class="treatment-header">
+                        <div class="treatment-title">💊 Pneumonia Treatment Protocol</div>
+                        <div class="treatment-category">Respiratory</div>
+                    </div>
+                    <div class="treatment-content">
+                        <div class="treatment-description">
+                            Comprehensive treatment protocol for bacterial pneumonia including antibiotic therapy and supportive care.
+                        </div>
+                        <div class="treatment-details">
+                            <div class="detail-item">
+                                <strong>Duration:</strong> 7-10 days
+                            </div>
+                            <div class="detail-item">
+                                <strong>Severity:</strong> Moderate to Severe
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="treatment-item">
+                    <div class="treatment-header">
+                        <div class="treatment-title">🦠 Tuberculosis Treatment Protocol</div>
+                        <div class="treatment-category">Infectious Disease</div>
+                    </div>
+                    <div class="treatment-content">
+                        <div class="treatment-description">
+                            Standard treatment protocol for active tuberculosis with first-line anti-TB medications.
+                        </div>
+                        <div class="treatment-details">
+                            <div class="detail-item">
+                                <strong>Duration:</strong> 6-9 months
+                            </div>
+                            <div class="detail-item">
+                                <strong>Severity:</strong> High
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="treatment-item">
+                    <div class="treatment-header">
+                        <div class="treatment-title">🩸 Malaria Treatment Protocol</div>
+                        <div class="treatment-category">Parasitic Disease</div>
+                    </div>
+                    <div class="treatment-content">
+                        <div class="treatment-description">
+                            Treatment protocol for uncomplicated malaria using artemisinin-based combination therapy.
+                        </div>
+                        <div class="treatment-details">
+                            <div class="detail-item">
+                                <strong>Duration:</strong> 3-5 days
+                            </div>
+                            <div class="detail-item">
+                                <strong>Severity:</strong> Moderate
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div id="navigation-container"></div>
+
+    <!-- Include API client -->
+    <script src="js/api.js"></script>
+    
+    <script>
+        let currentTreatments = [];
+        let filteredTreatments = [];
+
+        // Load treatments on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadTreatments();
+        });
+
+        async function loadTreatments() {
+            try {
+                // Try to load from API, fallback to mock data
+                if (api.isAuthenticated()) {
+                    currentTreatments = await api.getTreatments();
+                } else {
+                    // Use mock data for demo
+                    currentTreatments = api.getMockTreatments();
+                }
+                
+                filteredTreatments = [...currentTreatments];
+                displayTreatments(filteredTreatments);
+            } catch (error) {
+                console.error('Failed to load treatments:', error);
+                // Fallback to sample data
+                loadSampleData();
+            }
+        }
+
+        function loadSampleData() {
+            // Sample treatment data
+            const sampleTreatments = [
+            {
+                id: "T001",
+                title: "Pneumonia Treatment Protocol",
+                category: "respiratory",
+                severity: "medium",
+                condition: "Pneumonia",
+                duration: "7-10 days",
+                description: "Comprehensive treatment protocol for community-acquired pneumonia including antibiotic therapy, supportive care, and monitoring guidelines.",
+                medications: [
+                    "Amoxicillin 500mg TID",
+                    "Azithromycin 250mg daily",
+                    "Paracetamol 500mg QID"
+                ],
+                procedures: [
+                    "Chest X-ray monitoring",
+                    "Oxygen saturation monitoring",
+                    "Vital signs every 4 hours"
+                ],
+                precautions: [
+                    "Monitor for allergic reactions",
+                    "Check kidney function",
+                    "Assess respiratory status"
+                ],
+                contraindications: [
+                    "Penicillin allergy",
+                    "Severe kidney disease",
+                    "Pregnancy (certain antibiotics)"
+                ]
+            },
+            {
+                id: "T002",
+                title: "Tuberculosis Treatment Regimen",
+                category: "infectious",
+                severity: "high",
+                condition: "Tuberculosis",
+                duration: "6-9 months",
+                description: "Standard first-line anti-tuberculosis treatment regimen following WHO guidelines for drug-sensitive tuberculosis.",
+                medications: [
+                    "Isoniazid 300mg daily",
+                    "Rifampin 600mg daily",
+                    "Ethambutol 800mg daily",
+                    "Pyrazinamide 1500mg daily"
+                ],
+                procedures: [
+                    "Monthly sputum examination",
+                    "Liver function monitoring",
+                    "Visual acuity testing"
+                ],
+                precautions: [
+                    "Monitor liver function",
+                    "Check vision regularly",
+                    "Ensure medication compliance"
+                ],
+                contraindications: [
+                    "Severe liver disease",
+                    "Optic neuritis",
+                    "Gout (pyrazinamide)"
+                ]
+            },
+            {
+                id: "T003",
+                title: "Malaria Treatment Protocol",
+                category: "infectious",
+                severity: "medium",
+                condition: "Malaria",
+                duration: "3-7 days",
+                description: "Treatment protocol for uncomplicated malaria using artemisinin-based combination therapy (ACT) as recommended by WHO.",
+                medications: [
+                    "Artemether-Lumefantrine",
+                    "Paracetamol for fever",
+                    "ORS for dehydration"
+                ],
+                procedures: [
+                    "Blood smear monitoring",
+                    "Temperature monitoring",
+                    "Hydration assessment"
+                ],
+                precautions: [
+                    "Monitor for severe malaria signs",
+                    "Ensure complete course",
+                    "Check for drug resistance"
+                ],
+                contraindications: [
+                    "Severe malaria",
+                    "Pregnancy (first trimester)",
+                    "Known drug allergies"
+                ]
+            },
+            {
+                id: "T004",
+                title: "Lung Cancer Supportive Care",
+                category: "oncology",
+                severity: "high",
+                condition: "Lung Cancer",
+                duration: "Ongoing",
+                description: "Comprehensive supportive care protocol for lung cancer patients including symptom management and quality of life improvement.",
+                medications: [
+                    "Morphine for pain",
+                    "Dexamethasone for inflammation",
+                    "Bronchodilators for breathing"
+                ],
+                procedures: [
+                    "Regular imaging",
+                    "Pain assessment",
+                    "Nutritional support"
+                ],
+                precautions: [
+                    "Monitor respiratory status",
+                    "Assess pain levels",
+                    "Watch for complications"
+                ],
+                contraindications: [
+                    "Severe respiratory failure",
+                    "Active bleeding",
+                    "Severe cardiac disease"
+                ]
+            },
+            {
+                id: "T005",
+                title: "Acute Respiratory Distress",
+                category: "emergency",
+                severity: "high",
+                condition: "Respiratory Emergency",
+                duration: "Immediate",
+                description: "Emergency protocol for acute respiratory distress including immediate interventions and stabilization measures.",
+                medications: [
+                    "Oxygen therapy",
+                    "Bronchodilators",
+                    "Corticosteroids"
+                ],
+                procedures: [
+                    "Immediate oxygen",
+                    "Vital signs monitoring",
+                    "Arterial blood gas"
+                ],
+                precautions: [
+                    "Monitor oxygen levels",
+                    "Prepare for intubation",
+                    "Check for pneumothorax"
+                ],
+                contraindications: [
+                    "COPD with CO2 retention",
+                    "Severe heart failure",
+                    "Drug allergies"
+                ]
+            },
+            {
+                id: "T006",
+                title: "Hypertensive Crisis Management",
+                category: "emergency",
+                severity: "high",
+                condition: "Hypertensive Crisis",
+                duration: "24-48 hours",
+                description: "Emergency management protocol for hypertensive crisis with careful blood pressure reduction to prevent organ damage.",
+                medications: [
+                    "Nicardipine IV",
+                    "Labetalol IV",
+                    "Hydralazine"
+                ],
+                procedures: [
+                    "Continuous BP monitoring",
+                    "Neurological assessment",
+                    "Cardiac monitoring"
+                ],
+                precautions: [
+                    "Gradual BP reduction",
+                    "Monitor for stroke",
+                    "Check kidney function"
+                ],
+                contraindications: [
+                    "Acute stroke",
+                    "Severe heart failure",
+                    "Aortic dissection"
+                ]
+            }
+        ];
+
+            currentTreatments = sampleTreatments;
+            filteredTreatments = [...currentTreatments];
+            displayTreatments(filteredTreatments);
+        }
+
+        function displayTreatments(treatments) {
+            renderTreatments(treatments);
+            console.log('📖 AfriDiag Treatment Guide loaded');
+            console.log(`📋 Loaded ${treatments.length} treatment protocols`);
+        }
+
+        let activeCategory = '';
+
+        function renderTreatments(treatments) {
+            const treatmentsList = document.getElementById('treatmentsList');
+            
+            if (treatments.length === 0) {
+                treatmentsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <h3>No treatments found</h3>
+                        <p>Try adjusting your search criteria or browse different categories.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            treatmentsList.innerHTML = treatments.map(treatment => `
+                <div class="treatment-item">
+                    <div class="treatment-header">
+                        <div class="treatment-info">
+                            <div class="treatment-title">
+                                ${getCategoryIcon(treatment.category)} ${treatment.title}
+                            </div>
+                            <div class="treatment-meta">
+                                <span class="meta-item">🏥 ${treatment.condition}</span>
+                                <span class="meta-item">⏱️ ${treatment.duration}</span>
+                                <span class="meta-item">📂 ${treatment.category}</span>
+                                <span class="severity-badge severity-${treatment.severity}">${treatment.severity}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="treatment-description">
+                        ${treatment.description}
+                    </div>
+                    
+                    <div class="treatment-details">
+                        <div class="detail-section">
+                            <div class="detail-title">💊 Medications</div>
+                            <div class="detail-content">
+                                <ul class="detail-list">
+                                    ${treatment.medications.map(med => `<li>${med}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <div class="detail-title">🔬 Procedures</div>
+                            <div class="detail-content">
+                                <ul class="detail-list">
+                                    ${treatment.procedures.map(proc => `<li>${proc}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <div class="detail-title">⚠️ Precautions</div>
+                            <div class="detail-content">
+                                <ul class="detail-list">
+                                    ${treatment.precautions.map(prec => `<li>${prec}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <div class="detail-title">🚫 Contraindications</div>
+                            <div class="detail-content">
+                                <ul class="detail-list">
+                                    ${treatment.contraindications.map(contra => `<li>${contra}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="treatment-actions">
+                        <button class="action-btn view-btn" onclick="viewTreatment('${treatment.id}')">👁️ View Details</button>
+                        <button class="action-btn download-btn" onclick="downloadProtocol('${treatment.id}')">📥 Download</button>
+                        <button class="action-btn bookmark-btn" onclick="bookmarkTreatment('${treatment.id}')">🔖 Bookmark</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'respiratory': '🫁',
+                'infectious': '🦠',
+                'oncology': '🎗️',
+                'emergency': '🚨'
+            };
+            return icons[category] || '📋';
+        }
+
+        function filterByCategory(category) {
+            // Update active category
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            if (activeCategory === category) {
+                activeCategory = '';
+                currentTreatments = [...sampleTreatments];
+            } else {
+                activeCategory = category;
+                event.target.closest('.category-card').classList.add('active');
+                currentTreatments = sampleTreatments.filter(treatment => treatment.category === category);
+            }
+            
+            document.getElementById('categoryFilter').value = activeCategory;
+            renderTreatments(currentTreatments);
+        }
+
+        function searchTreatments() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const severityFilter = document.getElementById('severityFilter').value;
+
+            let filteredTreatments = sampleTreatments.filter(treatment => {
+                const matchesSearch = !searchTerm || 
+                    treatment.title.toLowerCase().includes(searchTerm) ||
+                    treatment.condition.toLowerCase().includes(searchTerm) ||
+                    treatment.description.toLowerCase().includes(searchTerm) ||
+                    treatment.medications.some(med => med.toLowerCase().includes(searchTerm));
+                
+                const matchesCategory = !categoryFilter || treatment.category === categoryFilter;
+                const matchesSeverity = !severityFilter || treatment.severity === severityFilter;
+
+                return matchesSearch && matchesCategory && matchesSeverity;
+            });
+
+            currentTreatments = filteredTreatments;
+            renderTreatments(filteredTreatments);
+        }
+
+        function viewTreatment(treatmentId) {
+            const treatment = sampleTreatments.find(t => t.id === treatmentId);
+            alert(`📖 Treatment Details:\n\n${treatment.title}\n\nCondition: ${treatment.condition}\nDuration: ${treatment.duration}\nSeverity: ${treatment.severity}\n\n${treatment.description}`);
+        }
+
+        function downloadProtocol(treatmentId) {
+            const treatment = sampleTreatments.find(t => t.id === treatmentId);
+            alert(`📥 Downloading treatment protocol for:\n\n${treatment.title}\n\nThis would generate a PDF with the complete treatment protocol including medications, procedures, and guidelines.`);
+        }
+
+        function bookmarkTreatment(treatmentId) {
+            const treatment = sampleTreatments.find(t => t.id === treatmentId);
+            alert(`🔖 Bookmarked:\n\n${treatment.title}\n\nThis treatment has been added to your bookmarks for quick access.`);
+        }
+
+        // Real-time search
+        document.getElementById('searchInput').addEventListener('input', searchTreatments);
+        document.getElementById('categoryFilter').addEventListener('change', searchTreatments);
+        document.getElementById('severityFilter').addEventListener('change', searchTreatments);
+
+        async function checkDrugInteractions() {
+            const drug1 = document.getElementById('drug1').value;
+            const drug2 = document.getElementById('drug2').value;
+            
+            if (!drug1 || !drug2) {
+                alert('Please enter both drug names');
+                return;
+            }
+            
+            try {
+                let result;
+                if (api.isAuthenticated()) {
+                    // Try to get real interaction data from API
+                    result = await api.checkDrugInteractions(drug1, drug2);
+                } else {
+                    // Mock interaction check for demo
+                    const interactions = [
+                        { level: 'none', message: 'No known interactions found' },
+                        { level: 'minor', message: 'Minor interaction - Monitor patient closely' },
+                        { level: 'moderate', message: 'Moderate interaction - Use with caution and adjust dosing' },
+                        { level: 'major', message: 'Major interaction - Avoid combination if possible' }
+                    ];
+                    
+                    result = interactions[Math.floor(Math.random() * interactions.length)];
+                }
+                
+                const severityClass = result.level === 'major' ? 'danger' : 
+                                    result.level === 'moderate' ? 'warning' : 
+                                    result.level === 'minor' ? 'info' : 'success';
+                
+                document.getElementById('interactionResult').innerHTML = `
+                    <div class="interaction-result ${severityClass}">
+                        <h4>Interaction Check: ${drug1} + ${drug2}</h4>
+                        <p><strong>Severity:</strong> ${result.level.toUpperCase()}</p>
+                        <p>${result.message}</p>
+                        ${result.recommendation ? `<p><strong>Recommendation:</strong> ${result.recommendation}</p>` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to check drug interactions:', error);
+                document.getElementById('interactionResult').innerHTML = `
+                    <div class="interaction-result danger">
+                        <h4>Error</h4>
+                        <p>Failed to check drug interactions. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize page - this is handled by loadTreatments() function
+        
+        // Initialize navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Treatment guide page loaded');
+        });
+    </script>
+</body>
+</html>

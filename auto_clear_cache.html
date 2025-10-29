@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Clear All Cache - AfriDiag</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success {
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #ffc107;
+            color: #212529;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info {
+            background-color: #17a2b8;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .danger {
+            background-color: #dc3545;
+        }
+        .danger:hover {
+            background-color: #c82333;
+        }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Force Clear All Cache - AfriDiag</h1>
+        
+        <div class="warning">
+            <h3>⚠️ Aggressive Cache Clearing in Progress</h3>
+            <p>This will clear ALL cached data including login tokens. You may need to log in again.</p>
+        </div>
+        
+        <div class="log" id="clearingLog">
+            <strong>Cache Clearing Log:</strong><br>
+            Starting comprehensive cache clearing...<br>
+        </div>
+        
+        <div class="info">
+            <h3>🔍 What's Being Cleared:</h3>
+            <div id="clearedItems"></div>
+        </div>
+        
+        <div class="success" id="successMessage" style="display: none;">
+            <h3>✅ All Cache Cleared Successfully!</h3>
+            <p>All cached data has been removed. Redirecting to fresh diagnosis page...</p>
+            <p>Redirecting in <span class="countdown" id="countdown">3</span> seconds...</p>
+        </div>
+        
+        <button class="button danger" onclick="forceClearEverything()">🗑️ Force Clear Everything Now</button>
+        <button class="button" onclick="goToDiagnosis()">🏥 Go to Diagnosis</button>
+        <button class="button" onclick="testBackend()">🔧 Test Backend</button>
+    </div>
+
+    <script>
+        let logElement = document.getElementById('clearingLog');
+        let clearedItemsElement = document.getElementById('clearedItems');
+        
+        function log(message) {
+            console.log(message);
+            logElement.innerHTML += message + '<br>';
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function forceClearEverything() {
+            log('🚀 Starting aggressive cache clearing...');
+            
+            const clearedItems = [];
+            
+            // 1. Clear all localStorage
+            log('📦 Clearing localStorage...');
+            const lsKeys = Object.keys(localStorage);
+            lsKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value && value.includes('covid')) {
+                    log(`   🎯 Found COVID data in ${key}: ${value.substring(0, 50)}...`);
+                }
+                localStorage.removeItem(key);
+                clearedItems.push(`localStorage.${key}`);
+            });
+            localStorage.clear();
+            log(`   ✅ Cleared ${lsKeys.length} localStorage items`);
+            
+            // 2. Clear all sessionStorage
+            log('📦 Clearing sessionStorage...');
+            const ssKeys = Object.keys(sessionStorage);
+            ssKeys.forEach(key => {
+                const value = sessionStorage.getItem(key);
+                if (value && value.includes('covid')) {
+                    log(`   🎯 Found COVID data in ${key}: ${value.substring(0, 50)}...`);
+                }
+                sessionStorage.removeItem(key);
+                clearedItems.push(`sessionStorage.${key}`);
+            });
+            sessionStorage.clear();
+            log(`   ✅ Cleared ${ssKeys.length} sessionStorage items`);
+            
+            // 3. Clear browser cache (force reload)
+            log('🌐 Forcing browser cache clear...');
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                        clearedItems.push(`cache.${name}`);
+                        log(`   ✅ Cleared cache: ${name}`);
+                    });
+                });
+            }
+            
+            // 4. Clear any global variables that might contain cached data
+            log('🔧 Clearing global variables...');
+            if (window.diagnosisResult) {
+                log('   🎯 Found global diagnosisResult variable');
+                delete window.diagnosisResult;
+                clearedItems.push('window.diagnosisResult');
+            }
+            if (window.patientData) {
+                log('   🎯 Found global patientData variable');
+                delete window.patientData;
+                clearedItems.push('window.patientData');
+            }
+            
+            // 5. Force clear any form data
+            log('📝 Clearing form data...');
+            const forms = document.querySelectorAll('form');
+            forms.forEach((form, index) => {
+                form.reset();
+                clearedItems.push(`form[${index}]`);
+            });
+            
+            // 6. Clear any cookies related to diagnosis
+            log('🍪 Clearing diagnosis-related cookies...');
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+            });
+            
+            log('💥 FORCE CLEARING COMPLETE!');
+            log('🔄 Preparing to reload with fresh data...');
+            
+            // Update cleared items display
+            clearedItemsElement.innerHTML = clearedItems.map(item => `• ${item}`).join('<br>');
+            
+            // Show success message and start countdown
+            document.getElementById('successMessage').style.display = 'block';
+            startCountdown();
+        }
+        
+        function startCountdown() {
+            let seconds = 3;
+            const countdownElement = document.getElementById('countdown');
+            
+            const interval = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    // Force reload with cache busting
+                    const timestamp = new Date().getTime();
+                    window.location.href = `/diagnosis_screen.html?nocache=${timestamp}&cleared=true`;
+                }
+            }, 1000);
+        }
+        
+        function goToDiagnosis() {
+            const timestamp = new Date().getTime();
+            window.location.href = `/diagnosis_screen.html?nocache=${timestamp}&cleared=true`;
+        }
+        
+        function testBackend() {
+            log('🔧 Testing backend connection...');
+            fetch('/api/v1/health')
+                .then(response => response.json())
+                .then(data => {
+                    log(`✅ Backend is healthy: ${JSON.stringify(data)}`);
+                })
+                .catch(error => {
+                    log(`❌ Backend error: ${error.message}`);
+                });
+        }
+        
+        // Auto-run on page load
+        window.onload = function() {
+            log('🧹 Auto Cache Cleaner - Starting aggressive clearing...');
+            
+            // Wait a moment then auto-clear
+            setTimeout(() => {
+                forceClearEverything();
+            }, 1000);
+        };
+        
+        // Prevent any caching of this page itself
+        window.addEventListener('beforeunload', function() {
+            // Clear any remaining data
+            localStorage.clear();
+            sessionStorage.clear();
+        });
+    </script>
+</body>
+</html>

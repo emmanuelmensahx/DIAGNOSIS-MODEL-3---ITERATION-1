@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnosis Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        button { padding: 10px 20px; margin: 10px 0; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .log { background: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; margin: 10px 0; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Diagnosis Submission Debug Test</h1>
+        
+        <button onclick="testAuthentication()">Test Authentication</button>
+        <button onclick="testDiagnosisSubmission()">Test Diagnosis Submission</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+        
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log ${type}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        async function testAuthentication() {
+            log('Testing authentication...');
+            
+            try {
+                const response = await fetch('http://localhost:8001/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'username': 'frontline@afridiag.org',
+                        'password': 'frontline123'
+                    })
+                });
+                
+                log(`Auth response status: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`Auth successful! Token: ${data.access_token.substring(0, 20)}...`, 'success');
+                    window.testToken = data.access_token;
+                    return data.access_token;
+                } else {
+                    const errorText = await response.text();
+                    log(`Auth failed: ${errorText}`, 'error');
+                    return null;
+                }
+            } catch (error) {
+                log(`Auth error: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        async function testDiagnosisSubmission() {
+            log('Testing diagnosis submission...');
+            
+            // Get token first
+            let token = window.testToken;
+            if (!token) {
+                log('No token available, getting new token...');
+                token = await testAuthentication();
+                if (!token) {
+                    log('Cannot proceed without token', 'error');
+                    return;
+                }
+            }
+            
+            const diagnosisData = {
+                medical_history: "Patient has fever and cough for 3 days",
+                additional_notes: "Debug test submission"
+            };
+            
+            const apiUrl = 'http://localhost:8001/api/v1/emergency-diagnosis';
+            log(`Making request to: ${apiUrl}`);
+            log(`Request data: ${JSON.stringify(diagnosisData, null, 2)}`);
+            log(`Using token: ${token.substring(0, 20)}...`);
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(diagnosisData)
+                });
+                
+                log(`Response status: ${response.status} ${response.statusText}`);
+                log(`Response headers: ${JSON.stringify([...response.headers.entries()], null, 2)}`);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    log(`Success! Response: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    log(`Error response: ${errorText}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`Request failed: ${error.message}`, 'error');
+                log(`Error details: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

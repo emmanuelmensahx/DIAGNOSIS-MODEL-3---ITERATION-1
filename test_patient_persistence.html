@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Patient Data Persistence</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border-radius: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .info {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Patient Data Persistence Test</h1>
+            <p>Test the patient save and display functionality</p>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Test 1: Add Sample Patient</h3>
+            <p>This will add a test patient to localStorage and verify it's saved correctly.</p>
+            <button class="test-button" onclick="addTestPatient()">➕ Add Test Patient</button>
+            <div id="addPatientResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>👥 Test 2: View Saved Patients</h3>
+            <p>Display all patients currently saved in localStorage.</p>
+            <button class="test-button" onclick="viewSavedPatients()">👁️ View Saved Patients</button>
+            <div id="viewPatientsResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 Test 3: Clear Patient Data</h3>
+            <p>Remove all saved patient data from localStorage.</p>
+            <button class="test-button" onclick="clearPatientData()" style="background: linear-gradient(135deg, #f44336, #ef5350);">🗑️ Clear All Patients</button>
+            <div id="clearPatientsResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 Test 4: Open Patients Page</h3>
+            <p>Open the patients page to verify that saved patients are displayed correctly.</p>
+            <button class="test-button" onclick="openPatientsPage()">🏥 Open Patients Page</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Current Status</h3>
+            <div id="statusInfo" class="result">
+                <p>Click "View Saved Patients" to see current status</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addTestPatient() {
+            const resultDiv = document.getElementById('addPatientResult');
+            resultDiv.style.display = 'block';
+            
+            try {
+                // Create a test patient with diagnosis result
+                const testPatient = {
+                    id: `TEST_${Date.now()}`,
+                    name: 'Test Patient',
+                    firstName: 'Test',
+                    lastName: 'Patient',
+                    age: 30,
+                    gender: 'Male',
+                    phone: '+1-555-TEST',
+                    phoneNumber: '+1-555-TEST',
+                    registrationDate: new Date().toISOString().split('T')[0],
+                    createdAt: new Date().toISOString(),
+                    status: 'active',
+                    diagnosisResult: {
+                        predictions: [
+                            {
+                                disease: 'Common Cold',
+                                confidence: 85.5,
+                                symptoms_matched: ['fever', 'cough']
+                            }
+                        ],
+                        total_diseases_searched: 500,
+                        search_time_ms: 150
+                    },
+                    symptoms: ['fever', 'cough', 'headache'],
+                    medicalHistory: 'No significant medical history'
+                };
+
+                // Get existing patients
+                const existingPatients = JSON.parse(localStorage.getItem('afridiag_patients') || '[]');
+                
+                // Add new patient
+                existingPatients.push(testPatient);
+                
+                // Save back to localStorage
+                localStorage.setItem('afridiag_patients', JSON.stringify(existingPatients));
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Test patient added successfully!</div>
+                    <p><strong>Patient ID:</strong> ${testPatient.id}</p>
+                    <p><strong>Name:</strong> ${testPatient.name}</p>
+                    <p><strong>Diagnosis:</strong> ${testPatient.diagnosisResult.predictions[0].disease}</p>
+                    <p><strong>Total patients now:</strong> ${existingPatients.length}</p>
+                `;
+                
+                updateStatus();
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error adding test patient: ${error.message}</div>`;
+            }
+        }
+
+        function viewSavedPatients() {
+            const resultDiv = document.getElementById('viewPatientsResult');
+            resultDiv.style.display = 'block';
+            
+            try {
+                const savedPatients = JSON.parse(localStorage.getItem('afridiag_patients') || '[]');
+                
+                if (savedPatients.length === 0) {
+                    resultDiv.innerHTML = `<div class="info">ℹ️ No patients found in localStorage</div>`;
+                } else {
+                    let html = `<div class="success">✅ Found ${savedPatients.length} saved patients:</div>`;
+                    
+                    savedPatients.forEach((patient, index) => {
+                        const diagnosis = patient.diagnosisResult?.predictions?.[0]?.disease || 'No diagnosis';
+                        html += `
+                            <div style="margin: 10px 0; padding: 10px; border-left: 3px solid #1E88E5;">
+                                <strong>${index + 1}. ${patient.name || 'Unknown'}</strong><br>
+                                ID: ${patient.id || 'N/A'}<br>
+                                Age: ${patient.age || 'N/A'}, Gender: ${patient.gender || 'N/A'}<br>
+                                Phone: ${patient.phone || patient.phoneNumber || 'N/A'}<br>
+                                Diagnosis: ${diagnosis}<br>
+                                Date: ${patient.registrationDate || patient.createdAt || 'N/A'}
+                            </div>
+                        `;
+                    });
+                    
+                    resultDiv.innerHTML = html;
+                }
+                
+                updateStatus();
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error viewing patients: ${error.message}</div>`;
+            }
+        }
+
+        function clearPatientData() {
+            const resultDiv = document.getElementById('clearPatientsResult');
+            resultDiv.style.display = 'block';
+            
+            if (confirm('Are you sure you want to clear all patient data? This cannot be undone.')) {
+                try {
+                    localStorage.removeItem('afridiag_patients');
+                    resultDiv.innerHTML = `<div class="success">✅ All patient data cleared successfully!</div>`;
+                    updateStatus();
+                } catch (error) {
+                    resultDiv.innerHTML = `<div class="error">❌ Error clearing patient data: ${error.message}</div>`;
+                }
+            } else {
+                resultDiv.innerHTML = `<div class="info">ℹ️ Clear operation cancelled</div>`;
+            }
+        }
+
+        function openPatientsPage() {
+            window.open('patients_screen.html', '_blank');
+        }
+
+        function updateStatus() {
+            const statusDiv = document.getElementById('statusInfo');
+            
+            try {
+                const savedPatients = JSON.parse(localStorage.getItem('afridiag_patients') || '[]');
+                const storageSize = JSON.stringify(savedPatients).length;
+                
+                statusDiv.innerHTML = `
+                    <div class="info">📊 Current Status:</div>
+                    <p><strong>Total Patients:</strong> ${savedPatients.length}</p>
+                    <p><strong>Storage Size:</strong> ${storageSize} bytes</p>
+                    <p><strong>Last Updated:</strong> ${new Date().toLocaleString()}</p>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="error">❌ Error reading status: ${error.message}</div>`;
+            }
+        }
+
+        // Initialize status on page load
+        window.addEventListener('load', updateStatus);
+    </script>
+</body>
+</html>

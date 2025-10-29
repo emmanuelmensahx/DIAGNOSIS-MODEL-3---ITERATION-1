@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Authentication Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .pending { background-color: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Simple Authentication Test</h1>
+        <p>Testing the corrected authentication with form data format</p>
+
+        <div class="test-section pending" id="auth-section">
+            <h3>Authentication Test</h3>
+            <p>Status: <span id="auth-status">Ready to test</span></p>
+            <button onclick="testAuth()">Test Authentication</button>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:8001/api/v1';
+        
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function setStatus(status, className = 'pending') {
+            document.getElementById('auth-status').textContent = status;
+            const section = document.getElementById('auth-section');
+            section.className = `test-section ${className}`;
+        }
+
+        async function testAuth() {
+            log('Starting authentication test...');
+            setStatus('Testing...', 'pending');
+
+            try {
+                // Use form data format as expected by OAuth2PasswordRequestForm
+                const formData = new URLSearchParams();
+                formData.append('username', 'admin@afridiag.org');
+                formData.append('password', 'admin123');
+
+                log('Sending login request with form data...');
+                
+                const response = await fetch(`${baseUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+
+                log(`Login response status: ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Authentication successful!');
+                    log(`Token type: ${data.token_type}`);
+                    log(`Access token: ${data.access_token.substring(0, 20)}...`);
+                    setStatus('Authentication successful!', 'success');
+                    
+                    // Test authenticated request
+                    await testAuthenticatedRequest(data.access_token);
+                } else {
+                    const errorData = await response.json();
+                    log(`❌ Authentication failed: ${JSON.stringify(errorData)}`);
+                    setStatus('Authentication failed', 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`);
+                setStatus('Error occurred', 'error');
+            }
+        }
+
+        async function testAuthenticatedRequest(token) {
+            try {
+                log('Testing authenticated request...');
+                
+                const response = await fetch(`${baseUrl}/users/me`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                log(`User info response status: ${response.status}`);
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    log('✅ Authenticated request successful!');
+                    log(`User: ${userData.full_name} (${userData.role})`);
+                    log(`Email: ${userData.email}`);
+                } else {
+                    const errorData = await response.json();
+                    log(`❌ Authenticated request failed: ${JSON.stringify(errorData)}`);
+                }
+            } catch (error) {
+                log(`❌ Authenticated request error: ${error.message}`);
+            }
+        }
+
+        // Auto-start test when page loads
+        window.addEventListener('load', () => {
+            log('Page loaded. Ready to test authentication.');
+        });
+    </script>
+</body>
+</html>

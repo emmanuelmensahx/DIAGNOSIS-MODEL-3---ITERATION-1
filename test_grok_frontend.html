@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Frontend Grok Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        
+        .test-section h3 {
+            color: #1E88E5;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #1E88E5;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result.success {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            color: #2e7d32;
+        }
+        
+        .result.error {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            color: #c62828;
+        }
+        
+        .result.info {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            color: #1565c0;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1E88E5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.online {
+            background: #4caf50;
+        }
+        
+        .status-indicator.offline {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🩺 AfriDiag Frontend Test</h1>
+            <p>Testing Grok AI Integration & Performance Optimizations</p>
+        </div>
+        
+        <div class="content">
+            <!-- Connection Test -->
+            <div class="test-section">
+                <h3>🔌 Backend Connection Test</h3>
+                <p>Test if the frontend can connect to the backend API</p>
+                <button class="btn" onclick="testConnection()">Test Connection</button>
+                <div id="connectionResult"></div>
+            </div>
+            
+            <!-- Diagnosis Test -->
+            <div class="test-section">
+                <h3>🏥 AI Diagnosis Test</h3>
+                <div class="form-group">
+                    <label for="symptoms">Symptoms (comma-separated):</label>
+                    <textarea id="symptoms" placeholder="e.g., fever, cough, chest pain, shortness of breath">fever, cough with yellow sputum, chest pain, shortness of breath, fatigue</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="patientAge">Patient Age:</label>
+                    <input type="number" id="patientAge" value="45" min="1" max="120">
+                </div>
+                
+                <div class="form-group">
+                    <label for="patientGender">Gender:</label>
+                    <select id="patientGender">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="medicalHistory">Medical History:</label>
+                    <textarea id="medicalHistory" placeholder="e.g., smoker, diabetes, hypertension">smoker, recent cold</textarea>
+                </div>
+                
+                <button class="btn" onclick="testDiagnosis()">🤖 Get AI Diagnosis</button>
+                <button class="btn" onclick="testEmergencyDiagnosis()">🚨 Emergency Diagnosis</button>
+                <div id="diagnosisResult"></div>
+            </div>
+            
+            <!-- Performance Test -->
+            <div class="test-section">
+                <h3>⚡ Performance Test</h3>
+                <p>Test the performance optimizations (caching, async processing)</p>
+                <button class="btn" onclick="testPerformance()">Run Performance Test</button>
+                <div id="performanceResult"></div>
+            </div>
+            
+            <!-- System Status -->
+            <div class="test-section">
+                <h3>📊 System Status</h3>
+                <p><span class="status-indicator" id="backendStatus"></span>Backend: <span id="backendStatusText">Checking...</span></p>
+                <p><span class="status-indicator" id="grokStatus"></span>Grok AI: <span id="grokStatusText">Checking...</span></p>
+                <button class="btn" onclick="checkSystemStatus()">Refresh Status</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api/v1';
+        let authToken = null;
+        
+        // Authentication function
+        async function authenticate() {
+            if (authToken) {
+                console.log('Already authenticated with token');
+                return true; // Already authenticated
+            }
+            
+            try {
+                console.log('Starting authentication process...');
+                
+                // Use existing frontline worker user from the system
+                return await loginUser();
+                
+            } catch (error) {
+                console.error('Authentication error:', error);
+                return false;
+            }
+        }
+        
+        async function loginUser() {
+            try {
+                console.log('Attempting login with existing frontline worker...');
+                
+                const formData = new FormData();
+                formData.append('username', 'frontline@afridiag.org');
+                formData.append('password', 'frontline123');
+                
+                const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Login response status:', loginResponse.status);
+                
+                if (loginResponse.ok) {
+                    const loginData = await loginResponse.json();
+                    authToken = loginData.access_token;
+                    console.log('Login successful, token received:', authToken ? 'YES' : 'NO');
+                    return true;
+                } else {
+                    const errorData = await loginResponse.json();
+                    console.error('Login failed with status', loginResponse.status, ':', errorData);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                return false;
+            }
+        }
+        
+        // Test backend connection
+        async function testConnection() {
+            const resultDiv = document.getElementById('connectionResult');
+            resultDiv.innerHTML = '<div class="loading"></div>Testing connection...';
+            
+            try {
+                // First authenticate
+                const authSuccess = await authenticate();
+                console.log('Authentication result:', authSuccess, 'Token:', authToken ? 'present' : 'missing');
+                
+                const response = await fetch('http://localhost:8001/health');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="result success">✅ Connection successful!
+Status: ${data.status}
+Authentication: ${authSuccess ? 'Success' : 'Failed'}
+Token: ${authToken ? 'Present' : 'Missing'}
+Timestamp: ${new Date().toLocaleString()}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Connection failed: ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Connection error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test AI diagnosis
+        async function testDiagnosis() {
+            const resultDiv = document.getElementById('diagnosisResult');
+            resultDiv.innerHTML = '<div class="loading"></div>Getting AI diagnosis...';
+            
+            const symptoms = document.getElementById('symptoms').value;
+            const age = document.getElementById('patientAge').value;
+            const gender = document.getElementById('patientGender').value;
+            const medicalHistory = document.getElementById('medicalHistory').value;
+            
+            const payload = {
+                symptoms: symptoms.split(',').map(s => s.trim()),
+                patient_age: parseInt(age),
+                patient_gender: gender,
+                medical_history: medicalHistory,
+                use_ai: true
+            };
+            
+            try {
+                const startTime = Date.now();
+                // Ensure authentication
+                if (!authToken) {
+                    await authenticate();
+                }
+                
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                const response = await fetch(`${API_BASE}/predict/grok-primary`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="result success">✅ AI Diagnosis Complete!
+                    
+🏥 Primary Diagnosis: ${data.ai_diagnosis || 'N/A'}
+🎯 Confidence: ${data.ai_confidence || 'N/A'}
+🔬 Disease Code: ${data.disease_code || 'N/A'}
+⚡ Response Time: ${responseTime}ms
+🤖 AI Provider: ${data.ai_provider || 'N/A'}
+
+📋 Full Response:
+${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Diagnosis failed: ${response.status}
+${JSON.stringify(data, null, 2)}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Diagnosis error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test emergency diagnosis
+        async function testEmergencyDiagnosis() {
+            const resultDiv = document.getElementById('diagnosisResult');
+            resultDiv.innerHTML = '<div class="loading"></div>Getting emergency diagnosis...';
+            
+            const symptoms = document.getElementById('symptoms').value;
+            const age = document.getElementById('patientAge').value;
+            const gender = document.getElementById('patientGender').value;
+            const medicalHistory = document.getElementById('medicalHistory').value;
+            
+            // Build medical history text from available inputs
+            let medicalHistoryText = medicalHistory || '';
+            if (symptoms) {
+                medicalHistoryText += `\nSymptoms: ${symptoms}`;
+            }
+            if (age) {
+                medicalHistoryText += `\nPatient Age: ${age}`;
+            }
+            if (gender) {
+                medicalHistoryText += `\nGender: ${gender}`;
+            }
+            
+            // Ensure we have some medical history
+            if (!medicalHistoryText.trim()) {
+                medicalHistoryText = "Emergency case - limited information available";
+            }
+            
+            const payload = {
+                medical_history: medicalHistoryText.trim(),
+                patient_name: "Emergency Patient",
+                patient_age: age ? parseInt(age) : null,
+                patient_gender: gender || null,
+                symptoms: symptoms ? symptoms.split(',').map(s => s.trim()) : null
+            };
+            
+            try {
+                const startTime = Date.now();
+                // Ensure authentication
+                if (!authToken) {
+                    await authenticate();
+                }
+                
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                const response = await fetch(`${API_BASE}/emergency-diagnosis`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="result success">🚨 Emergency Diagnosis Complete!
+                    
+🏥 Primary Diagnosis: ${data.ai_diagnosis || 'N/A'}
+🎯 Confidence: ${data.ai_confidence || 'N/A'}
+🚨 Urgency: ${data.urgency || 'N/A'}
+⚡ Response Time: ${responseTime}ms
+
+📋 Full Response:
+${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="result error">❌ Emergency diagnosis failed: ${response.status}
+${JSON.stringify(data, null, 2)}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Emergency diagnosis error: ${error.message}</div>`;
+            }
+        }
+        
+        // Test performance
+        async function testPerformance() {
+            const resultDiv = document.getElementById('performanceResult');
+            resultDiv.innerHTML = '<div class="loading"></div>Running performance tests...';
+            
+            try {
+                const tests = [];
+                
+                // Ensure authentication
+                if (!authToken) {
+                    await authenticate();
+                }
+                
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                // Test 1: Basic prediction
+                const start1 = Date.now();
+                const response1 = await fetch(`${API_BASE}/predict/supported-diseases`, {
+                    headers: headers
+                });
+                const end1 = Date.now();
+                tests.push({ name: 'Supported Diseases', time: end1 - start1, status: response1.ok });
+                
+                // Test 2: Performance metrics
+                const start2 = Date.now();
+                const response2 = await fetch(`${API_BASE}/performance/metrics`, {
+                    headers: headers
+                });
+                const end2 = Date.now();
+                tests.push({ name: 'Performance Metrics', time: end2 - start2, status: response2.ok });
+                
+                // Test 3: Cache test (same request twice)
+                const testPayload = {
+                    symptoms: ['fever', 'cough'],
+                    patient_age: 30,
+                    patient_gender: 'male',
+                    use_ai: true
+                };
+                
+                const start3 = Date.now();
+                await fetch(`${API_BASE}/predict/grok-primary`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(testPayload)
+                });
+                const end3 = Date.now();
+                
+                const start4 = Date.now();
+                await fetch(`${API_BASE}/predict/grok-primary`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(testPayload)
+                });
+                const end4 = Date.now();
+                
+                tests.push({ name: 'First Request', time: end3 - start3, status: true });
+                tests.push({ name: 'Cached Request', time: end4 - start4, status: true });
+                
+                const avgTime = tests.reduce((sum, test) => sum + test.time, 0) / tests.length;
+                const successRate = tests.filter(test => test.status).length / tests.length * 100;
+                
+                resultDiv.innerHTML = `<div class="result info">⚡ Performance Test Results:
+                
+📊 Average Response Time: ${avgTime.toFixed(2)}ms
+✅ Success Rate: ${successRate.toFixed(1)}%
+🔄 Cache Improvement: ${((end3 - start3) - (end4 - start4)).toFixed(2)}ms
+
+📋 Individual Tests:
+${tests.map(test => `${test.status ? '✅' : '❌'} ${test.name}: ${test.time}ms`).join('\n')}</div>`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Performance test error: ${error.message}</div>`;
+            }
+        }
+        
+        // Check system status
+        async function checkSystemStatus() {
+            try {
+                // Check backend (no /api/v1 prefix for health)
+                const backendResponse = await fetch('http://localhost:8001/health');
+                const backendStatus = document.getElementById('backendStatus');
+                const backendText = document.getElementById('backendStatusText');
+                
+                if (backendResponse.ok) {
+                    backendStatus.className = 'status-indicator online';
+                    backendText.textContent = 'Online';
+                } else {
+                    backendStatus.className = 'status-indicator offline';
+                    backendText.textContent = 'Offline';
+                }
+                
+                // Check Grok AI (by testing a simple prediction)
+                // Ensure authentication
+                if (!authToken) {
+                    await authenticate();
+                }
+                
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                
+                const grokResponse = await fetch(`${API_BASE}/predict/grok-primary`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({
+                        symptoms: ['test'],
+                        patient_age: 30,
+                        patient_gender: 'male',
+                        use_ai: true
+                    })
+                });
+                
+                const grokStatus = document.getElementById('grokStatus');
+                const grokText = document.getElementById('grokStatusText');
+                
+                if (grokResponse.status !== 404) {
+                    grokStatus.className = 'status-indicator online';
+                    grokText.textContent = 'Online';
+                } else {
+                    grokStatus.className = 'status-indicator offline';
+                    grokText.textContent = 'Offline';
+                }
+                
+            } catch (error) {
+                document.getElementById('backendStatus').className = 'status-indicator offline';
+                document.getElementById('backendStatusText').textContent = 'Error';
+                document.getElementById('grokStatus').className = 'status-indicator offline';
+                document.getElementById('grokStatusText').textContent = 'Error';
+            }
+        }
+        
+        // Initialize on page load
+        window.onload = function() {
+            checkSystemStatus();
+        };
+    </script>
+</body>
+</html>
