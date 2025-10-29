@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Patients</title>
+    <link rel="stylesheet" href="css/navigation.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .search-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #1E88E5;
+        }
+        
+        .filter-select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            min-width: 150px;
+        }
+        
+        .search-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1E88E5;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .patients-list {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+        
+        .list-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .list-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .add-patient-btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .patient-item {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .patient-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .patient-item:last-child {
+            border-bottom: none;
+        }
+        
+        .patient-info {
+            flex: 1;
+        }
+        
+        .patient-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .patient-details {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 5px;
+        }
+        
+        .patient-detail {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .patient-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .status-pending {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .status-completed {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .patient-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .view-btn {
+            background-color: #1E88E5;
+            color: white;
+        }
+        
+        .edit-btn {
+            background-color: #FF9800;
+            color: white;
+        }
+        
+        .diagnose-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            text-decoration: none;
+            color: #757575;
+            transition: color 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #1E88E5;
+        }
+        
+        .nav-item:hover {
+            color: #1E88E5;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+        }
+        
+        .nav-text {
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .patient-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .patient-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 Patient Management</h1>
+            <p>Manage and track all your patients</p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search patients by name, ID, or condition...">
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <select class="filter-select" id="conditionFilter">
+                    <option value="">All Conditions</option>
+                    <option value="pneumonia">Pneumonia</option>
+                    <option value="tuberculosis">Tuberculosis</option>
+                    <option value="malaria">Malaria</option>
+                    <option value="lung_cancer">Lung Cancer</option>
+                </select>
+                <button class="search-btn" onclick="searchPatients()">🔍 Search</button>
+                <button class="search-btn" onclick="refreshPatientData()" style="background: linear-gradient(135deg, #4CAF50, #66BB6A);">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number" id="totalPatients">127</div>
+                <div class="stat-label">Total Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activePatients">45</div>
+                <div class="stat-label">Active Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingPatients">23</div>
+                <div class="stat-label">Pending Diagnosis</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedPatients">59</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+
+        <!-- Patients List -->
+        <div class="patients-list">
+            <div class="list-header">
+                <div class="list-title">📋 Patient List</div>
+                <a href="new_patient_screen.html" class="add-patient-btn">➕ Add New Patient</a>
+            </div>
+            
+            <div id="patientsList">
+                <!-- Fallback content in case JavaScript doesn't load -->
+                <div class="patient-item">
+                    <div class="patient-info">
+                        <div class="patient-name">John Doe</div>
+                        <div class="patient-details">
+                            <span class="patient-detail">📋 ID: P001</span>
+                            <span class="patient-detail">👤 45y, Male</span>
+                            <span class="patient-detail">🏥 Pneumonia</span>
+                            <span class="patient-detail">📅 Last visit: 2024-01-15</span>
+                            <span class="patient-detail">📞 +1234567890</span>
+                        </div>
+                        <div class="patient-status status-active">active</div>
+                    </div>
+                    <div class="patient-actions">
+                        <button class="action-btn view-btn">👁️ View</button>
+                        <button class="action-btn edit-btn">✏️ Edit</button>
+                        <button class="action-btn diagnose-btn">🩺 Diagnose</button>
+                    </div>
+                </div>
+                <div class="patient-item">
+                    <div class="patient-info">
+                        <div class="patient-name">Jane Smith</div>
+                        <div class="patient-details">
+                            <span class="patient-detail">📋 ID: P002</span>
+                            <span class="patient-detail">👤 32y, Female</span>
+                            <span class="patient-detail">🏥 Tuberculosis</span>
+                            <span class="patient-detail">📅 Last visit: 2024-01-14</span>
+                            <span class="patient-detail">📞 +1234567891</span>
+                        </div>
+                        <div class="patient-status status-pending">pending</div>
+                    </div>
+                    <div class="patient-actions">
+                        <button class="action-btn view-btn">👁️ View</button>
+                        <button class="action-btn edit-btn">✏️ Edit</button>
+                        <button class="action-btn diagnose-btn">🩺 Diagnose</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div id="navigation-container"></div>
+
+    <script>
+        // Load patient data from localStorage and combine with sample data
+        function loadPatientData() {
+            // Sample patient data for demonstration
+            const samplePatients = [
+                {
+                    id: 'P001',
+                    name: 'Amara Okafor',
+                    age: 28,
+                    gender: 'Female',
+                    condition: 'Malaria',
+                    status: 'active',
+                    lastVisit: '2024-01-15',
+                    phone: '+234-801-234-5678'
+                },
+                {
+                    id: 'P002',
+                    name: 'Kwame Asante',
+                    age: 45,
+                    gender: 'Male',
+                    condition: 'Hypertension',
+                    status: 'pending',
+                    lastVisit: '2024-01-12',
+                    phone: '+233-244-567-890'
+                },
+                {
+                    id: 'P003',
+                    name: 'Fatima Al-Hassan',
+                    age: 32,
+                    gender: 'Female',
+                    condition: 'Diabetes',
+                    status: 'completed',
+                    lastVisit: '2024-01-10',
+                    phone: '+256-701-234-567'
+                }
+            ];
+
+            // Load saved patients from localStorage
+            const savedPatients = JSON.parse(localStorage.getItem('afridiag_patients') || '[]');
+            
+            // Convert saved patients to display format
+            const convertedSavedPatients = savedPatients.map((patient, index) => {
+                const patientId = patient.id || `SP${String(index + 1).padStart(3, '0')}`;
+                const fullName = patient.name || `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || 'Unknown Patient';
+                const condition = patient.diagnosisResult?.predictions?.[0]?.disease || patient.condition || 'General Consultation';
+                const status = patient.status || 'active';
+                const lastVisit = patient.registrationDate || patient.createdAt || new Date().toISOString().split('T')[0];
+                
+                return {
+                    id: patientId,
+                    name: fullName,
+                    age: patient.age || 'N/A',
+                    gender: patient.gender || 'N/A',
+                    condition: condition,
+                    status: status,
+                    lastVisit: lastVisit,
+                    phone: patient.phone || patient.phoneNumber || 'N/A',
+                    source: 'saved' // Mark as saved patient
+                };
+            });
+
+            // Combine saved patients with sample patients
+            return [...convertedSavedPatients, ...samplePatients];
+        }
+
+        let currentPatients = loadPatientData();
+
+        function renderPatients(patients) {
+            const patientsList = document.getElementById('patientsList');
+            
+            if (patients.length === 0) {
+                patientsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <h3>No patients found</h3>
+                        <p>Try adjusting your search criteria or add a new patient.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            patientsList.innerHTML = patients.map(patient => `
+                <div class="patient-item">
+                    <div class="patient-info">
+                        <div class="patient-name">${patient.name}</div>
+                        <div class="patient-details">
+                            <span class="patient-detail">📋 ID: ${patient.id}</span>
+                            <span class="patient-detail">👤 ${patient.age}y, ${patient.gender}</span>
+                            <span class="patient-detail">🏥 ${patient.condition}</span>
+                            <span class="patient-detail">📅 Last visit: ${patient.lastVisit}</span>
+                            <span class="patient-detail">📞 ${patient.phone}</span>
+                        </div>
+                        <div class="patient-status status-${patient.status}">${patient.status}</div>
+                    </div>
+                    <div class="patient-actions">
+                        <button class="action-btn view-btn" onclick="viewPatient('${patient.id}')">👁️ View</button>
+                        <button class="action-btn edit-btn" onclick="editPatient('${patient.id}')">✏️ Edit</button>
+                        <button class="action-btn diagnose-btn" onclick="diagnosePatient('${patient.id}')">🩺 Diagnose</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchPatients() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const conditionFilter = document.getElementById('conditionFilter').value;
+
+            let filteredPatients = currentPatients.filter(patient => {
+                const matchesSearch = !searchTerm || 
+                    patient.name.toLowerCase().includes(searchTerm) ||
+                    patient.id.toLowerCase().includes(searchTerm) ||
+                    patient.condition.toLowerCase().includes(searchTerm);
+                
+                const matchesStatus = !statusFilter || patient.status === statusFilter;
+                const matchesCondition = !conditionFilter || patient.condition.toLowerCase() === conditionFilter;
+
+                return matchesSearch && matchesStatus && matchesCondition;
+            });
+
+            renderPatients(filteredPatients);
+            updateStats(filteredPatients);
+        }
+
+        function refreshPatientData() {
+            console.log('Refreshing patient data...');
+            currentPatients = loadPatientData();
+            searchPatients(); // This will re-render with current filters
+            console.log(`Loaded ${currentPatients.length} patients total`);
+        }
+
+        function updateStats(patients) {
+            const total = patients.length;
+            const active = patients.filter(p => p.status === 'active').length;
+            const pending = patients.filter(p => p.status === 'pending').length;
+            const completed = patients.filter(p => p.status === 'completed').length;
+
+            document.getElementById('totalPatients').textContent = total;
+            document.getElementById('activePatients').textContent = active;
+            document.getElementById('pendingPatients').textContent = pending;
+            document.getElementById('completedPatients').textContent = completed;
+        }
+
+        function viewPatient(patientId) {
+            const patient = currentPatients.find(p => p.id === patientId);
+            if (patient) {
+                const sourceInfo = patient.source === 'saved' ? '\n🆕 Recently Added Patient' : '\n📋 Sample Patient';
+                alert(`👁️ Viewing Patient Details:\n\nName: ${patient.name}\nID: ${patient.id}\nAge: ${patient.age}\nGender: ${patient.gender}\nCondition: ${patient.condition}\nStatus: ${patient.status}\nLast Visit: ${patient.lastVisit}\nPhone: ${patient.phone}${sourceInfo}`);
+            } else {
+                alert('❌ Patient not found');
+            }
+        }
+
+        function editPatient(patientId) {
+            const patient = currentPatients.find(p => p.id === patientId);
+            if (patient && patient.source === 'saved') {
+                alert(`✏️ Edit Patient ${patientId}\n\nThis would open the patient edit form for the saved patient: ${patient.name}`);
+            } else {
+                alert(`✏️ Edit Patient ${patientId}\n\nThis would open the patient edit form.`);
+            }
+        }
+
+        function diagnosePatient(patientId) {
+            const patient = currentPatients.find(p => p.id === patientId);
+            if (patient) {
+                if (confirm(`🩺 Start diagnosis for ${patient.name}?\n\nThis will open the diagnosis screen with patient information pre-filled.`)) {
+                    window.location.href = `diagnosis_screen.html?patientId=${patientId}`;
+                }
+            } else {
+                alert('❌ Patient not found');
+            }
+        }
+
+        // Real-time search
+        document.getElementById('searchInput').addEventListener('input', searchPatients);
+        document.getElementById('statusFilter').addEventListener('change', searchPatients);
+        document.getElementById('conditionFilter').addEventListener('change', searchPatients);
+
+        // Initialize page immediately and on DOM ready
+        function initializePage() {
+            console.log('Initializing page...');
+            try {
+                const patientsList = document.getElementById('patientsList');
+                if (patientsList) {
+                    console.log('Found patientsList element, loading patient data...');
+                    refreshPatientData(); // This will load data and render patients
+                    console.log('Patients loaded and rendered successfully');
+                } else {
+                    console.error('patientsList element not found!');
+                }
+                
+                // Navigation will be handled separately
+            } catch (error) {
+                console.error('Error initializing page:', error);
+            }
+        }
+
+        // Try multiple initialization methods
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            // DOM is already loaded
+            initializePage();
+        }
+        
+        // Also try on window load as backup
+        window.addEventListener('load', initializePage);
+    </script>
+</body>
+</html>

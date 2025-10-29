@@ -1,0 +1,2417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specialist Chat - AfriDiag</title>
+    <link rel="stylesheet" href="css/navigation.css">
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="/frontend/specialist_database.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .chat-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-title h2 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .chat-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .chat-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .chat-rooms-sidebar {
+            width: 350px;
+            background: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .sidebar-header h3 {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .new-chat-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-left: auto;
+        }
+
+        .new-chat-button:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+
+        .chat-rooms-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .chat-room-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .chat-room-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-room-item.active {
+            border-color: #4CAF50;
+            background: #f8fff8;
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .room-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.3;
+        }
+
+        .room-time {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .room-preview {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .room-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-participants {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .unread-badge {
+            background: #FF5722;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .emergency-badge {
+            background: #FF1744;
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-room-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .room-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .room-details h3 {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .room-status {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.sent .message-avatar {
+            background: #2196F3;
+        }
+
+        .message-content {
+            max-width: 70%;
+            background: white;
+            border-radius: 18px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .message.sent .message-content {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 5px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .message.sent .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-input-container {
+            background: white;
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .message-input {
+            flex: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #4CAF50;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-button {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 50%;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-button:hover {
+            background: #e0e0e0;
+            transform: scale(1.1);
+        }
+
+        .send-button {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .send-button:hover {
+            background: #45a049;
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 20px;
+            font-style: italic;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #4CAF50;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Recommendations Styles */
+        .recommendations-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+
+        .recommendation-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .recommendation-card:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        }
+
+        .recommendation-card.selected {
+            border-color: #4CAF50;
+            background: #f0f8f0;
+        }
+
+        .specialist-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .specialist-specialization {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .specialist-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .match-score {
+            background: #4CAF50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .availability-status {
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .available {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .busy {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .offline {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Emergency Contact Styles */
+        .emergency-contact {
+            margin-top: 8px;
+            padding: 8px;
+            background: #fff3e0;
+            border: 1px solid #ffb74d;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .emergency-label {
+            font-weight: 600;
+            color: #e65100;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: white;
+            border: 1px solid #ffb74d;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #e65100;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .contact-link:hover {
+            background: #e65100;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(230, 81, 0, 0.3);
+        }
+
+        .phone-link:hover {
+            background: #2e7d32;
+            border-color: #2e7d32;
+        }
+
+        .email-link:hover {
+            background: #1976d2;
+            border-color: #1976d2;
+        }
+
+        /* Nearest Specialists Styles */
+        .nearest-specialists-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .nearest-specialist-card {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nearest-specialist-card:last-child {
+            border-bottom: none;
+        }
+
+        .nearest-specialist-card:hover {
+            background: #f0f8ff;
+            border-color: #2196F3;
+        }
+
+        .nearest-specialist-card.selected {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+
+        .distance-badge {
+            background: #2196F3;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            float: right;
+        }
+
+        .specialist-location {
+            color: #666;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .btn-outline-primary {
+            border: 1px solid #2196F3;
+            color: #2196F3;
+            background: transparent;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-container {
+                height: calc(100vh - 40px);
+                margin: 20px 10px;
+            }
+
+            .chat-body {
+                flex-direction: column;
+            }
+
+            .chat-rooms-sidebar {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .chat-main {
+                flex: 1;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+        }
+
+        /* Medical Template Styles */
+        .medical-template-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .medical-template-btn:hover {
+            background: #1976D2;
+        }
+
+        .medical-template-modal {
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .template-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .template-section h4 {
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .template-section .form-group {
+            margin-bottom: 15px;
+        }
+
+        .template-section .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .medical-response-preview {
+            background: #e8f5e8;
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .medical-response-preview h5 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .confidence-high {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .confidence-medium {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .confidence-low {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .medical-message {
+            background: #f0f8ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .medical-message .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #1976D2;
+        }
+
+        .medical-message .diagnosis-section,
+        .medical-message .treatment-section,
+        .medical-message .followup-section {
+            margin-bottom: 15px;
+        }
+
+        .medical-message .section-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .medical-message .section-content {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .medical-message .icd-code {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🏥</span>
+                <span class="brand-text">AfriDiag</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="diagnosis_screen.html" class="nav-link">Diagnosis</a>
+                <a href="patients_screen.html" class="nav-link">Patients</a>
+                <a href="specialist_chat.html" class="nav-link active">Chat</a>
+                <a href="profile_screen.html" class="nav-link">Profile</a>
+            </div>
+            <div class="nav-user">
+                <span id="userGreeting">Welcome, User</span>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Chat Container -->
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="header-left">
+                <button class="back-button" onclick="goBack()">←</button>
+                <div class="chat-title">
+                    <h2>Specialist Consultations</h2>
+                    <div class="chat-subtitle">Connect with specialists for expert guidance</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-button" onclick="refreshChats()">
+                    🔄 Refresh
+                </button>
+                <button class="action-button" onclick="showNewChatModal()">
+                    ➕ New Chat
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Body -->
+        <div class="chat-body">
+            <!-- Chat Rooms Sidebar -->
+            <div class="chat-rooms-sidebar">
+                <div class="sidebar-header">
+                    <h3>Chat Rooms</h3>
+                    <button class="new-chat-button" onclick="showNewChatModal()">+ New</button>
+                </div>
+                <div class="chat-rooms-list" id="chatRoomsList">
+                    <div class="loading-indicator" id="roomsLoading">
+                        Loading chat rooms...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="chat-main">
+                <div id="emptyChatState" class="empty-state">
+                    <div class="empty-state-icon">💬</div>
+                    <h3>Select a chat room</h3>
+                    <p>Choose a conversation from the sidebar or start a new consultation with a specialist</p>
+                </div>
+
+                <div id="activeChatArea" style="display: none; height: 100%; display: flex; flex-direction: column;">
+                    <!-- Active Chat Header -->
+                    <div class="chat-room-header">
+                        <div class="room-info">
+                            <div class="room-avatar" id="activeRoomAvatar">👥</div>
+                            <div class="room-details">
+                                <h3 id="activeRoomTitle">Chat Room</h3>
+                                <div id="diagnosisInfo" style="display: none; margin: 4px 0; padding: 6px 10px; background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 6px; font-size: 12px; color: #1565c0;">
+                                    <span style="font-weight: 600;">🩺 Diagnosis:</span>
+                                    <span id="diagnosisText"></span>
+                                </div>
+                                <div class="room-status">
+                                    <div class="status-dot"></div>
+                                    <span id="activeRoomStatus">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="header-actions">
+                            <button class="action-button" onclick="viewRoomInfo()">
+                                ℹ️ Info
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Messages Container -->
+                    <div class="messages-container" id="messagesContainer">
+                        <div class="loading-indicator" id="messagesLoading">
+                            Loading messages...
+                        </div>
+                    </div>
+
+                    <!-- Typing Indicator -->
+                    <div class="typing-indicator" id="typingIndicator">
+                        Someone is typing...
+                    </div>
+
+                    <!-- Message Input -->
+                    <div class="message-input-container">
+                        <input 
+                            type="text" 
+                            class="message-input" 
+                            id="messageInput" 
+                            placeholder="Type your message..."
+                            onkeypress="handleKeyPress(event)"
+                        >
+                        <div class="input-actions">
+                            <button class="input-button" onclick="attachFile()" title="Attach File">
+                                📎
+                            </button>
+                            <button class="input-button medical-template-btn" onclick="openMedicalTemplate()" title="Medical Response Template">
+                                🩺
+                            </button>
+                            <button class="input-button send-button" id="sendButton" onclick="sendMessage()" title="Send Message">
+                                ➤
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Chat Modal -->
+    <div class="modal" id="newChatModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Start New Consultation</h3>
+                <button class="close-button" onclick="closeModal('newChatModal')">&times;</button>
+            </div>
+            <form id="newChatForm" onsubmit="createNewChat(event)">
+                <div class="form-group">
+                    <label class="form-label">Consultation Title</label>
+                    <input type="text" class="form-input" id="chatTitle" required placeholder="e.g., Urgent cardiac consultation">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="chatDescription" placeholder="Describe the case or consultation needed..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Related Diagnosis (Optional)</label>
+                    <select class="form-select" id="diagnosisSelect">
+                        <option value="">Select a diagnosis...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Specialist Type</label>
+                    <select class="form-select" id="specialistType" required>
+                        <option value="">Select specialist type...</option>
+                        <option value="cardiologist">Cardiologist</option>
+                        <option value="neurologist">Neurologist</option>
+                        <option value="pediatrician">Pediatrician</option>
+                        <option value="surgeon">Surgeon</option>
+                        <option value="radiologist">Radiologist</option>
+                        <option value="emergency">Emergency Medicine</option>
+                        <option value="internal">Internal Medicine</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <!-- Intelligent Specialist Recommendations -->
+                <div class="form-group" id="recommendationsSection" style="display: none;">
+                    <label class="form-label">🤖 AI Recommended Specialists</label>
+                    <div class="recommendations-container" id="recommendationsContainer">
+                        <!-- Recommendations will be populated here -->
+                    </div>
+                    <small class="form-text text-muted">Based on the selected diagnosis and symptoms</small>
+                </div>
+
+                <!-- Location-Based Specialist Search -->
+                <div class="form-group">
+                    <label class="form-label">📍 Find Nearest Specialists</label>
+                    <select class="form-select" id="userLocation">
+                        <option value="">Select your location...</option>
+                        <option value="Nairobi, Kenya">Nairobi, Kenya</option>
+                        <option value="London, UK">London, UK</option>
+                        <option value="Cairo, Egypt">Cairo, Egypt</option>
+                        <option value="Lagos, Nigeria">Lagos, Nigeria</option>
+                        <option value="Cape Town, South Africa">Cape Town, South Africa</option>
+                        <option value="Accra, Ghana">Accra, Ghana</option>
+                        <option value="Addis Ababa, Ethiopia">Addis Ababa, Ethiopia</option>
+                        <option value="Kampala, Uganda">Kampala, Uganda</option>
+                        <option value="Dar es Salaam, Tanzania">Dar es Salaam, Tanzania</option>
+                        <option value="Kigali, Rwanda">Kigali, Rwanda</option>
+                        <option value="Lusaka, Zambia">Lusaka, Zambia</option>
+                        <option value="Harare, Zimbabwe">Harare, Zimbabwe</option>
+                        <option value="Maputo, Mozambique">Maputo, Mozambique</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-primary" id="findNearestBtn" onclick="findNearestSpecialists()" style="margin-top: 8px; width: 100%;">
+                        🔍 Find Nearest Specialists
+                    </button>
+                </div>
+
+                <!-- Nearest Specialists Results -->
+                <div class="form-group" id="nearestSpecialistsSection" style="display: none;">
+                    <label class="form-label">🗺️ Nearest Specialists</label>
+                    <div class="nearest-specialists-container" id="nearestSpecialistsContainer">
+                        <!-- Nearest specialists will be populated here -->
+                    </div>
+                    <small class="form-text text-muted">Specialists sorted by distance from your location</small>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isEmergency">
+                        <label for="isEmergency" class="form-label">🚨 Emergency Consultation</label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newChatModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Start Consultation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Medical Response Template Modal -->
+    <div class="modal" id="medicalTemplateModal">
+        <div class="modal-content medical-template-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">🩺 Medical Response Template</h3>
+                <button class="close-button" onclick="closeModal('medicalTemplateModal')">&times;</button>
+            </div>
+            <form id="medicalTemplateForm" onsubmit="sendMedicalResponse(event)">
+                <div class="template-section">
+                    <h4>📋 Primary Diagnosis</h4>
+                    <div class="form-group">
+                        <label class="form-label">Diagnosis</label>
+                        <input type="text" class="form-input" id="primaryDiagnosis" placeholder="e.g., Acute myocardial infarction" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ICD-10 Code</label>
+                        <input type="text" class="form-input" id="icdCode" placeholder="e.g., I21.9">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confidence Level</label>
+                        <select class="form-input" id="confidenceLevel" required>
+                            <option value="">Select confidence level</option>
+                            <option value="high">High (>90%)</option>
+                            <option value="medium">Medium (70-90%)</option>
+                            <option value="low">Low (<70%)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="template-section">
+                    <h4>🔍 Differential Diagnoses</h4>
+                    <div class="form-group">
+                        <textarea class="form-textarea" id="differentialDiagnoses" placeholder="List alternative diagnoses to consider..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="template-section">
+                    <h4>💊 Treatment Recommendations</h4>
+                    <div class="form-group">
+                        <label class="form-label">Immediate Actions</label>
+                        <textarea class="form-textarea" id="immediateActions" placeholder="Urgent interventions needed..." rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Medications</label>
+                        <textarea class="form-textarea" id="medications" placeholder="Prescribed medications with dosages..." rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Additional Treatments</label>
+                        <textarea class="form-textarea" id="additionalTreatments" placeholder="Other therapeutic interventions..." rows="2"></textarea>
+                    </div>
+                </div>
+
+                <div class="template-section">
+                    <h4>🔬 Diagnostic Tests</h4>
+                    <div class="form-group">
+                        <textarea class="form-textarea" id="diagnosticTests" placeholder="Recommended laboratory tests, imaging, etc..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="template-section">
+                    <h4>📅 Follow-up Instructions</h4>
+                    <div class="form-group">
+                        <label class="form-label">Follow-up Timeline</label>
+                        <select class="form-input" id="followupTimeline">
+                            <option value="">Select timeline</option>
+                            <option value="immediate">Immediate (within hours)</option>
+                            <option value="24hours">Within 24 hours</option>
+                            <option value="48hours">Within 48 hours</option>
+                            <option value="1week">Within 1 week</option>
+                            <option value="2weeks">Within 2 weeks</option>
+                            <option value="1month">Within 1 month</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-textarea" id="followupInstructions" placeholder="Specific follow-up care instructions..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="template-section">
+                    <h4>⚠️ Warning Signs</h4>
+                    <div class="form-group">
+                        <textarea class="form-textarea" id="warningSigns" placeholder="Signs that require immediate medical attention..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="template-section">
+                    <h4>📝 Additional Notes</h4>
+                    <div class="form-group">
+                        <textarea class="form-textarea" id="additionalNotes" placeholder="Any additional clinical notes or observations..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('medicalTemplateModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Medical Response</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let chatRooms = [];
+        let currentRoomId = null;
+        let currentMessages = [];
+        let messagePollingInterval = null;
+
+        // Display diagnosis information for a chat room
+        async function displayDiagnosisInfo(room) {
+            const diagnosisInfoElement = document.getElementById('diagnosisInfo');
+            const diagnosisTextElement = document.getElementById('diagnosisText');
+
+            // Hide diagnosis info by default
+            if (diagnosisInfoElement) {
+                diagnosisInfoElement.style.display = 'none';
+            }
+
+            // Check if room has diagnosis_id
+            if (room.diagnosis_id) {
+                try {
+                    // Fetch diagnosis details
+                    const response = await api.get(`/diagnoses/${room.diagnosis_id}`);
+                    if (response.ok) {
+                        const diagnosis = await response.json();
+                        
+                        // Create diagnosis display text
+                        let diagnosisDisplay = '';
+                        if (diagnosis.patient_name) {
+                            diagnosisDisplay += `Patient: ${diagnosis.patient_name}`;
+                        }
+                        if (diagnosis.primary_diagnosis) {
+                            diagnosisDisplay += diagnosisDisplay ? ` • ${diagnosis.primary_diagnosis}` : diagnosis.primary_diagnosis;
+                        }
+                        if (diagnosis.ai_diagnosis && diagnosis.ai_diagnosis !== diagnosis.primary_diagnosis) {
+                            diagnosisDisplay += diagnosisDisplay ? ` • AI: ${diagnosis.ai_diagnosis}` : `AI: ${diagnosis.ai_diagnosis}`;
+                        }
+                        if (diagnosis.status) {
+                            diagnosisDisplay += diagnosisDisplay ? ` • Status: ${diagnosis.status}` : `Status: ${diagnosis.status}`;
+                        }
+
+                        // Display diagnosis info if we have content
+                        if (diagnosisDisplay && diagnosisTextElement && diagnosisInfoElement) {
+                            diagnosisTextElement.textContent = diagnosisDisplay;
+                            diagnosisInfoElement.style.display = 'block';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching diagnosis info:', error);
+                    // Don't show error to user, just hide the diagnosis info
+                }
+            }
+        }
+
+        // Handle diagnosis context from URL parameters or sessionStorage
+        function handleDiagnosisContext() {
+            // Check for URL parameters first (existing functionality)
+            const urlParams = new URLSearchParams(window.location.search);
+            const context = urlParams.get('context');
+            const patient = urlParams.get('patient');
+            const diagnosis = urlParams.get('diagnosis');
+
+            // Check for sessionStorage data (new functionality from Request Second Opinion)
+            const diagnosisContext = sessionStorage.getItem('diagnosisContext');
+            const initialMessage = sessionStorage.getItem('initialChatMessage');
+
+            if (context === 'diagnosis' && patient && diagnosis) {
+                // Handle URL parameters (existing functionality)
+                showNewChatModal();
+                
+                const titleInput = document.getElementById('chatTitle');
+                if (titleInput) {
+                    titleInput.value = `Consultation for ${patient}`;
+                }
+                
+                const descriptionInput = document.getElementById('chatDescription');
+                if (descriptionInput) {
+                    const decodedDiagnosis = decodeURIComponent(diagnosis);
+                    descriptionInput.value = `Diagnosis consultation for patient: ${patient}\n\nDiagnosis Details:\n${decodedDiagnosis}`;
+                }
+                
+                setTimeout(() => {
+                    alert('A new chat has been prepared with the diagnosis information. Please review and create the chat to consult with a specialist.');
+                }, 500);
+            } else if (diagnosisContext && initialMessage) {
+                // Handle sessionStorage data from Request Second Opinion
+                try {
+                    const diagnosisData = JSON.parse(diagnosisContext);
+                    
+                    // Auto-open the new chat modal
+                    showNewChatModal();
+                    
+                    // Pre-fill the chat title
+                    const titleInput = document.getElementById('chatTitle');
+                    if (titleInput) {
+                        titleInput.value = 'Second Opinion Request';
+                    }
+                    
+                    // Pre-fill the description with diagnosis context
+                    const descriptionInput = document.getElementById('chatDescription');
+                    if (descriptionInput) {
+                        descriptionInput.value = `Second opinion consultation requested on ${new Date(diagnosisData.timestamp).toLocaleString()}`;
+                    }
+                    
+                    // Store the initial message to be sent when chat is created
+                    window.pendingInitialMessage = initialMessage;
+                    
+                    // Clear the sessionStorage data
+                    sessionStorage.removeItem('diagnosisContext');
+                    sessionStorage.removeItem('initialChatMessage');
+                    
+                    // Show helpful message
+                    setTimeout(() => {
+                        alert('🩺 Second Opinion Request\n\nA new chat has been prepared with your diagnosis information. Please create the chat to consult with a specialist for a second opinion.');
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('Error parsing diagnosis context:', error);
+                    alert('⚠️ Error loading diagnosis information. You can still create a new chat manually.');
+                }
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            try {
+                // Check authentication
+                try {
+                    currentUser = await api.getCurrentUser();
+                } catch (error) {
+                    // If authentication fails, try to login with demo credentials
+                    console.log('No authentication found, attempting demo login...');
+                    try {
+                        await api.login('frontline@afridiag.org', 'frontline123');
+                        currentUser = await api.getCurrentUser();
+                        console.log('Demo login successful');
+                    } catch (loginError) {
+                        console.error('Demo login failed:', loginError);
+                        showError('Authentication failed. Please refresh the page.');
+                        return;
+                    }
+                }
+
+                if (!currentUser) {
+                    showError('Failed to get user information. Please refresh the page.');
+                    return;
+                }
+
+                // Update user greeting
+                const userGreeting = document.getElementById('userGreeting');
+                if (userGreeting) {
+                    userGreeting.textContent = `Welcome, ${currentUser.full_name || currentUser.username}`;
+                }
+
+                // Load initial data
+                await loadChatRooms();
+                await loadDiagnoses();
+
+                // Handle diagnosis context if coming from diagnosis page
+                handleDiagnosisContext();
+
+                // Initialize WebSocket connection
+                initializeWebSocket();
+
+                // Add typing indicator event listener
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput) {
+                    messageInput.addEventListener('input', handleMessageInput);
+                }
+
+                // Add diagnosis selection event listener for recommendations
+                const diagnosisSelect = document.getElementById('diagnosisSelect');
+                if (diagnosisSelect) {
+                    diagnosisSelect.addEventListener('change', onDiagnosisSelect);
+                }
+
+                // Initialize location options for nearest specialists
+                initializeLocationOptions();
+
+            } catch (error) {
+                console.error('Failed to initialize app:', error);
+                showError('Failed to load chat interface');
+            }
+        }
+
+        // Chat Rooms Management
+        async function loadChatRooms() {
+            try {
+                const roomsLoading = document.getElementById('roomsLoading');
+                if (roomsLoading) {
+                    roomsLoading.style.display = 'block';
+                }
+                
+                const response = await api.getChatRooms();
+
+                chatRooms = response.chat_rooms || [];
+                renderChatRooms();
+
+            } catch (error) {
+                console.error('Failed to load chat rooms:', error);
+                showError('Failed to load chat rooms');
+            } finally {
+                const roomsLoading = document.getElementById('roomsLoading');
+                if (roomsLoading) {
+                    roomsLoading.style.display = 'none';
+                }
+            }
+        }
+
+        function renderChatRooms() {
+            const container = document.getElementById('chatRoomsList');
+            const loadingIndicator = document.getElementById('roomsLoading');
+            
+            if (chatRooms.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 40px 20px;">
+                        <div style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;">💬</div>
+                        <h4 style="color: #333; margin-bottom: 10px;">No chat rooms yet</h4>
+                        <p style="color: #666; font-size: 14px; text-align: center;">Start a new consultation to connect with specialists</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const roomsHTML = chatRooms.map(room => `
+                <div class="chat-room-item ${room.id === currentRoomId ? 'active' : ''}" 
+                     onclick="selectChatRoom(${room.id})">
+                    ${room.is_emergency ? '<div class="emergency-badge">EMERGENCY</div>' : ''}
+                    <div class="room-header">
+                        <div class="room-title">${escapeHtml(room.title)}</div>
+                        <div class="room-time">${formatTime(room.updated_at || room.created_at)}</div>
+                    </div>
+                    <div class="room-preview">
+                        ${room.last_message ? escapeHtml(room.last_message) : 'No messages yet'}
+                    </div>
+                    <div class="room-meta">
+                        <div class="room-participants">${room.participant_count} participants</div>
+                        ${room.unread_messages > 0 ? `<div class="unread-badge">${room.unread_messages}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = roomsHTML;
+        }
+
+        async function selectChatRoom(roomId) {
+            try {
+                currentRoomId = roomId;
+                const room = chatRooms.find(r => r.id === roomId);
+                
+                if (!room) return;
+
+                // Update UI
+                renderChatRooms(); // Re-render to show active state
+                const emptyChatState = document.getElementById('emptyChatState');
+                const activeChatArea = document.getElementById('activeChatArea');
+                if (emptyChatState) emptyChatState.style.display = 'none';
+                if (activeChatArea) activeChatArea.style.display = 'flex';
+
+                // Update room header
+                const activeRoomTitle = document.getElementById('activeRoomTitle');
+                const activeRoomAvatar = document.getElementById('activeRoomAvatar');
+                const activeRoomStatus = document.getElementById('activeRoomStatus');
+                
+                if (activeRoomTitle) activeRoomTitle.textContent = room.title;
+                if (activeRoomAvatar) activeRoomAvatar.textContent = room.is_emergency ? '🚨' : '👥';
+                if (activeRoomStatus) activeRoomStatus.textContent = 
+                    `${room.participant_count} participants • ${room.status}`;
+
+                // Display diagnosis information if available
+                await displayDiagnosisInfo(room);
+
+                // Load messages
+                await loadMessages(roomId);
+
+                // Mark messages as read
+                await markMessagesAsRead(roomId);
+
+            } catch (error) {
+                console.error('Failed to select chat room:', error);
+                showError('Failed to load chat room');
+            }
+        }
+
+        async function loadMessages(roomId) {
+            try {
+                const messagesLoading = document.getElementById('messagesLoading');
+                if (messagesLoading) {
+                    messagesLoading.style.display = 'block';
+                }
+                
+                const response = await api.request(`/chat/rooms/${roomId}/messages`, {
+                    method: 'GET'
+                });
+
+                currentMessages = response.messages || [];
+                renderMessages();
+
+            } catch (error) {
+                console.error('Failed to load messages:', error);
+                showError('Failed to load messages');
+            } finally {
+                const messagesLoading = document.getElementById('messagesLoading');
+                if (messagesLoading) {
+                    messagesLoading.style.display = 'none';
+                }
+            }
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            
+            if (currentMessages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💭</div>
+                        <h3>No messages yet</h3>
+                        <p>Start the conversation by sending a message</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const messagesHTML = currentMessages.map(message => {
+                const isSent = message.sender_id === currentUser.id;
+                const isMedicalResponse = message.message_type === 'medical_response';
+                
+                let messageContent;
+                if (isMedicalResponse) {
+                    messageContent = formatMedicalMessageDisplay(message.content);
+                } else {
+                    messageContent = `<div class="message-text">${escapeHtml(message.content)}</div>`;
+                }
+                
+                return `
+                    <div class="message ${isSent ? 'sent' : 'received'} ${isMedicalResponse ? 'medical-message' : ''}">
+                        <div class="message-avatar">
+                            ${getAvatarForRole(message.sender_role)}
+                        </div>
+                        <div class="message-content">
+                            ${messageContent}
+                            <div class="message-time">${formatTime(message.created_at)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = messagesHTML;
+            scrollToBottom();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            if (!input) return;
+            
+            const content = input.value.trim();
+            
+            if (!content || !currentRoomId) return;
+
+            try {
+                const sendButton = document.getElementById('sendButton');
+                if (sendButton) {
+                    sendButton.disabled = true;
+                }
+
+                const response = await api.request(`/chat/rooms/${currentRoomId}/messages`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        content: content,
+                        message_type: 'text',
+                        chat_room_id: currentRoomId
+                    })
+                });
+
+                // Add message to current messages
+                currentMessages.push(response);
+                renderMessages();
+
+                // Clear input
+                input.value = '';
+
+                // Refresh chat rooms to update last message
+                await loadChatRooms();
+
+            } catch (error) {
+                console.error('Failed to send message:', error);
+                showError('Failed to send message');
+            } finally {
+                const sendButton = document.getElementById('sendButton');
+                if (sendButton) {
+                    sendButton.disabled = false;
+                }
+            }
+        }
+
+        async function createNewChat(event) {
+            event.preventDefault();
+            
+            try {
+                const formData = new FormData(event.target);
+                const titleElement = document.getElementById('chatTitle');
+                const descriptionElement = document.getElementById('chatDescription');
+                const diagnosisElement = document.getElementById('diagnosisSelect');
+                const emergencyElement = document.getElementById('isEmergency');
+                
+                const chatData = {
+                    title: titleElement ? titleElement.value : '',
+                    description: descriptionElement ? descriptionElement.value : '',
+                    diagnosis_id: diagnosisElement ? (diagnosisElement.value || null) : null,
+                    is_emergency: emergencyElement ? emergencyElement.checked : false,
+                    participant_ids: [] // Will be populated by backend based on specialist type
+                };
+
+                const response = await api.createChatRoom(chatData);
+
+                // Close modal
+                closeModal('newChatModal');
+                
+                // Refresh chat rooms
+                await loadChatRooms();
+                
+                // Select the new chat room
+                await selectChatRoom(response.id);
+
+                // If there's a pending initial message (from second opinion request), send it
+                if (window.pendingInitialMessage) {
+                    try {
+                        // Wait a moment for the chat to be fully loaded
+                        setTimeout(async () => {
+                            const messageInput = document.getElementById('messageInput');
+                            if (messageInput) {
+                                messageInput.value = window.pendingInitialMessage;
+                                await sendMessage(); // Send the message
+                                window.pendingInitialMessage = null; // Clear the pending message
+                                showSuccess('Second opinion request sent to specialist!');
+                            }
+                        }, 1000);
+                    } catch (error) {
+                        console.error('Error sending initial message:', error);
+                        showError('Chat created but failed to send initial message. Please send your message manually.');
+                    }
+                } else {
+                    showSuccess('Consultation started successfully!');
+                }
+
+            } catch (error) {
+                console.error('Failed to create chat:', error);
+                showError('Failed to start consultation');
+            }
+        }
+
+        async function loadDiagnoses() {
+            try {
+                const response = await api.getDiagnoses();
+
+                const select = document.getElementById('diagnosisSelect');
+                // Clear existing options except the first one
+                while (select.children.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+                
+                // The API returns the diagnoses array directly
+                const diagnoses = Array.isArray(response) ? response : [];
+                
+                diagnoses.forEach(diagnosis => {
+                    const option = document.createElement('option');
+                    option.value = diagnosis.id;
+                    
+                    // Create a more informative display text
+                    let displayText = `#${diagnosis.id}`;
+                    if (diagnosis.patient && diagnosis.patient.first_name) {
+                        displayText += ` - ${diagnosis.patient.first_name} ${diagnosis.patient.last_name || ''}`.trim();
+                    }
+                    if (diagnosis.primary_diagnosis) {
+                        displayText += ` - ${diagnosis.primary_diagnosis}`;
+                    } else if (diagnosis.ai_diagnosis) {
+                        displayText += ` - ${diagnosis.ai_diagnosis}`;
+                    }
+                    if (diagnosis.status) {
+                        displayText += ` (${diagnosis.status})`;
+                    }
+                    
+                    option.textContent = displayText;
+                    select.appendChild(option);
+                });
+
+                console.log(`Loaded ${diagnoses.length} diagnoses for consultation`);
+
+            } catch (error) {
+                console.error('Failed to load diagnoses:', error);
+                showError('Failed to load diagnoses for consultation');
+            }
+        }
+
+        // Handle diagnosis selection and show recommendations
+        async function onDiagnosisSelect() {
+            const diagnosisSelect = document.getElementById('diagnosisSelect');
+            const recommendationsSection = document.getElementById('recommendationsSection');
+            const recommendationsContainer = document.getElementById('recommendationsContainer');
+            
+            if (!diagnosisSelect.value) {
+                recommendationsSection.style.display = 'none';
+                return;
+            }
+
+            try {
+                // Get the selected diagnosis details
+                const response = await api.getDiagnoses();
+                const diagnoses = Array.isArray(response) ? response : [];
+                const selectedDiagnosis = diagnoses.find(d => d.id == diagnosisSelect.value);
+                
+                if (!selectedDiagnosis) {
+                    recommendationsSection.style.display = 'none';
+                    return;
+                }
+
+                // Get specialist recommendations
+                const specialistDb = new SpecialistDatabase();
+                const recommendations = specialistDb.recommendSpecialists(selectedDiagnosis);
+                
+                // Display recommendations
+                displayRecommendations(recommendations);
+                recommendationsSection.style.display = 'block';
+
+            } catch (error) {
+                console.error('Failed to load recommendations:', error);
+                recommendationsSection.style.display = 'none';
+            }
+        }
+
+        function displayRecommendations(recommendations) {
+            const container = document.getElementById('recommendationsContainer');
+            container.innerHTML = '';
+
+            if (!recommendations || recommendations.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No specialist recommendations available.</p>';
+                return;
+            }
+
+            recommendations.forEach((rec, index) => {
+                const card = document.createElement('div');
+                card.className = 'recommendation-card';
+                card.onclick = () => selectRecommendation(rec, card);
+                
+                const availabilityStatus = rec.availability?.status || 'offline';
+                const availabilityClass = availabilityStatus === 'available' ? 'available' : 
+                                        availabilityStatus === 'busy' ? 'busy' : 'offline';
+                
+                card.innerHTML = `
+                    <div class="specialist-name">${rec.name}</div>
+                    <div class="specialist-specialization">${rec.specialization}${rec.subSpecialties ? ' • ' + rec.subSpecialties.join(', ') : ''}</div>
+                    <div class="specialist-details">
+                        <span>${rec.location} • ${rec.experience} years exp.</span>
+                        <div>
+                            <span class="match-score">${Math.round(rec.matchScore || 0)}% match</span>
+                            <span class="availability-status ${availabilityClass}">${availabilityStatus}</span>
+                        </div>
+                    </div>
+                    <div class="emergency-contact">
+                        <div class="emergency-label">🚨 Emergency Contact:</div>
+                        <div class="contact-info">
+                            <a href="tel:${rec.phone}" class="contact-link phone-link">
+                                📞 ${rec.phone}
+                            </a>
+                            <a href="mailto:${rec.email}" class="contact-link email-link">
+                                ✉️ ${rec.email}
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function selectRecommendation(recommendation, cardElement) {
+            // Remove previous selection
+            document.querySelectorAll('.recommendation-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select current card
+            cardElement.classList.add('selected');
+            
+            // Auto-fill specialist type based on recommendation
+            const specialistTypeSelect = document.getElementById('specialistType');
+            const specialization = recommendation.specialist.specialization.toLowerCase();
+            
+            // Map specializations to form options
+            const specializationMap = {
+                'cardiology': 'cardiologist',
+                'neurology': 'neurologist',
+                'pediatrics': 'pediatrician',
+                'surgery': 'surgeon',
+                'radiology': 'radiologist',
+                'emergency medicine': 'emergency',
+                'internal medicine': 'internal'
+            };
+            
+            const mappedValue = specializationMap[specialization] || 'other';
+            specialistTypeSelect.value = mappedValue;
+            
+            // Store selected specialist info for later use
+            window.selectedSpecialist = recommendation.specialist;
+        }
+
+        // Nearest Specialists Functionality
+        async function findNearestSpecialists() {
+            const userLocationSelect = document.getElementById('userLocation');
+            const specialistTypeSelect = document.getElementById('specialistType');
+            const nearestSpecialistsContainer = document.getElementById('nearestSpecialistsContainer');
+            
+            if (!userLocationSelect.value) {
+                alert('Please select your location first.');
+                return;
+            }
+
+            try {
+                const specialistDb = new SpecialistDatabase();
+                const userLocation = userLocationSelect.value;
+                const specialization = specialistTypeSelect.value !== 'other' ? specialistTypeSelect.value : null;
+                
+                // Get nearest specialists
+                const nearestSpecialists = specialistDb.findNearestSpecialists(userLocation, specialization, 10);
+                
+                // Display results
+                displayNearestSpecialists(nearestSpecialists);
+                
+                // Show the results container
+                nearestSpecialistsContainer.style.display = 'block';
+
+            } catch (error) {
+                console.error('Failed to find nearest specialists:', error);
+                alert('Failed to find nearest specialists. Please try again.');
+            }
+        }
+
+        function displayNearestSpecialists(specialists) {
+            const container = document.getElementById('nearestSpecialistsContainer');
+            container.innerHTML = '';
+
+            if (!specialists || specialists.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No specialists found in your area.</p>';
+                return;
+            }
+
+            specialists.forEach((specialist, index) => {
+                const card = document.createElement('div');
+                card.className = 'nearest-specialist-card';
+                card.onclick = () => selectNearestSpecialist(specialist, card);
+                
+                const availabilityClass = specialist.availability_status === 'available' ? 'available' : 
+                                        specialist.availability_status === 'busy' ? 'busy' : 'offline';
+                
+                const distanceText = specialist.distance !== undefined ? 
+                    `${specialist.distance.toFixed(1)} km` : 'Location match';
+                
+                card.innerHTML = `
+                    <div class="distance-badge">${distanceText}</div>
+                    <div class="specialist-name">${specialist.name}</div>
+                    <div class="specialist-specialization">${specialist.specialization}${specialist.sub_specialties ? ' • ' + specialist.sub_specialties.join(', ') : ''}</div>
+                    <div class="specialist-location">${specialist.location}</div>
+                    <div class="specialist-details">
+                        <span>${specialist.experience} years exp.</span>
+                        <span class="availability-status ${availabilityClass}">${specialist.availability_status}</span>
+                    </div>
+                    <div class="emergency-contact">
+                        <div class="emergency-label">🚨 Emergency Contact:</div>
+                        <div class="contact-info">
+                            <a href="tel:${specialist.phone}" class="contact-link phone-link">
+                                📞 ${specialist.phone}
+                            </a>
+                            <a href="mailto:${specialist.email}" class="contact-link email-link">
+                                ✉️ ${specialist.email}
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function selectNearestSpecialist(specialist, cardElement) {
+            // Remove previous selection
+            document.querySelectorAll('.nearest-specialist-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select current card
+            cardElement.classList.add('selected');
+            
+            // Auto-fill specialist type based on selection
+            const specialistTypeSelect = document.getElementById('specialistType');
+            const specialization = specialist.specialization.toLowerCase();
+            
+            // Map specializations to form options
+            const specializationMap = {
+                'cardiology': 'cardiologist',
+                'neurology': 'neurologist',
+                'pediatrics': 'pediatrician',
+                'surgery': 'surgeon',
+                'radiology': 'radiologist',
+                'emergency medicine': 'emergency',
+                'internal medicine': 'internal'
+            };
+            
+            const mappedValue = specializationMap[specialization] || 'other';
+            specialistTypeSelect.value = mappedValue;
+            
+            // Store selected specialist info for later use
+            window.selectedSpecialist = specialist;
+        }
+
+        // Initialize location options when page loads
+        function initializeLocationOptions() {
+            const userLocationSelect = document.getElementById('userLocation');
+            const specialistDb = new SpecialistDatabase();
+            const locations = specialistDb.getAvailableLocations();
+            
+            // Clear existing options except the first one
+            userLocationSelect.innerHTML = '<option value="">Select your location</option>';
+            
+            // Add location options
+            locations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                option.textContent = location;
+                userLocationSelect.appendChild(option);
+            });
+        }
+
+        async function markMessagesAsRead(roomId) {
+            try {
+                await api.request(`/chat/rooms/${roomId}/mark-read`, {
+                    method: 'POST'
+                });
+            } catch (error) {
+                console.error('Failed to mark messages as read:', error);
+            }
+        }
+
+        // WebSocket functionality for real-time messaging
+        let websocket = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        let typingTimer = null;
+        let isTyping = false;
+
+        function initializeWebSocket() {
+            if (!currentUser || !currentUser.id) {
+                console.error('Cannot initialize WebSocket: No current user');
+                return;
+            }
+
+            const wsUrl = `ws://localhost:8001/api/v1/chat/ws/${currentUser.id}`;
+            websocket = new WebSocket(wsUrl);
+
+            websocket.onopen = function(event) {
+                console.log('WebSocket connected');
+                reconnectAttempts = 0;
+                
+                // Join current room if any
+                if (currentRoomId) {
+                    sendWebSocketMessage({
+                        type: 'join_room',
+                        room_id: currentRoomId
+                    });
+                }
+            };
+
+            websocket.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                }
+            };
+
+            websocket.onclose = function(event) {
+                console.log('WebSocket disconnected');
+                
+                // Attempt to reconnect
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts++;
+                    console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})`);
+                    setTimeout(initializeWebSocket, 2000 * reconnectAttempts);
+                } else {
+                    console.error('Max reconnection attempts reached');
+                    showError('Connection lost. Please refresh the page.');
+                }
+            };
+
+            websocket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+            };
+        }
+
+        function sendWebSocketMessage(message) {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                websocket.send(JSON.stringify(message));
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'new_message':
+                    handleNewMessage(data.message);
+                    break;
+                    
+                case 'typing':
+                    handleTypingIndicator(data);
+                    break;
+                    
+                case 'user_status':
+                    handleUserStatusChange(data);
+                    break;
+                    
+                case 'pong':
+                    // Handle ping response
+                    break;
+                    
+                default:
+                    console.log('Unknown WebSocket message type:', data.type);
+            }
+        }
+
+        function handleNewMessage(message) {
+            // Only add message if it's for the current room
+            if (message.room_id === currentRoomId) {
+                // Check if message already exists to avoid duplicates
+                const existingMessage = currentMessages.find(m => m.id === message.id);
+                if (!existingMessage) {
+                    currentMessages.push(message);
+                    renderMessages();
+                    scrollToBottom();
+                }
+            }
+            
+            // Update chat rooms list to show new message
+            loadChatRooms();
+        }
+
+        function handleTypingIndicator(data) {
+            if (data.room_id === currentRoomId && data.user_id !== currentUser.id) {
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    if (data.is_typing) {
+                        typingIndicator.textContent = 'Someone is typing...';
+                        typingIndicator.style.display = 'block';
+                    } else {
+                        typingIndicator.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        function handleUserStatusChange(data) {
+            // Update user status in the interface
+            console.log(`User ${data.user_id} is now ${data.status}`);
+            // You can add visual indicators for online/offline status here
+        }
+
+        function sendTypingIndicator(isTyping) {
+            if (currentRoomId && websocket && websocket.readyState === WebSocket.OPEN) {
+                sendWebSocketMessage({
+                    type: 'typing',
+                    room_id: currentRoomId,
+                    is_typing: isTyping
+                });
+            }
+        }
+
+        function handleMessageInput() {
+            if (!isTyping) {
+                isTyping = true;
+                sendTypingIndicator(true);
+            }
+            
+            // Clear existing timer
+            if (typingTimer) {
+                clearTimeout(typingTimer);
+            }
+            
+            // Set timer to stop typing indicator
+            typingTimer = setTimeout(() => {
+                isTyping = false;
+                sendTypingIndicator(false);
+            }, 1000);
+        }
+
+        // Utility Functions
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            } else {
+                // Handle typing indicator
+                handleMessageInput();
+            }
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('messagesContainer');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        function showNewChatModal() {
+            const modal = document.getElementById('newChatModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function refreshChats() {
+            loadChatRooms();
+            if (currentRoomId) {
+                loadMessages(currentRoomId);
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function getAvatarForRole(role) {
+            const avatars = {
+                'SPECIALIST': '👨‍⚕️',
+                'FRONTLINE_WORKER': '👩‍⚕️',
+                'ADMIN': '👨‍💼'
+            };
+            return avatars[role] || '👤';
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showError(message) {
+            // Simple error notification - could be enhanced with a proper notification system
+            alert('Error: ' + message);
+        }
+
+        function showSuccess(message) {
+            // Simple success notification - could be enhanced with a proper notification system
+            alert('Success: ' + message);
+        }
+
+        function attachFile() {
+            // File attachment functionality - to be implemented
+            alert('File attachment feature coming soon!');
+        }
+
+        function viewRoomInfo() {
+            // Room info modal - to be implemented
+            alert('Room information feature coming soon!');
+        }
+
+        // Medical Template Functions
+        function openMedicalTemplate() {
+            const modal = document.getElementById('medicalTemplateModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // Clear previous form data
+                document.getElementById('medicalTemplateForm').reset();
+            }
+        }
+
+        async function sendMedicalResponse(event) {
+            event.preventDefault();
+            
+            if (!currentRoomId) {
+                showError('No active chat room selected');
+                return;
+            }
+
+            try {
+                // Collect form data
+                const formData = {
+                    primaryDiagnosis: document.getElementById('primaryDiagnosis').value,
+                    icdCode: document.getElementById('icdCode').value,
+                    confidenceLevel: document.getElementById('confidenceLevel').value,
+                    differentialDiagnoses: document.getElementById('differentialDiagnoses').value,
+                    immediateActions: document.getElementById('immediateActions').value,
+                    medications: document.getElementById('medications').value,
+                    additionalTreatments: document.getElementById('additionalTreatments').value,
+                    diagnosticTests: document.getElementById('diagnosticTests').value,
+                    followupTimeline: document.getElementById('followupTimeline').value,
+                    followupInstructions: document.getElementById('followupInstructions').value,
+                    warningSigns: document.getElementById('warningSigns').value,
+                    additionalNotes: document.getElementById('additionalNotes').value
+                };
+
+                // Format the medical response
+                const medicalResponse = formatMedicalResponse(formData);
+
+                // Send the formatted message
+                const response = await api.request(`/chat/rooms/${currentRoomId}/messages`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        content: medicalResponse,
+                        message_type: 'medical_response',
+                        chat_room_id: currentRoomId,
+                        medical_data: formData
+                    })
+                });
+
+                // Add message to current messages
+                currentMessages.push(response);
+                renderMessages();
+
+                // Close modal
+                closeModal('medicalTemplateModal');
+
+                // Refresh chat rooms to update last message
+                await loadChatRooms();
+
+                showSuccess('Medical response sent successfully!');
+
+            } catch (error) {
+                console.error('Failed to send medical response:', error);
+                showError('Failed to send medical response');
+            }
+        }
+
+        function formatMedicalResponse(data) {
+            let response = "🩺 **MEDICAL CONSULTATION RESPONSE**\n\n";
+
+            // Primary Diagnosis
+            response += "📋 **PRIMARY DIAGNOSIS**\n";
+            response += `• Diagnosis: ${data.primaryDiagnosis}\n`;
+            if (data.icdCode) {
+                response += `• ICD-10 Code: ${data.icdCode}\n`;
+            }
+            response += `• Confidence Level: ${data.confidenceLevel.charAt(0).toUpperCase() + data.confidenceLevel.slice(1)}\n\n`;
+
+            // Differential Diagnoses
+            if (data.differentialDiagnoses) {
+                response += "🔍 **DIFFERENTIAL DIAGNOSES**\n";
+                response += `${data.differentialDiagnoses}\n\n`;
+            }
+
+            // Treatment Recommendations
+            response += "💊 **TREATMENT RECOMMENDATIONS**\n";
+            response += `**Immediate Actions:**\n${data.immediateActions}\n\n`;
+            
+            if (data.medications) {
+                response += `**Medications:**\n${data.medications}\n\n`;
+            }
+            
+            if (data.additionalTreatments) {
+                response += `**Additional Treatments:**\n${data.additionalTreatments}\n\n`;
+            }
+
+            // Diagnostic Tests
+            if (data.diagnosticTests) {
+                response += "🔬 **RECOMMENDED DIAGNOSTIC TESTS**\n";
+                response += `${data.diagnosticTests}\n\n`;
+            }
+
+            // Follow-up Instructions
+            if (data.followupTimeline || data.followupInstructions) {
+                response += "📅 **FOLLOW-UP INSTRUCTIONS**\n";
+                if (data.followupTimeline) {
+                    response += `• Timeline: ${data.followupTimeline.replace(/([a-z])([A-Z])/g, '$1 $2')}\n`;
+                }
+                if (data.followupInstructions) {
+                    response += `• Instructions: ${data.followupInstructions}\n`;
+                }
+                response += "\n";
+            }
+
+            // Warning Signs
+            if (data.warningSigns) {
+                response += "⚠️ **WARNING SIGNS - SEEK IMMEDIATE CARE IF:**\n";
+                response += `${data.warningSigns}\n\n`;
+            }
+
+            // Additional Notes
+            if (data.additionalNotes) {
+                response += "📝 **ADDITIONAL CLINICAL NOTES**\n";
+                response += `${data.additionalNotes}\n\n`;
+            }
+
+            response += "---\n";
+            response += `*Medical consultation provided on ${new Date().toLocaleString()}*`;
+
+            return response;
+        }
+
+        function formatMedicalMessageDisplay(content) {
+            // Convert markdown-style formatting to HTML for better display
+            let formattedContent = escapeHtml(content);
+            
+            // Convert **bold** to <strong>
+            formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Convert line breaks to <br>
+            formattedContent = formattedContent.replace(/\n/g, '<br>');
+            
+            // Add medical message header
+            if (formattedContent.includes('MEDICAL CONSULTATION RESPONSE')) {
+                formattedContent = `
+                    <div class="message-header">
+                        🩺 Medical Consultation Response
+                    </div>
+                    <div class="medical-content">
+                        ${formattedContent.replace('🩺 **MEDICAL CONSULTATION RESPONSE**<br><br>', '')}
+                    </div>
+                `;
+            } else {
+                formattedContent = `<div class="message-text">${formattedContent}</div>`;
+            }
+            
+            return formattedContent;
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (messagePollingInterval) {
+                clearInterval(messagePollingInterval);
+            }
+        });
+    </script>
+</body>
+</html>

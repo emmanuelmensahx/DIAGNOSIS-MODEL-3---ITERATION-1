@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Patient Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background-color: #2196F3;
+            color: white;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        
+        .search-bar {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            background: white;
+        }
+        
+        .search-bar:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+        
+        .patient-list {
+            display: grid;
+            gap: 16px;
+        }
+        
+        .patient-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .patient-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .patient-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .patient-id {
+            font-size: 14px;
+            color: #666;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .patient-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .info-item {
+            font-size: 14px;
+        }
+        
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            color: #333;
+        }
+        
+        .patient-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1976D2;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: #2196F3;
+            border: 1px solid #2196F3;
+        }
+        
+        .btn-outline:hover {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        /* Floating Action Button (Blue Plus Sign) */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background-color: #2196F3;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            z-index: 1000;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(33, 150, 243, 0.6);
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
+        }
+        
+        .fab-icon {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background-color: #4CAF50;
+        }
+        
+        .status-offline {
+            background-color: #FF9800;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .patient-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .fab {
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AfriDiag - Patient Management</h1>
+    </div>
+    
+    <div class="container">
+        <input type="text" class="search-bar" id="searchInput" placeholder="Search patients...">
+        
+        <div id="patientList" class="patient-list">
+            <div class="loading">Loading patients...</div>
+        </div>
+        
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h3>No patients found</h3>
+            <p>Start by adding your first patient using the blue plus button</p>
+            <button class="btn btn-primary" onclick="openAddPatientModal()">Add New Patient</button>
+        </div>
+    </div>
+    
+    <!-- Floating Action Button (Blue Plus Sign) -->
+    <button class="fab" onclick="openAddPatientModal()" title="Add New Patient">
+        <span class="fab-icon">+</span>
+    </button>
+    
+    <!-- Add Patient Modal -->
+    <div id="addPatientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Patient</h2>
+                <button class="close" onclick="closeAddPatientModal()">&times;</button>
+            </div>
+            
+            <form id="addPatientForm">
+                <div class="form-group">
+                    <label class="form-label" for="patientName">Full Name</label>
+                    <input type="text" class="form-input" id="patientName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="patientAge">Age</label>
+                    <input type="number" class="form-input" id="patientAge" min="0" max="120" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="patientGender">Gender</label>
+                    <select class="form-input" id="patientGender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="patientPhone">Phone Number</label>
+                    <input type="tel" class="form-input" id="patientPhone">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="patientNotes">Notes</label>
+                    <textarea class="form-input" id="patientNotes" rows="3" placeholder="Any additional notes..."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeAddPatientModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8001/api/v1';
+        let patients = [
+            // Sample patients for demonstration
+            {
+                id: 1,
+                first_name: "John",
+                last_name: "Doe",
+                age: 35,
+                gender: "Male",
+                phone: "+1234567890",
+                email: "john.doe@email.com",
+                created_at: "2024-01-15T10:30:00Z"
+            },
+            {
+                id: 2,
+                first_name: "Jane",
+                last_name: "Smith",
+                age: 28,
+                gender: "Female",
+                phone: "+1234567891",
+                email: "jane.smith@email.com",
+                created_at: "2024-01-16T14:20:00Z"
+            },
+            {
+                id: 3,
+                first_name: "Michael",
+                last_name: "Johnson",
+                age: 42,
+                gender: "Male",
+                phone: "+1234567892",
+                email: "michael.johnson@email.com",
+                created_at: "2024-01-17T09:15:00Z"
+            }
+        ];
+        let authToken = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Patient Management App loaded');
+            autoLogin();
+        });
+
+        // Auto login function
+        async function autoLogin() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        username: 'worker@afridiag.com',
+                        password: 'demo123'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    console.log('Auto-login successful');
+                    loadPatients();
+                } else {
+                    console.error('Auto-login failed');
+                    showError('Authentication failed. Please check your connection.');
+                }
+            } catch (error) {
+                console.error('Auto-login error:', error);
+                showError('Connection error. Please check if the backend server is running.');
+            }
+        }
+
+        // Load patients from API
+        async function loadPatients() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/patients`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Handle different response formats
+                    if (Array.isArray(data)) {
+                        patients = data;
+                    } else if (data.patients && Array.isArray(data.patients)) {
+                        patients = data.patients;
+                    } else if (data.data && Array.isArray(data.data)) {
+                        patients = data.data;
+                    } else {
+                        console.log('Unexpected data format:', data);
+                        patients = [];
+                    }
+                    console.log('Loaded patients:', patients);
+                    renderPatients();
+                } else {
+                    console.error('Failed to load patients, status:', response.status);
+                    patients = [];
+                    renderPatients();
+                    showError('Failed to load patients');
+                }
+            } catch (error) {
+                console.error('Error loading patients:', error);
+                patients = [];
+                renderPatients();
+                showError('Error loading patients');
+            }
+        }
+
+        // Render patients list
+        function renderPatients() {
+            const patientList = document.getElementById('patientList');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (patients.length === 0) {
+                patientList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            patientList.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            patientList.innerHTML = patients.map(patient => `
+                <div class="patient-card" onclick="viewPatientDetails(${patient.id})">
+                    <div class="patient-header">
+                        <div class="patient-name">${patient.name}</div>
+                        <div class="patient-id">ID: ${patient.id}</div>
+                    </div>
+                    
+                    <div class="patient-info">
+                        <div class="info-item">
+                            <span class="info-label">Age:</span>
+                            <span class="info-value">${patient.age || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Gender:</span>
+                            <span class="info-value">${patient.gender || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Phone:</span>
+                            <span class="info-value">${patient.phone || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value">
+                                <span class="status-indicator status-online"></span>
+                                Active
+                            </span>
+                        </div>
+                    </div>
+                    
+                    ${patient.notes ? `<div style="margin-top: 8px; color: #666; font-size: 14px;">${patient.notes}</div>` : ''}
+                    
+                    <div class="patient-actions">
+                        <button class="btn btn-outline" onclick="event.stopPropagation(); editPatient(${patient.id})">Edit</button>
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); viewPatientDetails(${patient.id})">Details</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredPatients = patients.filter(patient => 
+                patient.name.toLowerCase().includes(searchTerm) ||
+                (patient.phone && patient.phone.includes(searchTerm)) ||
+                patient.id.toString().includes(searchTerm)
+            );
+            
+            const patientList = document.getElementById('patientList');
+            patientList.innerHTML = filteredPatients.map(patient => `
+                <div class="patient-card" onclick="viewPatientDetails(${patient.id})">
+                    <div class="patient-header">
+                        <div class="patient-name">${patient.name}</div>
+                        <div class="patient-id">ID: ${patient.id}</div>
+                    </div>
+                    
+                    <div class="patient-info">
+                        <div class="info-item">
+                            <span class="info-label">Age:</span>
+                            <span class="info-value">${patient.age || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Gender:</span>
+                            <span class="info-value">${patient.gender || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Phone:</span>
+                            <span class="info-value">${patient.phone || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value">
+                                <span class="status-indicator status-online"></span>
+                                Active
+                            </span>
+                        </div>
+                    </div>
+                    
+                    ${patient.notes ? `<div style="margin-top: 8px; color: #666; font-size: 14px;">${patient.notes}</div>` : ''}
+                    
+                    <div class="patient-actions">
+                        <button class="btn btn-outline" onclick="event.stopPropagation(); editPatient(${patient.id})">Edit</button>
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); viewPatientDetails(${patient.id})">Details</button>
+                    </div>
+                </div>
+            `).join('');
+        });
+
+        // Modal functions
+        function openAddPatientModal() {
+            document.getElementById('addPatientModal').style.display = 'block';
+        }
+
+        function closeAddPatientModal() {
+            document.getElementById('addPatientModal').style.display = 'none';
+            document.getElementById('addPatientForm').reset();
+        }
+
+        // Add patient form submission
+        document.getElementById('addPatientForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('patientName').value,
+                age: parseInt(document.getElementById('patientAge').value),
+                gender: document.getElementById('patientGender').value,
+                phone: document.getElementById('patientPhone').value,
+                notes: document.getElementById('patientNotes').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/patients`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    const newPatient = await response.json();
+                    patients.push(newPatient);
+                    renderPatients();
+                    closeAddPatientModal();
+                    showSuccess('Patient added successfully!');
+                } else {
+                    showError('Failed to add patient');
+                }
+            } catch (error) {
+                console.error('Error adding patient:', error);
+                showError('Error adding patient');
+            }
+        });
+
+        // Patient actions
+        function viewPatientDetails(patientId) {
+            alert(`Viewing details for patient ID: ${patientId}`);
+            // In a real app, this would navigate to a patient details page
+        }
+
+        function editPatient(patientId) {
+            alert(`Editing patient ID: ${patientId}`);
+            // In a real app, this would open an edit modal or navigate to edit page
+        }
+
+        // Utility functions
+        function showSuccess(message) {
+            // Simple success notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                z-index: 3000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        function showError(message) {
+            // Simple error notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #f44336;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                z-index: 3000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('addPatientModal');
+            if (event.target === modal) {
+                closeAddPatientModal();
+            }
+        }
+    </script>
+</body>
+</html>

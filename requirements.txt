@@ -1,0 +1,51 @@
+# Backend dependencies
+fastapi
+uvicorn
+pydantic<2.0.0
+python-dotenv
+python-jose
+passlib[argon2]>=1.7.4
+argon2-cffi>=21.3.0
+python-multipart
+
+# Database
+sqlalchemy
+psycopg2-binary
+pymongo
+motor
+
+# Utilities
+requests
+httpx>=0.25.0
+tqdm
+
+# ML dependencies (required for prediction module)
+numpy>=1.24.0
+scikit-learn>=1.2.0
+joblib>=1.3.0
+
+# Email
+# smtplib is part of the Python standard library
+email-validator>=2.0.0
+pytest-asyncio>=0.23.0
+# Using argon2 via passlib[argon2]; no bcrypt dependency needed
+
+# Integration services dependencies
+# For mapping services
+googlemaps>=4.10.0
+
+# For video call services
+requests-oauthlib>=1.3.1
+PyJWT>=2.8.0
+
+# For virtual board services
+websockets>=11.0.3
+
+# Additional utilities for integrations
+aiohttp>=3.8.5
+aiofiles>=23.2.1
+pillow>=10.0.0
+
+# Optional: For advanced features
+# opencv-python>=4.8.0  # For image processing in boards
+# reportlab>=4.0.4      # For PDF export of boards

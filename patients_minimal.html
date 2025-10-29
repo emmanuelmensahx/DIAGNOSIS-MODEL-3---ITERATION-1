@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Patients (Minimal)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .patients-list {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .patient-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .patient-info h3 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        
+        .patient-info p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status.active {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .status.pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 AfriDiag - Patient Management</h1>
+            <p>Minimal version for testing</p>
+        </div>
+        
+        <div class="patients-list">
+            <h2>📋 Patient List</h2>
+            
+            <div class="patient-item">
+                <div class="patient-info">
+                    <h3>John Doe</h3>
+                    <p>Age: 45 | Gender: Male | Condition: Pneumonia</p>
+                    <p>Last Visit: 2024-01-15 | Phone: +1234567890</p>
+                </div>
+                <div class="status active">Active</div>
+            </div>
+            
+            <div class="patient-item">
+                <div class="patient-info">
+                    <h3>Jane Smith</h3>
+                    <p>Age: 32 | Gender: Female | Condition: Tuberculosis</p>
+                    <p>Last Visit: 2024-01-14 | Phone: +1234567891</p>
+                </div>
+                <div class="status pending">Pending</div>
+            </div>
+            
+            <div class="patient-item">
+                <div class="patient-info">
+                    <h3>Mike Johnson</h3>
+                    <p>Age: 28 | Gender: Male | Condition: Malaria</p>
+                    <p>Last Visit: 2024-01-13 | Phone: +1234567892</p>
+                </div>
+                <div class="status active">Active</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Minimal patients page loaded successfully');
+        
+        // Add a visible test indicator
+        const indicator = document.createElement('div');
+        indicator.innerHTML = '✅ JavaScript is working!';
+        indicator.style.cssText = 'position: fixed; top: 10px; right: 10px; background: green; color: white; padding: 10px; border-radius: 5px; z-index: 9999;';
+        document.body.appendChild(indicator);
+        
+        // Log DOM elements
+        console.log('Container found:', document.querySelector('.container'));
+        console.log('Patients list found:', document.querySelector('.patients-list'));
+        console.log('Patient items found:', document.querySelectorAll('.patient-item').length);
+    </script>
+</body>
+</html>

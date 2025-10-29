@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - AfriDiag</title>
+    <link rel="stylesheet" href="css/navigation.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #FF9800, #FFB74D);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .profile-sections {
+            display: grid;
+            gap: 25px;
+        }
+        
+        .profile-section {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-icon {
+            font-size: 24px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .section-content {
+            padding: 25px;
+        }
+        
+        .profile-info {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        
+        .profile-avatar {
+            text-align: center;
+        }
+        
+        .avatar-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF9800, #FFB74D);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            margin: 0 auto 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .avatar-circle:hover {
+            transform: scale(1.05);
+        }
+        
+        .change-photo-btn {
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .change-photo-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .profile-details {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr auto;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .detail-value {
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .edit-btn {
+            padding: 6px 12px;
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .edit-btn:hover {
+            background-color: #F57C00;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #FF9800;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: white;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .settings-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .setting-description {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background-color: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background-color: #FF9800;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #FF9800;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FF9800;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+        
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, #FF9800, #FFB74D);
+            color: white;
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        }
+        
+        .secondary-btn {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .secondary-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .danger-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .danger-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            text-decoration: none;
+            color: #757575;
+            transition: color 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #FF9800;
+        }
+        
+        .nav-item:hover {
+            color: #FF9800;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+        }
+        
+        .nav-text {
+            font-size: 12px;
+        }
+        
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #FF9800;
+        }
+        
+        .activity-icon {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .activity-time {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-info {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .detail-row {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👤 Profile</h1>
+            <p>Manage your account settings and preferences</p>
+        </div>
+
+        <div class="profile-sections">
+            <!-- Personal Information -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <div class="section-icon">👨‍⚕️</div>
+                    <div class="section-title">Personal Information</div>
+                </div>
+                <div class="section-content">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <div class="avatar-circle" onclick="changePhoto()">
+                                👨‍⚕️
+                            </div>
+                            <button class="change-photo-btn" onclick="changePhoto()">Change Photo</button>
+                        </div>
+                        <div class="profile-details">
+                            <div class="detail-row">
+                                <div class="detail-label">Full Name:</div>
+                                <div class="detail-value">Dr. John Doe</div>
+                                <button class="edit-btn" onclick="editField('name')">Edit</button>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Email:</div>
+                                <div class="detail-value">john.doe@afridiag.com</div>
+                                <button class="edit-btn" onclick="editField('email')">Edit</button>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Phone:</div>
+                                <div class="detail-value">+234 123 456 7890</div>
+                                <button class="edit-btn" onclick="editField('phone')">Edit</button>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Specialization:</div>
+                                <div class="detail-value">Internal Medicine</div>
+                                <button class="edit-btn" onclick="editField('specialization')">Edit</button>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">License Number:</div>
+                                <div class="detail-value">MD-2024-001234</div>
+                                <button class="edit-btn" onclick="editField('license')">Edit</button>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Hospital/Clinic:</div>
+                                <div class="detail-value">Lagos University Teaching Hospital</div>
+                                <button class="edit-btn" onclick="editField('hospital')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <div class="section-title">Your Statistics</div>
+                </div>
+                <div class="section-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">247</div>
+                            <div class="stat-label">Patients Diagnosed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">89</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">96%</div>
+                            <div class="stat-label">Accuracy Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">156</div>
+                            <div class="stat-label">Days Active</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Settings -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <div class="section-icon">⚙️</div>
+                    <div class="section-title">App Settings</div>
+                </div>
+                <div class="section-content">
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">Dark Mode</div>
+                                <div class="setting-description">Switch to dark theme for better viewing in low light</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">Push Notifications</div>
+                                <div class="setting-description">Receive notifications for new patients and updates</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">Auto-Save Diagnoses</div>
+                                <div class="setting-description">Automatically save diagnosis progress</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">Enhanced AI Features</div>
+                                <div class="setting-description">Enable advanced AI diagnostic assistance</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">Data Sync</div>
+                                <div class="setting-description">Sync data across devices</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <div class="section-icon">🔒</div>
+                    <div class="section-title">Security & Privacy</div>
+                </div>
+                <div class="section-content">
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">Two-Factor Authentication</div>
+                                <div class="setting-description">Add an extra layer of security to your account</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">Biometric Login</div>
+                                <div class="setting-description">Use fingerprint or face recognition</div>
+                            </div>
+                            <div class="toggle-switch" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">Session Timeout</div>
+                                <div class="setting-description">Automatically log out after inactivity</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="action-btn secondary-btn" onclick="changePassword()">
+                            🔑 Change Password
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="viewLoginHistory()">
+                            📋 Login History
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="downloadData()">
+                            📥 Download My Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <div class="section-title">Recent Activity</div>
+                </div>
+                <div class="section-content">
+                    <div class="activity-list">
+                        <!-- Activity items will be populated by JavaScript -->
+                        <div class="activity-item">
+                            <div class="activity-icon">📋</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Loading recent activity...</div>
+                                <div class="activity-time">Please wait</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Actions -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <div class="section-icon">🔧</div>
+                    <div class="section-title">Account Actions</div>
+                </div>
+                <div class="section-content">
+                    <div class="action-buttons">
+                        <button class="action-btn primary-btn" onclick="saveProfile()">
+                            💾 Save Changes
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="exportSettings()">
+                            📤 Export Settings
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="contactSupport()">
+                            📞 Contact Support
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="logout()">
+                            🚪 Logout
+                        </button>
+                        <button class="action-btn danger-btn" onclick="deleteAccount()">
+                            🗑️ Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div id="navigation-container"></div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Edit Information</div>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="editForm">
+                <!-- Form content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Include API client -->
+    <script src="js/api.js"></script>
+    
+    <script>
+        let currentEditField = '';
+        let currentEditValue = '';
+
+        // Load user data and statistics on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadUserProfile();
+            await loadUserStatistics();
+            await loadRecentActivity();
+        });
+
+        // Show notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            if (type === 'success') notification.style.backgroundColor = '#28a745';
+            else if (type === 'error') notification.style.backgroundColor = '#dc3545';
+            else if (type === 'warning') notification.style.backgroundColor = '#ffc107';
+            else notification.style.backgroundColor = '#17a2b8';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Update profile display function
+        function updateProfileDisplay(userData) {
+            try {
+                // Update avatar name and role
+                const avatarName = document.querySelector('.avatar-name');
+                const avatarRole = document.querySelector('.avatar-role');
+                if (avatarName) avatarName.textContent = userData.name || 'Dr. John Doe';
+                if (avatarRole) avatarRole.textContent = userData.role || 'Medical Officer';
+                
+                // Update info rows
+                const infoRows = document.querySelectorAll('.info-row');
+                const fieldMap = {
+                    'full name': userData.name,
+                    'email': userData.email,
+                    'phone': userData.phone,
+                    'license': userData.license,
+                    'specialization': userData.specialization,
+                    'experience': userData.experience
+                };
+
+                infoRows.forEach(row => {
+                    const labelElement = row.querySelector('.info-label');
+                    const valueElement = row.querySelector('.info-value');
+                    
+                    if (labelElement && valueElement) {
+                        const label = labelElement.textContent.toLowerCase();
+                        
+                        for (const [key, value] of Object.entries(fieldMap)) {
+                            if (label.includes(key)) {
+                                valueElement.textContent = value || valueElement.textContent;
+                                break;
+                            }
+                        }
+                    }
+                });
+                
+                console.log('Profile display updated successfully');
+            } catch (error) {
+                console.error('Error updating profile display:', error);
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                // Try to load from API, fallback to mock data
+                let userData;
+                if (api.isAuthenticated()) {
+                    userData = await api.getCurrentUser();
+                } else {
+                    // Use mock data for demo
+                    userData = {
+                        name: "Dr. John Doe",
+                        email: "john.doe@afridiag.com",
+                        phone: "+234 123 456 7890",
+                        license: "MD-2024-001",
+                        specialization: "General Medicine",
+                        experience: "8 Years",
+                        role: "Medical Officer",
+                        status: "Online"
+                    };
+                }
+
+                // Update profile display
+                updateProfileDisplay(userData);
+            } catch (error) {
+                console.error('Failed to load user profile:', error);
+                showNotification('Failed to load profile data', 'error');
+            }
+        }
+
+        async function loadUserStatistics() {
+            try {
+                let stats;
+                if (api.isAuthenticated()) {
+                    stats = await api.getUserStatistics();
+                } else {
+                    // Use mock data for demo
+                    stats = api.getMockStatistics();
+                }
+
+                // Update statistics display
+                updateStatisticsDisplay(stats);
+            } catch (error) {
+                console.error('Failed to load statistics:', error);
+                showNotification('Failed to load statistics', 'error');
+            }
+        }
+
+        // Update activity display function
+        function updateActivityDisplay(activities) {
+            try {
+                const activityContainer = document.querySelector('.activity-list');
+                if (!activityContainer) {
+                    console.log('Activity container not found, skipping activity update');
+                    return;
+                }
+
+                if (activities && activities.length > 0) {
+                    activityContainer.innerHTML = activities.map(activity => `
+                        <div class="activity-item">
+                            <div class="activity-icon">📋</div>
+                            <div class="activity-content">
+                                <div class="activity-title">${activity.action || activity.title}</div>
+                                <div class="activity-time">${activity.timestamp || activity.time}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                console.log('Activity display updated successfully');
+            } catch (error) {
+                console.error('Error updating activity display:', error);
+            }
+        }
+
+        async function loadRecentActivity() {
+            try {
+                let activities;
+                if (api.isAuthenticated()) {
+                    const notifications = await api.getNotifications();
+                    activities = notifications.slice(0, 5); // Get latest 5
+                } else {
+                    // Use mock data for demo
+                    activities = api.getMockStatistics().recent_activity;
+                }
+
+                // Update activity display
+                updateActivityDisplay(activities);
+            } catch (error) {
+                console.error('Failed to load recent activity:', error);
+                // Keep existing mock data
+            }
+        }
+
+
+
+        function updateStatisticsDisplay(stats) {
+            const statCards = document.querySelectorAll('.stat-card');
+            const statValues = [
+                stats.patients_diagnosed || 247,
+                stats.cases_this_month || 89,
+                `${stats.accuracy_rate || 96}%`,
+                stats.active_days || 15,
+                stats.treatments_prescribed || 156,
+                stats.followups_pending || 23
+            ];
+
+            statCards.forEach((card, index) => {
+                if (statValues[index] !== undefined) {
+                    card.querySelector('.stat-number').textContent = statValues[index];
+                }
+            });
+        }
+
+
+
+        function toggleSetting(element) {
+            element.classList.toggle('active');
+            const title = element.parentElement.querySelector('.setting-title').textContent;
+            const isActive = element.classList.contains('active');
+            console.log(`${title}: ${isActive ? 'Enabled' : 'Disabled'}`);
+        }
+
+        function editField(field) {
+            const modal = document.getElementById('editModal');
+            const form = document.getElementById('editForm');
+            
+            let formContent = '';
+            
+            switch(field) {
+                case 'name':
+                    formContent = `
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" value="Dr. John Doe" placeholder="Enter full name">
+                        </div>
+                    `;
+                    break;
+                case 'email':
+                    formContent = `
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" value="john.doe@afridiag.com" placeholder="Enter email address">
+                        </div>
+                    `;
+                    break;
+                case 'phone':
+                    formContent = `
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" value="+234 123 456 7890" placeholder="Enter phone number">
+                        </div>
+                    `;
+                    break;
+                case 'specialization':
+                    formContent = `
+                        <div class="form-group">
+                            <label class="form-label">Medical Specialization</label>
+                            <select class="form-select">
+                                <option value="internal">Internal Medicine</option>
+                                <option value="pediatrics">Pediatrics</option>
+                                <option value="surgery">Surgery</option>
+                                <option value="cardiology">Cardiology</option>
+                                <option value="neurology">Neurology</option>
+                                <option value="oncology">Oncology</option>
+                                <option value="emergency">Emergency Medicine</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'license':
+                    formContent = `
+                        <div class="form-group">
+                            <label class="form-label">Medical License Number</label>
+                            <input type="text" class="form-input" value="MD-2024-001234" placeholder="Enter license number">
+                        </div>
+                    `;
+                    break;
+                case 'hospital':
+                    formContent = `
+                        <div class="form-group">
+                            <label class="form-label">Hospital/Clinic</label>
+                            <input type="text" class="form-input" value="Lagos University Teaching Hospital" placeholder="Enter hospital or clinic name">
+                        </div>
+                    `;
+                    break;
+            }
+            
+            formContent += `
+                <div class="action-buttons">
+                    <button class="action-btn primary-btn" onclick="saveField('${field}')">Save Changes</button>
+                    <button class="action-btn secondary-btn" onclick="closeModal()">Cancel</button>
+                </div>
+            `;
+            
+            form.innerHTML = formContent;
+            modal.style.display = 'block';
+        }
+
+        function saveField(field) {
+            alert(`✅ ${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully!`);
+            closeModal();
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function changePhoto() {
+            alert('📷 Photo upload functionality would be implemented here.\n\nThis would allow you to:\n• Take a new photo\n• Upload from gallery\n• Choose from avatars');
+        }
+
+        function changePassword() {
+            alert('🔑 Change Password\n\nThis would open a secure form to:\n• Enter current password\n• Set new password\n• Confirm new password');
+        }
+
+        function viewLoginHistory() {
+            alert('📋 Login History\n\nThis would show:\n• Recent login attempts\n• Device information\n• Location data\n• Suspicious activity alerts');
+        }
+
+        function downloadData() {
+            alert('📥 Download My Data\n\nThis would generate a comprehensive export of:\n• Personal information\n• Diagnosis history\n• Settings and preferences\n• Usage statistics');
+        }
+
+        async function saveProfile() {
+            try {
+                // Collect all current profile data
+                const profileData = {
+                    name: document.querySelector('.detail-row .detail-value').textContent,
+                    email: document.querySelectorAll('.detail-row .detail-value')[1].textContent,
+                    phone: document.querySelectorAll('.detail-row .detail-value')[2].textContent,
+                    specialization: document.querySelectorAll('.detail-row .detail-value')[3].textContent,
+                    license: document.querySelectorAll('.detail-row .detail-value')[4].textContent,
+                    hospital: document.querySelectorAll('.detail-row .detail-value')[5].textContent
+                };
+
+                // Try to save to backend
+                if (api.isAuthenticated()) {
+                    await api.updateUser(profileData);
+                }
+
+                showNotification('Profile saved successfully!', 'success');
+            } catch (error) {
+                console.error('Failed to save profile:', error);
+                showNotification('Failed to save profile', 'error');
+            }
+        }
+
+        function exportSettings() {
+            alert('📤 Export Settings\n\nThis would create a backup file of:\n• App preferences\n• Security settings\n• Customizations\n• Notification preferences');
+        }
+
+        function contactSupport() {
+            alert('📞 Contact Support\n\nSupport options:\n• Email: support@afridiag.com\n• Phone: +234 800 AFRIDIAG\n• Live chat available 24/7\n• Help documentation');
+        }
+
+        function logout() {
+            if (confirm('🚪 Are you sure you want to logout?')) {
+                alert('👋 Logged out successfully!\n\nYou will be redirected to the login screen.');
+            }
+        }
+
+        function deleteAccount() {
+            if (confirm('⚠️ WARNING: Delete Account\n\nThis action cannot be undone. All your data will be permanently deleted.\n\nAre you sure you want to continue?')) {
+                if (confirm('🗑️ Final Confirmation\n\nType "DELETE" to confirm account deletion.')) {
+                    alert('❌ Account deletion initiated.\n\nYou will receive an email with final confirmation steps.');
+                }
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('👤 AfriDiag Profile loaded');
+            console.log('⚙️ Settings and preferences ready');
+            
+            // Navigation will be handled separately
+            console.log('Profile page loaded');
+        });
+    </script>
+</body>
+</html>

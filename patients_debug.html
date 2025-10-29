@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfriDiag - Patients (Debug)</title>
+    <link rel="stylesheet" href="css/navigation.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .debug-info {
+            background: #ffeb3b;
+            color: #333;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .patient-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #1E88E5;
+        }
+        
+        .patient-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .patient-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .patient-detail {
+            margin-right: 15px;
+            display: inline-block;
+        }
+        
+        .patient-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-active {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .status-pending {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .status-completed {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info">
+        <strong>DEBUG MODE:</strong> This page will show debug information to identify content loading issues.
+        <div id="debug-log"></div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>👥 Patient Management (Debug)</h1>
+            <p>Debug version to identify content loading issues</p>
+        </div>
+
+        <div class="patients-list">
+            <div class="list-header">
+                <div class="list-title">📋 Patient List</div>
+            </div>
+            
+            <div id="patientsList">
+                <div class="debug-info">Waiting for JavaScript to populate content...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function debugLog(message) {
+            console.log(message);
+            const debugElement = document.getElementById('debug-log');
+            debugElement.innerHTML += '<br>' + new Date().toLocaleTimeString() + ': ' + message;
+        }
+        
+        debugLog('Script started');
+        
+        // Sample patient data
+        const samplePatients = [
+            {
+                id: "P001",
+                name: "John Doe",
+                age: 45,
+                gender: "Male",
+                condition: "Pneumonia",
+                status: "active",
+                lastVisit: "2024-01-15",
+                phone: "+1234567890"
+            },
+            {
+                id: "P002",
+                name: "Jane Smith",
+                age: 32,
+                gender: "Female",
+                condition: "Tuberculosis",
+                status: "pending",
+                lastVisit: "2024-01-14",
+                phone: "+1234567891"
+            }
+        ];
+        
+        debugLog('Sample patients data loaded: ' + samplePatients.length + ' patients');
+
+        function renderPatients(patients) {
+            debugLog('renderPatients called with ' + patients.length + ' patients');
+            
+            const patientsList = document.getElementById('patientsList');
+            debugLog('patientsList element found: ' + (patientsList ? 'YES' : 'NO'));
+            
+            if (!patientsList) {
+                debugLog('ERROR: patientsList element not found!');
+                return;
+            }
+            
+            if (patients.length === 0) {
+                patientsList.innerHTML = `
+                    <div class="debug-info">No patients to display</div>
+                `;
+                return;
+            }
+
+            const html = patients.map(patient => `
+                <div class="patient-item">
+                    <div class="patient-info">
+                        <div class="patient-name">${patient.name}</div>
+                        <div class="patient-details">
+                            <span class="patient-detail">📋 ID: ${patient.id}</span>
+                            <span class="patient-detail">👤 ${patient.age}y, ${patient.gender}</span>
+                            <span class="patient-detail">🏥 ${patient.condition}</span>
+                            <span class="patient-detail">📅 Last visit: ${patient.lastVisit}</span>
+                            <span class="patient-detail">📞 ${patient.phone}</span>
+                        </div>
+                        <div class="patient-status status-${patient.status}">${patient.status}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            debugLog('Generated HTML length: ' + html.length);
+            patientsList.innerHTML = html;
+            debugLog('Content inserted into patientsList');
+        }
+
+        // Try immediate execution
+        debugLog('Attempting immediate render...');
+        renderPatients(samplePatients);
+
+        // Also try on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('DOMContentLoaded event fired');
+            debugLog('Document ready state: ' + document.readyState);
+            renderPatients(samplePatients);
+        });
+        
+        // And try on window load
+        window.addEventListener('load', function() {
+            debugLog('Window load event fired');
+            renderPatients(samplePatients);
+        });
+        
+        debugLog('Event listeners registered');
+    </script>
+</body>
+</html>
